@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}编辑商品 - 七彩果坊{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-edit me-2"></i>编辑商品
+        </h2>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">商品名称 *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ product.name }}" placeholder="请输入商品名称" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="category" class="form-label">商品分类</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="">请选择分类</option>
+                                    <option value="生鲜" {% if product.category == '生鲜' %}selected{% endif %}>生鲜</option>
+                                    <option value="蔬菜" {% if product.category == '蔬菜' %}selected{% endif %}>蔬菜</option>
+                                    <option value="水果" {% if product.category == '水果' %}selected{% endif %}>水果</option>
+                                    <option value="肉类" {% if product.category == '肉类' %}selected{% endif %}>肉类</option>
+                                    <option value="海鲜" {% if product.category == '海鲜' %}selected{% endif %}>海鲜</option>
+                                    <option value="粮油" {% if product.category == '粮油' %}selected{% endif %}>粮油</option>
+                                    <option value="调味品" {% if product.category == '调味品' %}selected{% endif %}>调味品</option>
+                                    <option value="零食" {% if product.category == '零食' %}selected{% endif %}>零食</option>
+                                    <option value="饮料" {% if product.category == '饮料' %}selected{% endif %}>饮料</option>
+                                    <option value="其他" {% if product.category == '其他' %}selected{% endif %}>其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="supplier" class="form-label">供应商</label>
+                                <select class="form-select" id="supplier" name="supplier">
+                                    <option value="">请选择供应商</option>
+                                    {% for supplier in suppliers %}
+                                    <option value="{{ supplier.id }}" {% if product.supplier_id == supplier.id %}selected{% endif %}>
+                                        {{ supplier.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="cost_price" class="form-label">成本价 (元)</label>
+                                <input type="number" step="0.01" class="form-control" id="cost_price" name="cost_price" 
+                                       value="{{ product.cost_price or '' }}" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="selling_price" class="form-label">销售价 (元)</label>
+                                <input type="number" step="0.01" class="form-control" id="selling_price" name="selling_price" 
+                                       value="{{ product.selling_price or '' }}" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="unit" class="form-label">计量单位</label>
+                        <select class="form-select" id="unit" name="unit">
+                            <option value="">请选择单位</option>
+                            <option value="斤" {% if product.unit == '斤' %}selected{% endif %}>斤</option>
+                            <option value="公斤" {% if product.unit == '公斤' %}selected{% endif %}>公斤</option>
+                            <option value="个" {% if product.unit == '个' %}selected{% endif %}>个</option>
+                            <option value="包" {% if product.unit == '包' %}selected{% endif %}>包</option>
+                            <option value="盒" {% if product.unit == '盒' %}selected{% endif %}>盒</option>
+                            <option value="瓶" {% if product.unit == '瓶' %}selected{% endif %}>瓶</option>
+                            <option value="袋" {% if product.unit == '袋' %}selected{% endif %}>袋</option>
+                            <option value="箱" {% if product.unit == '箱' %}selected{% endif %}>箱</option>
+                            <option value="件" {% if product.unit == '件' %}selected{% endif %}>件</option>
+                            <option value="其他" {% if product.unit == '其他' %}selected{% endif %}>其他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                   {% if product.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                启用商品
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">取消勾选将停用该商品</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>保存修改
+                        </button>
+                        <a href="{{ url_for('products') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>返回
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}添加用户 - MoneyMind{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-plus me-2"></i>添加用户
+        </h2>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名 *</label>
+                        <input type="text" class="form-control" id="username" name="username" 
+                               placeholder="请输入用户名" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱 *</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               placeholder="请输入邮箱地址" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">密码 *</label>
+                        <input type="password" class="form-control" id="password" name="password" 
+                               placeholder="请输入密码" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="role" class="form-label">角色 *</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="">请选择角色</option>
+                            <option value="admin">管理员</option>
+                            <option value="manager">经理</option>
+                            <option value="employee">员工</option>
+                        </select>
+                        <div class="form-text">
+                            <small>
+                                <strong>管理员：</strong>拥有所有权限，可以管理用户<br>
+                                <strong>经理：</strong>可以查看所有数据，管理供应商和商品<br>
+                                <strong>员工：</strong>只能添加和查看交易记录
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>保存用户
+                        </button>
+                        <a href="{{ url_for('users') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>返回
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}添加分类 - MoneyMind{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-plus me-2"></i>添加分类
+        </h2>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">分类名称</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               placeholder="例如：餐饮、交通、购物..." required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="type" class="form-label">分类类型</label>
+                        <select class="form-select" id="type" name="type" required>
+                            <option value="">请选择类型</option>
+                            <option value="income">收入</option>
+                            <option value="expense">支出</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="color" class="form-label">分类颜色</label>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="color" class="form-control form-control-color" 
+                                       id="color" name="color" value="#667eea" required>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex flex-wrap gap-1 mt-2">
+                                    <div class="color-preview" style="width: 20px; height: 20px; background-color: #FF6B6B; border-radius: 50%; cursor: pointer;" data-color="#FF6B6B"></div>
+                                    <div class="color-preview" style="width: 20px; height: 20px; background-color: #4ECDC4; border-radius: 50%; cursor: pointer;" data-color="#4ECDC4"></div>
+                                    <div class="color-preview" style="width: 20px; height: 20px; background-color: #45B7D1; border-radius: 50%; cursor: pointer;" data-color="#45B7D1"></div>
+                                    <div class="color-preview" style="width: 20px; height: 20px; background-color: #96CEB4; border-radius: 50%; cursor: pointer;" data-color="#96CEB4"></div>
+                                    <div class="color-preview" style="width: 20px; height: 20px; background-color: #FFEAA7; border-radius: 50%; cursor: pointer;" data-color="#FFEAA7"></div>
+                                    <div class="color-preview" style="width: 20px; height: 20px; background-color: #DDA0DD; border-radius: 50%; cursor: pointer;" data-color="#DDA0DD"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>保存分类
+                        </button>
+                        <a href="{{ url_for('categories') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>返回
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const colorInput = document.getElementById('color');
+    const colorPreviews = document.querySelectorAll('.color-preview');
+    
+    // 点击颜色预览设置颜色
+    colorPreviews.forEach(preview => {
+        preview.addEventListener('click', function() {
+            const color = this.dataset.color;
+            colorInput.value = color;
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}编辑交易 - 七彩果坊{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-edit me-2"></i>编辑交易记录
+        </h2>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">金额 *</label>
+                                <input type="number" step="0.01" class="form-control" id="amount" name="amount" 
+                                       value="{{ transaction.amount }}" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="type" class="form-label">交易类型 *</label>
+                                <select class="form-select" id="type" name="type" required>
+                                    <option value="">请选择类型</option>
+                                    <option value="income" {% if transaction.type == 'income' %}selected{% endif %}>收入</option>
+                                    <option value="expense" {% if transaction.type == 'expense' %}selected{% endif %}>支出</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" 
+                                  placeholder="请输入交易描述">{{ transaction.description or '' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="category" class="form-label">分类 *</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">请选择分类</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if transaction.category_id == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">日期 *</label>
+                                <input type="date" class="form-control" id="date" name="date" 
+                                       value="{{ transaction.date.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="supplier" class="form-label">供应商</label>
+                                <select class="form-select" id="supplier" name="supplier">
+                                    <option value="">请选择供应商</option>
+                                    {% for supplier in suppliers %}
+                                    <option value="{{ supplier.id }}" {% if transaction.supplier_id == supplier.id %}selected{% endif %}>
+                                        {{ supplier.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="product" class="form-label">商品</label>
+                                <select class="form-select" id="product" name="product">
+                                    <option value="">请选择商品</option>
+                                    {% for product in products %}
+                                    <option value="{{ product.id }}" {% if transaction.product_id == product.id %}selected{% endif %}>
+                                        {{ product.name }} ({{ product.cost_price or 0 }}/{{ product.selling_price or 0 }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">数量</label>
+                                <input type="number" step="0.01" class="form-control" id="quantity" name="quantity" 
+                                       value="{{ transaction.quantity or '' }}" placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="unit_price" class="form-label">单价</label>
+                                <input type="number" step="0.01" class="form-control" id="unit_price" name="unit_price" 
+                                       value="{{ transaction.unit_price or '' }}" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>保存修改
+                        </button>
+                        <a href="{{ url_for('transactions') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>返回
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('type');
+    const productSelect = document.getElementById('product');
+    const unitPriceInput = document.getElementById('unit_price');
+    const quantityInput = document.getElementById('quantity');
+    const amountInput = document.getElementById('amount');
+    
+    // 当交易类型改变时，自动设置单价
+    typeSelect.addEventListener('change', function() {
+        updateUnitPrice();
+    });
+    
+    // 当商品改变时，自动设置单价
+    productSelect.addEventListener('change', function() {
+        updateUnitPrice();
+    });
+    
+    // 当数量或单价改变时，自动计算金额
+    quantityInput.addEventListener('input', function() {
+        calculateAmount();
+    });
+    
+    unitPriceInput.addEventListener('input', function() {
+        calculateAmount();
+    });
+    
+    function updateUnitPrice() {
+        const selectedProduct = productSelect.options[productSelect.selectedIndex];
+        const transactionType = typeSelect.value;
+        
+        if (selectedProduct && selectedProduct.value) {
+            const productText = selectedProduct.text;
+            const priceMatch = productText.match(/\(([^/]+)\/([^)]+)\)/);
+            
+            if (priceMatch) {
+                const costPrice = parseFloat(priceMatch[1]);
+                const sellingPrice = parseFloat(priceMatch[2]);
+                
+                if (transactionType === 'expense') {
+                    unitPriceInput.value = costPrice || '';
+                } else if (transactionType === 'income') {
+                    unitPriceInput.value = sellingPrice || '';
+                }
+                
+                calculateAmount();
+            }
+        }
+    }
+    
+    function calculateAmount() {
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const unitPrice = parseFloat(unitPriceInput.value) || 0;
+        const amount = quantity * unitPrice;
+        
+        if (amount > 0) {
+            amountInput.value = amount.toFixed(2);
+        }
+    }
+});
+</script>
+{% endblock %} 

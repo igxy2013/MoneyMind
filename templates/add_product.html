@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}添加商品 - MoneyMind{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-plus me-2"></i>添加商品
+        </h2>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">商品名称 *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               placeholder="请输入商品名称" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="category" class="form-label">商品分类</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">请选择分类</option>
+                            <option value="生鲜">生鲜</option>
+                            <option value="蔬菜">蔬菜</option>
+                            <option value="水果">水果</option>
+                            <option value="肉类">肉类</option>
+                            <option value="海鲜">海鲜</option>
+                            <option value="粮油">粮油</option>
+                            <option value="零食">零食</option>
+                            <option value="饮料">饮料</option>
+                            <option value="日用品">日用品</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="supplier" class="form-label">供应商</label>
+                        <select class="form-select" id="supplier" name="supplier">
+                            <option value="">请选择供应商</option>
+                            {% for supplier in suppliers %}
+                            <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cost_price" class="form-label">成本价</label>
+                            <div class="input-group">
+                                <span class="input-group-text">¥</span>
+                                <input type="number" class="form-control" id="cost_price" name="cost_price" 
+                                       step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="selling_price" class="form-label">销售价</label>
+                            <div class="input-group">
+                                <span class="input-group-text">¥</span>
+                                <input type="number" class="form-control" id="selling_price" name="selling_price" 
+                                       step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="unit" class="form-label">单位</label>
+                        <select class="form-select" id="unit" name="unit">
+                            <option value="">请选择单位</option>
+                            <option value="个">个</option>
+                            <option value="斤">斤</option>
+                            <option value="公斤">公斤</option>
+                            <option value="包">包</option>
+                            <option value="盒">盒</option>
+                            <option value="瓶">瓶</option>
+                            <option value="袋">袋</option>
+                            <option value="箱">箱</option>
+                            <option value="件">件</option>
+                            <option value="套">套</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>保存商品
+                        </button>
+                        <a href="{{ url_for('products') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>返回
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

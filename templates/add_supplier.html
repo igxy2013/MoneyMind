@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}添加供应商 - MoneyMind{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-plus me-2"></i>添加供应商
+        </h2>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">供应商名称 *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               placeholder="请输入供应商名称" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="contact_person" class="form-label">联系人</label>
+                        <input type="text" class="form-control" id="contact_person" name="contact_person" 
+                               placeholder="联系人姓名">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">联系电话</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" 
+                               placeholder="联系电话">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱地址</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               placeholder="邮箱地址">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="address" class="form-label">地址</label>
+                        <textarea class="form-control" id="address" name="address" 
+                                  rows="3" placeholder="详细地址"></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>保存供应商
+                        </button>
+                        <a href="{{ url_for('suppliers') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>返回
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

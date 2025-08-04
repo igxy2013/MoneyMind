@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}用户管理 - MoneyMind{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+            <i class="fas fa-users me-2"></i>用户管理
+        </h2>
+        <a href="{{ url_for('add_user') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>添加用户
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if users %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>用户名</th>
+                            <th>邮箱</th>
+                            <th>角色</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <strong>{{ user.username }}</strong>
+                                {% if user.id == current_user.id %}
+                                    <span class="badge bg-primary ms-2">当前用户</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.role == 'admin' %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-crown me-1"></i>管理员
+                                    </span>
+                                {% elif user.role == 'manager' %}
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-user-tie me-1"></i>经理
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-user me-1"></i>员工
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">活跃</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">停用</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ user.created_at.strftime('%Y-%m-%d') }}</small>
+                            </td>
+                            <td>
+                                {% if user.id != current_user.id %}
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">暂无用户</h5>
+                <p class="text-muted">添加您的第一个用户吧！</p>
+                <a href="{{ url_for('add_user') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>添加用户
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}统计分析 - 七彩果坊{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-chart-pie me-2"></i>统计分析
+        </h2>
+    </div>
+</div>
+
+<!-- 时间范围选择 -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">选择时间范围</h5>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('statistics', days=7) }}" class="btn btn-outline-primary">最近7天</a>
+                    <a href="{{ url_for('statistics', days=30) }}" class="btn btn-outline-primary">最近30天</a>
+                    <a href="{{ url_for('statistics', days=90) }}" class="btn btn-outline-primary">最近90天</a>
+                    <a href="{{ url_for('statistics', days=365) }}" class="btn btn-outline-primary">最近一年</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 图表区域 -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>收支趋势图
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if chart_json %}
+                    <div id="chart" style="height: 400px;"></div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">暂无数据</h5>
+                        <p class="text-muted">添加一些交易记录来查看统计图表</p>
+                        <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>添加交易
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row mt-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-bar fa-2x text-primary mb-2"></i>
+                <h5 class="card-title">数据洞察</h5>
+                <p class="card-text text-muted">通过图表分析您的收支模式，了解消费习惯</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-trending-up fa-2x text-success mb-2"></i>
+                <h5 class="card-title">趋势分析</h5>
+                <p class="card-text text-muted">观察收支变化趋势，制定合理的理财计划</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-lightbulb fa-2x text-warning mb-2"></i>
+                <h5 class="card-title">智能建议</h5>
+                <p class="card-text text-muted">基于数据分析提供个性化的理财建议</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if chart_json %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = {{ chart_json | safe }};
+    Plotly.newPlot('chart', chartData.data, chartData.layout, {
+        responsive: true,
+        displayModeBar: false
+    });
+});
+</script>
+{% endif %}
+{% endblock %} 

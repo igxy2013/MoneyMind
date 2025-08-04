@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}分类管理 - 七彩果坊{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+            <i class="fas fa-tags me-2"></i>分类管理
+        </h2>
+        <a href="{{ url_for('add_category') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>添加分类
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 支出分类 -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-arrow-down me-2 text-danger"></i>支出分类
+                </h5>
+            </div>
+            <div class="card-body">
+                {% set expense_categories = categories|selectattr('type', 'equalto', 'expense')|list %}
+                {% if expense_categories %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>分类名称</th>
+                                    <th>颜色</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in expense_categories %}
+                                <tr>
+                                    <td>
+                                        <span class="badge" style="background-color: {{ category.color }};">
+                                            {{ category.name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle me-2" 
+                                                 style="width: 20px; height: 20px; background-color: {{ category.color }};"></div>
+                                            <small class="text-muted">{{ category.color }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('edit_category', id=category.id) }}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('delete_category', id=category.id) }}" 
+                                               class="btn btn-outline-danger btn-sm"
+                                               onclick="return confirm('确定要删除这个分类吗？')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-tags fa-2x text-muted mb-2"></i>
+                        <p class="text-muted small">暂无支出分类</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 收入分类 -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-arrow-up me-2 text-success"></i>收入分类
+                </h5>
+            </div>
+            <div class="card-body">
+                {% set income_categories = categories|selectattr('type', 'equalto', 'income')|list %}
+                {% if income_categories %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>分类名称</th>
+                                    <th>颜色</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in income_categories %}
+                                <tr>
+                                    <td>
+                                        <span class="badge" style="background-color: {{ category.color }};">
+                                            {{ category.name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle me-2" 
+                                                 style="width: 20px; height: 20px; background-color: {{ category.color }};"></div>
+                                            <small class="text-muted">{{ category.color }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('edit_category', id=category.id) }}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('delete_category', id=category.id) }}" 
+                                               class="btn btn-outline-danger btn-sm"
+                                               onclick="return confirm('确定要删除这个分类吗？')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-tags fa-2x text-muted mb-2"></i>
+                        <p class="text-muted small">暂无收入分类</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 分类统计 -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>分类使用统计
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if categories %}
+                    <div class="row">
+                        {% for category in categories %}
+                        <div class="col-md-4 col-lg-3 mb-3">
+                            <div class="border rounded p-3 text-center">
+                                <div class="rounded-circle mx-auto mb-2" 
+                                     style="width: 40px; height: 40px; background-color: {{ category.color }}; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-tag text-white"></i>
+                                </div>
+                                <h6 class="mb-1">{{ category.name }}</h6>
+                                <small class="text-muted">
+                                    {{ '收入' if category.type == 'income' else '支出' }}分类
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">暂无分类</h5>
+                        <p class="text-muted">创建您的第一个分类吧！</p>
+                        <a href="{{ url_for('add_category') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>添加分类
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
