@@ -87,7 +87,7 @@ echo.
 echo [提示] 按 Ctrl+C 停止服务
 echo ========================================
 echo.
-
+git pull
 :: 启动应用
 python app.py
 
