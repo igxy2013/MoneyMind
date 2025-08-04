@@ -48,6 +48,7 @@
 </div>
 
 <!-- 操作按钮 -->
+{% if current_user.role != 'employee' %}
 <div class="row mb-4">
     <div class="col-12">
         <a href="{{ url_for('add_receivable') }}" class="btn btn-primary">
@@ -55,6 +56,7 @@
         </a>
     </div>
 </div>
+{% endif %}
 
 <!-- 应收款列表 -->
 <div class="row">
@@ -76,7 +78,9 @@
                                 <th>状态</th>
                                 <th>到期日期</th>
                                 <th>创建时间</th>
+                                {% if current_user.role != 'employee' %}
                                 <th>操作</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -109,6 +113,7 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ receivable.created_at.strftime('%Y-%m-%d') }}</td>
+                                {% if current_user.role != 'employee' %}
                                 <td>
                                     {% if receivable.status == 'pending' %}
                                     <a href="{{ url_for('receive_receivable', id=receivable.id) }}" 
@@ -123,6 +128,7 @@
                                         <i class="fas fa-trash me-1"></i>删除
                                     </a>
                                 </td>
+                                {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -133,9 +139,11 @@
                     <i class="fas fa-hand-holding-dollar fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted">暂无应收款</h5>
                     <p class="text-muted">添加一些应收款记录来开始管理</p>
+                    {% if current_user.role != 'employee' %}
                     <a href="{{ url_for('add_receivable') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-1"></i>添加应收款
                     </a>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>

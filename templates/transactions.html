@@ -8,9 +8,11 @@
         <h2 class="mb-0">
             <i class="fas fa-list me-2"></i>交易记录
         </h2>
+        {% if current_user.role != 'employee' %}
         <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">
             <i class="fas fa-plus me-1"></i>添加交易
         </a>
+        {% endif %}
     </div>
 </div>
 
@@ -28,7 +30,9 @@
                             <th>供应商</th>
                             <th>商品</th>
                             <th class="text-end">金额</th>
+                            {% if current_user.role != 'employee' %}
                             <th>操作</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -68,6 +72,7 @@
                                     {{ '+' if transaction.type == 'income' else '-' }}¥{{ "%.2f"|format(transaction.amount) }}
                                 </span>
                             </td>
+                            {% if current_user.role != 'employee' %}
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="{{ url_for('edit_transaction', id=transaction.id) }}" 
@@ -81,6 +86,7 @@
                                     </a>
                                 </div>
                             </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -120,9 +126,11 @@
                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                 <h5 class="text-muted">暂无交易记录</h5>
                 <p class="text-muted">开始记录您的第一笔交易吧！</p>
+                {% if current_user.role != 'employee' %}
                 <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i>添加交易
                 </a>
+                {% endif %}
             </div>
         {% endif %}
     </div>

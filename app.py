@@ -108,6 +108,16 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def edit_required(f):
+    @wraps(f)
+    @login_required
+    def decorated_function(*args, **kwargs):
+        if current_user.role == 'employee':
+            flash('员工权限不足，只能查看数据', 'error')
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/')
 @login_required
 def dashboard():
@@ -205,7 +215,7 @@ def transactions():
     return render_template('transactions.html', transactions=transactions, categories=categories, suppliers=suppliers, products=products)
 
 @app.route('/add_transaction', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def add_transaction():
     if request.method == 'POST':
         amount = float(request.form['amount'])
@@ -252,7 +262,7 @@ def add_transaction():
     return render_template('add_transaction.html', categories=categories, suppliers=suppliers, products=products, today=today)
 
 @app.route('/edit_transaction/<int:id>', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def edit_transaction(id):
     transaction = Transaction.query.get_or_404(id)
     
@@ -292,7 +302,7 @@ def edit_transaction(id):
     return render_template('edit_transaction.html', transaction=transaction, categories=categories, suppliers=suppliers, products=products)
 
 @app.route('/delete_transaction/<int:id>')
-@login_required
+@edit_required
 def delete_transaction(id):
     transaction = Transaction.query.get_or_404(id)
     
@@ -309,7 +319,7 @@ def categories():
     return render_template('categories.html', categories=categories)
 
 @app.route('/add_category', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def add_category():
     if request.method == 'POST':
         name = request.form['name']
@@ -330,7 +340,7 @@ def add_category():
     return render_template('add_category.html')
 
 @app.route('/edit_category/<int:id>', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def edit_category(id):
     category = Category.query.get_or_404(id)
     
@@ -346,7 +356,7 @@ def edit_category(id):
     return render_template('edit_category.html', category=category)
 
 @app.route('/delete_category/<int:id>')
-@login_required
+@edit_required
 def delete_category(id):
     category = Category.query.get_or_404(id)
     
@@ -367,7 +377,7 @@ def suppliers():
     return render_template('suppliers.html', suppliers=suppliers)
 
 @app.route('/add_supplier', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def add_supplier():
     if request.method == 'POST':
         name = request.form['name']
@@ -391,7 +401,7 @@ def add_supplier():
     return render_template('add_supplier.html')
 
 @app.route('/edit_supplier/<int:id>', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def edit_supplier(id):
     supplier = Supplier.query.get_or_404(id)
     
@@ -410,7 +420,7 @@ def edit_supplier(id):
     return render_template('edit_supplier.html', supplier=supplier)
 
 @app.route('/delete_supplier/<int:id>')
-@login_required
+@edit_required
 def delete_supplier(id):
     supplier = Supplier.query.get_or_404(id)
     
@@ -432,7 +442,7 @@ def products():
     return render_template('products.html', products=products, suppliers=suppliers)
 
 @app.route('/add_product', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def add_product():
     if request.method == 'POST':
         name = request.form['name']
@@ -459,7 +469,7 @@ def add_product():
     return render_template('add_product.html', suppliers=suppliers)
 
 @app.route('/edit_product/<int:id>', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def edit_product(id):
     product = Product.query.get_or_404(id)
     
@@ -480,7 +490,7 @@ def edit_product(id):
     return render_template('edit_product.html', product=product, suppliers=suppliers)
 
 @app.route('/delete_product/<int:id>')
-@login_required
+@edit_required
 def delete_product(id):
     product = Product.query.get_or_404(id)
     
@@ -622,7 +632,7 @@ def receivables():
                          total_count=total_count)
 
 @app.route('/receivables/add', methods=['GET', 'POST'])
-@login_required
+@edit_required
 def add_receivable():
     if request.method == 'POST':
         title = request.form['title']
@@ -653,7 +663,7 @@ def add_receivable():
     return render_template('add_receivable.html')
 
 @app.route('/receivables/<int:id>/receive')
-@login_required
+@edit_required
 def receive_receivable(id):
     receivable = Receivable.query.filter_by(id=id, user_id=current_user.id).first()
     if receivable:
@@ -667,7 +677,7 @@ def receive_receivable(id):
     return redirect(url_for('receivables'))
 
 @app.route('/receivables/<int:id>/delete')
-@login_required
+@edit_required
 def delete_receivable(id):
     receivable = Receivable.query.filter_by(id=id, user_id=current_user.id).first()
     if receivable:

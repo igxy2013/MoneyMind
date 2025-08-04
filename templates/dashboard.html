@@ -178,9 +178,11 @@
                 <h5 class="mb-0">
                     <i class="fas fa-list me-2"></i>最近交易
                 </h5>
+                {% if current_user.role != 'employee' %}
                 <a href="{{ url_for('add_transaction') }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus me-1"></i>添加交易
                 </a>
+                {% endif %}
             </div>
             <div class="card-body">
                 {% if recent_transactions %}
@@ -229,9 +231,11 @@
                     <div class="text-center py-4">
                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                         <p class="text-muted">暂无交易记录</p>
+                        {% if current_user.role != 'employee' %}
                         <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i>添加第一笔交易
                         </a>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
@@ -301,6 +305,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
+                    {% if current_user.role != 'employee' %}
                     <div class="col-md-3 mb-2">
                         <a href="{{ url_for('add_transaction') }}" class="btn btn-outline-primary w-100">
                             <i class="fas fa-plus me-1"></i>添加交易
@@ -316,6 +321,7 @@
                             <i class="fas fa-box me-1"></i>添加商品
                         </a>
                     </div>
+                    {% endif %}
                     <div class="col-md-3 mb-2">
                         <a href="{{ url_for('statistics') }}" class="btn btn-outline-warning w-100">
                             <i class="fas fa-chart-bar me-1"></i>查看统计

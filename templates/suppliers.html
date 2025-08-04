@@ -8,9 +8,11 @@
         <h2 class="mb-0">
             <i class="fas fa-truck me-2"></i>供应商管理
         </h2>
+        {% if current_user.role != 'employee' %}
         <a href="{{ url_for('add_supplier') }}" class="btn btn-primary">
             <i class="fas fa-plus me-1"></i>添加供应商
         </a>
+        {% endif %}
     </div>
 </div>
 
@@ -28,7 +30,9 @@
                             <th>地址</th>
                             <th>状态</th>
                             <th>创建时间</th>
+                            {% if current_user.role != 'employee' %}
                             <th>操作</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -53,6 +57,7 @@
                             <td>
                                 <small class="text-muted">{{ supplier.created_at.strftime('%Y-%m-%d') }}</small>
                             </td>
+                            {% if current_user.role != 'employee' %}
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="{{ url_for('edit_supplier', id=supplier.id) }}" 
@@ -66,6 +71,7 @@
                                     </a>
                                 </div>
                             </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -76,9 +82,11 @@
                 <i class="fas fa-truck fa-3x text-muted mb-3"></i>
                 <h5 class="text-muted">暂无供应商</h5>
                 <p class="text-muted">添加您的第一个供应商吧！</p>
+                {% if current_user.role != 'employee' %}
                 <a href="{{ url_for('add_supplier') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i>添加供应商
                 </a>
+                {% endif %}
             </div>
         {% endif %}
     </div>

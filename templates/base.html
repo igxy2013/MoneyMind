@@ -119,9 +119,11 @@
                         <a class="nav-link {% if request.endpoint == 'transactions' %}active{% endif %}" href="{{ url_for('transactions') }}">
                             <i class="fas fa-list me-2"></i>交易记录
                         </a>
+                        {% if current_user.role != 'employee' %}
                         <a class="nav-link {% if request.endpoint == 'add_transaction' %}active{% endif %}" href="{{ url_for('add_transaction') }}">
                             <i class="fas fa-plus me-2"></i>添加交易
                         </a>
+                        {% endif %}
                         <a class="nav-link {% if request.endpoint == 'categories' %}active{% endif %}" href="{{ url_for('categories') }}">
                             <i class="fas fa-tags me-2"></i>分类管理
                         </a>
