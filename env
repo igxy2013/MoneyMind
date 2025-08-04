@@ -1,0 +1,12 @@
+# 数据库配置
+DB_HOST=acbim.fun
+DB_USER=mysql
+DB_PASSWORD=12345678
+DB_NAME=MoneyMind
+
+# Flask配置
+SECRET_KEY=your-secret-key-here-change-this-in-production
+
+# 应用配置
+FLASK_ENV=production
+FLASK_DEBUG=false 

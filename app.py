@@ -9,12 +9,19 @@ import json
 from collections import defaultdict
 from functools import wraps
 import pymysql
+import os
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://mysql:12345678@acbim.fun/MoneyMind'
+
+# 从环境变量加载配置
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{os.getenv('DB_USER', 'mysql')}:{os.getenv('DB_PASSWORD', '12345678')}@{os.getenv('DB_HOST', 'acbim.fun')}/{os.getenv('DB_NAME', 'MoneyMind')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
