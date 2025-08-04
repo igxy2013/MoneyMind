@@ -8,16 +8,24 @@ import plotly.utils
 import json
 from collections import defaultdict
 from functools import wraps
+import pymysql
+
+pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///moneymind.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://mysql:12345678@acbim.fun/MoneyMind'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('请先登录才能访问此页面', 'error')
+    return redirect(url_for('login'))
 
 # 数据模型
 class User(UserMixin, db.Model):
@@ -694,17 +702,27 @@ def logout():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            admin = User(
-                username='admin',
-                email='admin@company.com',
-                password_hash=generate_password_hash('admin123'),
-                role='admin'
-            )
-            db.session.add(admin)
-            db.session.commit()
-            print("默认管理员账户已创建 - 用户名: admin, 密码: admin123")
+        try:
+            db.create_all()
+            print("数据库表创建成功")
+            
+            if not User.query.filter_by(username='admin').first():
+                admin = User(
+                    username='admin',
+                    email='admin@company.com',
+                    password_hash=generate_password_hash('admin123'),
+                    role='admin'
+                )
+                db.session.add(admin)
+                db.session.commit()
+                print("默认管理员账户已创建 - 用户名: admin, 密码: admin123")
+            else:
+                print("管理员账户已存在")
+                
+        except Exception as e:
+            print(f"数据库连接或初始化失败: {e}")
+            print("请检查MySQL连接配置和数据库是否存在")
+            exit(1)
     
     # 生产环境配置
     app.run(host='0.0.0.0', port=5085, debug=False) 
