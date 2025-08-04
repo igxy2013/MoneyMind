@@ -1,0 +1,19 @@
+[Unit]
+Description=七彩果坊企业记账系统
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/your/moneymind
+Environment="PATH=/path/to/your/moneymind/venv/bin"
+Environment="FLASK_ENV=production"
+Environment="SECRET_KEY=your-production-secret-key-here"
+ExecStart=/path/to/your/moneymind/venv/bin/gunicorn --bind 0.0.0.0:5085 --workers 4 --timeout 120 wsgi:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target 

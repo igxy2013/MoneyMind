@@ -608,4 +608,6 @@ if __name__ == '__main__':
             db.session.add(admin)
             db.session.commit()
             print("默认管理员账户已创建 - 用户名: admin, 密码: admin123")
-    app.run(debug=True) 
+    
+    # 生产环境配置
+    app.run(host='0.0.0.0', port=5085, debug=False) 
