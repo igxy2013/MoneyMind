@@ -134,6 +134,9 @@
                         <a class="nav-link {% if request.endpoint == 'statistics' %}active{% endif %}" href="{{ url_for('statistics') }}">
                             <i class="fas fa-chart-pie me-2"></i>统计分析
                         </a>
+                        <a class="nav-link {% if request.endpoint == 'receivables' %}active{% endif %}" href="{{ url_for('receivables') }}">
+                            <i class="fas fa-hand-holding-dollar me-2"></i>应收款
+                        </a>
                         
                         {% if current_user.role in ['admin', 'manager'] %}
                         <hr class="text-white">

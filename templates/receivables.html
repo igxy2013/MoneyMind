@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}应收款管理 - 七彩果坊{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-hand-holding-dollar me-2"></i>应收款管理
+        </h2>
+    </div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-white">总应收款</h5>
+                <h3 class="text-white">¥{{ "%.2f"|format(total_amount) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card income-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-white">已收金额</h5>
+                <h3 class="text-white">¥{{ "%.2f"|format(received_amount) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card expense-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-white">待收金额</h5>
+                <h3 class="text-white">¥{{ "%.2f"|format(pending_amount) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">应收款数量</h5>
+                <h3 class="text-primary">{{ total_count }}笔</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 操作按钮 -->
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="{{ url_for('add_receivable') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>添加应收款
+        </a>
+    </div>
+</div>
+
+<!-- 应收款列表 -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>应收款列表
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if receivables %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>金额</th>
+                                <th>状态</th>
+                                <th>到期日期</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for receivable in receivables %}
+                            <tr>
+                                <td>
+                                    <strong>{{ receivable.title }}</strong>
+                                    {% if receivable.notes %}
+                                    <br><small class="text-muted">{{ receivable.notes }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-primary">¥{{ "%.2f"|format(receivable.amount) }}</span>
+                                </td>
+                                <td>
+                                    {% if receivable.status == 'pending' %}
+                                        <span class="badge bg-warning">待收</span>
+                                    {% else %}
+                                        <span class="badge bg-success">已收</span>
+                                        {% if receivable.received_at %}
+                                        <br><small class="text-muted">{{ receivable.received_at.strftime('%Y-%m-%d') }}</small>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if receivable.due_date %}
+                                        {{ receivable.due_date.strftime('%Y-%m-%d') }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ receivable.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    {% if receivable.status == 'pending' %}
+                                    <a href="{{ url_for('receive_receivable', id=receivable.id) }}" 
+                                       class="btn btn-sm btn-success"
+                                       onclick="return confirm('确认标记为已收？')">
+                                        <i class="fas fa-check me-1"></i>收款
+                                    </a>
+                                    {% endif %}
+                                    <a href="{{ url_for('delete_receivable', id=receivable.id) }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('确认删除此应收款？')">
+                                        <i class="fas fa-trash me-1"></i>删除
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-hand-holding-dollar fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">暂无应收款</h5>
+                    <p class="text-muted">添加一些应收款记录来开始管理</p>
+                    <a href="{{ url_for('add_receivable') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>添加应收款
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

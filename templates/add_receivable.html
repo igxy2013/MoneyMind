@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}添加应收款 - 七彩果坊{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3">
+            <i class="fas fa-plus me-2"></i>添加应收款
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>应收款信息
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">应收款标题 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required 
+                               placeholder="例如：房屋押金-张三">
+                        <div class="form-text">请输入应收款的标题，便于识别和管理</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">应收金额 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">¥</span>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   step="0.01" min="0" required placeholder="0.00">
+                        </div>
+                        <div class="form-text">请输入应收款的金额</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="due_date" class="form-label">到期日期</label>
+                        <input type="date" class="form-control" id="due_date" name="due_date">
+                        <div class="form-text">可选，设置应收款的到期日期</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">备注</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="添加一些备注信息，如联系人、联系方式等"></textarea>
+                        <div class="form-text">可选，添加一些额外的备注信息</div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>保存应收款
+                        </button>
+                        <a href="{{ url_for('receivables') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>返回列表
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>填写说明
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6><i class="fas fa-tag me-1"></i>标题</h6>
+                    <p class="text-muted small">建议使用简洁明了的标题，如"房屋押金-张三"、"服务费-公司A"等</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-money-bill me-1"></i>金额</h6>
+                    <p class="text-muted small">请输入准确的应收金额，支持小数点后两位</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-calendar me-1"></i>到期日期</h6>
+                    <p class="text-muted small">设置到期日期有助于提醒和跟踪应收款状态</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6><i class="fas fa-sticky-note me-1"></i>备注</h6>
+                    <p class="text-muted small">可以添加联系人、联系方式、相关说明等额外信息</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

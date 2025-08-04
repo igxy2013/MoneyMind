@@ -58,6 +58,18 @@ class Product(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     supplier = db.relationship('Supplier', backref='products')
 
+class Receivable(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='pending')  # pending, received
+    due_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    received_at = db.Column(db.DateTime)
+    notes = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='receivables')
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
@@ -147,6 +159,12 @@ def dashboard():
         Transaction.date >= month_start
     ).group_by(Supplier.name).limit(5).all()
     
+    # 应收款统计
+    receivables_list = Receivable.query.filter_by(user_id=current_user.id).all()
+    total_receivables = sum(r.amount for r in receivables_list)
+    received_receivables = sum(r.amount for r in receivables_list if r.status == 'received')
+    pending_receivables = total_receivables - received_receivables
+    
     return render_template('dashboard.html', 
                          month_income=month_income,
                          month_expense=month_expense,
@@ -162,7 +180,10 @@ def dashboard():
                          active_products=active_products,
                          active_users=active_users,
                          total_income=total_income,
-                         total_expense=total_expense)
+                         total_expense=total_expense,
+                         total_receivables=total_receivables,
+                         received_receivables=received_receivables,
+                         pending_receivables=pending_receivables)
 
 @app.route('/transactions')
 @login_required
@@ -573,6 +594,82 @@ def statistics():
         chart_json = None
     
     return render_template('statistics.html', chart_json=chart_json)
+
+@app.route('/receivables')
+@login_required
+def receivables():
+    receivables_list = Receivable.query.filter_by(user_id=current_user.id).order_by(Receivable.created_at.desc()).all()
+    
+    # 计算统计数据
+    total_amount = sum(r.amount for r in receivables_list)
+    received_amount = sum(r.amount for r in receivables_list if r.status == 'received')
+    pending_amount = total_amount - received_amount
+    total_count = len(receivables_list)
+    
+    return render_template('receivables.html', 
+                         receivables=receivables_list,
+                         total_amount=total_amount,
+                         received_amount=received_amount,
+                         pending_amount=pending_amount,
+                         total_count=total_count)
+
+@app.route('/receivables/add', methods=['GET', 'POST'])
+@login_required
+def add_receivable():
+    if request.method == 'POST':
+        title = request.form['title']
+        amount = float(request.form['amount'])
+        due_date_str = request.form.get('due_date')
+        notes = request.form.get('notes', '')
+        
+        due_date = None
+        if due_date_str:
+            try:
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+        
+        receivable = Receivable(
+            title=title,
+            amount=amount,
+            due_date=due_date,
+            notes=notes,
+            user_id=current_user.id
+        )
+        
+        db.session.add(receivable)
+        db.session.commit()
+        flash('应收款添加成功', 'success')
+        return redirect(url_for('receivables'))
+    
+    return render_template('add_receivable.html')
+
+@app.route('/receivables/<int:id>/receive')
+@login_required
+def receive_receivable(id):
+    receivable = Receivable.query.filter_by(id=id, user_id=current_user.id).first()
+    if receivable:
+        receivable.status = 'received'
+        receivable.received_at = datetime.utcnow()
+        db.session.commit()
+        flash('应收款已标记为已收', 'success')
+    else:
+        flash('应收款不存在', 'error')
+    
+    return redirect(url_for('receivables'))
+
+@app.route('/receivables/<int:id>/delete')
+@login_required
+def delete_receivable(id):
+    receivable = Receivable.query.filter_by(id=id, user_id=current_user.id).first()
+    if receivable:
+        db.session.delete(receivable)
+        db.session.commit()
+        flash('应收款已删除', 'success')
+    else:
+        flash('应收款不存在', 'error')
+    
+    return redirect(url_for('receivables'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
