@@ -23,15 +23,15 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>日期</th>
-                            <th>类型</th>
-                            <th>描述</th>
-                            <th class="d-none d-md-table-cell">分类</th>
-                            <th class="d-none d-lg-table-cell">供应商</th>
-                            <th class="d-none d-lg-table-cell">商品</th>
-                            <th class="text-end">金额</th>
+                            <th style="width: 10%;">日期</th>
+                            <th style="width: 8%;">类型</th>
+                            <th style="width: 25%;">描述</th>
+                            <th class="d-none d-md-table-cell" style="width: 12%;">分类</th>
+                            <th class="d-none d-lg-table-cell" style="width: 15%;">供应商</th>
+                            <th class="d-none d-lg-table-cell" style="width: 15%;">商品</th>
+                            <th class="text-end" style="width: 10%;">金额</th>
                             {% if current_user.role != 'employee' %}
-                            <th>操作</th>
+                            <th style="width: 5%;">操作</th>
                             {% endif %}
                         </tr>
                     </thead>
@@ -51,7 +51,10 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-column">
-                                    <span class="text-truncate" style="max-width: 120px;">{{ transaction.description or '无描述' }}</span>
+                                    <div class="text-break" style="max-width: 250px; min-width: 150px; word-wrap: break-word; line-height: 1.4;" 
+                                         title="{{ transaction.description or '无描述' }}">
+                                        {{ transaction.description or '无描述' }}
+                                    </div>
                                     <small class="text-muted d-md-none">
                                         <span class="badge" style="background-color: {{ transaction.category.color }}; font-size: 0.7rem;">
                                             {{ transaction.category.name }}
