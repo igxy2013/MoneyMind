@@ -1,0 +1,156 @@
+{
+    "name": "七彩果坊 - 企业记账系统",
+    "short_name": "七彩果坊",
+    "description": "专业的企业财务管理与记账系统，支持收入支出管理、供应商管理、商品管理、应收款管理等完整功能。",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#667eea",
+    "theme_color": "#667eea",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "zh-CN",
+    "dir": "ltr",
+    "categories": ["business", "finance", "productivity"],
+    "icons": [
+        {
+            "src": "/static/logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/static/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/static/logo.png",
+            "sizes": "72x72",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/logo.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/logo.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/logo.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/logo.png",
+            "sizes": "152x152",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/logo.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "添加交易",
+            "short_name": "添加交易",
+            "description": "快速添加新的收入或支出记录",
+            "url": "/add_transaction",
+            "icons": [
+                {
+                    "src": "/static/logo.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "交易记录",
+            "short_name": "交易记录",
+            "description": "查看所有交易记录",
+            "url": "/transactions",
+            "icons": [
+                {
+                    "src": "/static/logo.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "仪表板",
+            "short_name": "仪表板",
+            "description": "查看财务概览和统计",
+            "url": "/",
+            "icons": [
+                {
+                    "src": "/static/logo.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/static/screenshot-mobile.png",
+            "sizes": "540x720",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "移动端主界面"
+        },
+        {
+            "src": "/static/screenshot-desktop.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "桌面端主界面"
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
+    "handle_links": "preferred",
+    "protocol_handlers": [
+        {
+            "protocol": "web+moneymind",
+            "url": "/?action=%s"
+        }
+    ],
+    "file_handlers": [
+        {
+            "action": "/upload",
+            "accept": {
+                "text/csv": [".csv"],
+                "application/vnd.ms-excel": [".xls"],
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"]
+            }
+        }
+    ],
+    "share_target": {
+        "action": "/share",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    },
+    "permissions": [
+        "notifications",
+        "storage"
+    ],
+    "display_override": [
+        "window-controls-overlay",
+        "standalone",
+        "minimal-ui"
+    ]
+} 

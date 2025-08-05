@@ -262,11 +262,17 @@ def add_transaction():
         flash('交易记录添加成功！', 'success')
         return redirect(url_for('transactions'))
     
-    categories = Category.query.all()
+    # 根据URL参数或默认值决定显示哪种类型的分类
+    transaction_type = request.args.get('type', 'expense')
+    if transaction_type == 'expense':
+        categories = Category.query.filter_by(type='expense').all()
+    else:
+        categories = Category.query.filter_by(type='income').all()
+    
     suppliers = Supplier.query.filter_by(is_active=True).all()
     products = Product.query.filter_by(is_active=True).all()
     today = datetime.now().strftime('%Y-%m-%d')
-    return render_template('add_transaction.html', categories=categories, suppliers=suppliers, products=products, today=today)
+    return render_template('add_transaction.html', categories=categories, suppliers=suppliers, products=products, today=today, transaction_type=transaction_type)
 
 @app.route('/edit_transaction/<int:id>', methods=['GET', 'POST'])
 @edit_required

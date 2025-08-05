@@ -13,15 +13,15 @@
 
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        <div class="card">
+        <div class="card" id="transactionForm">
             <div class="card-body p-4">
                 <form method="POST">
                     <div class="mb-3">
                         <label for="type" class="form-label">交易类型</label>
                         <select class="form-select" id="type" name="type" required>
                             <option value="">请选择类型</option>
-                            <option value="income">收入</option>
-                            <option value="expense">支出</option>
+                            <option value="income" {% if transaction_type == 'income' %}selected{% endif %}>收入</option>
+                            <option value="expense" {% if transaction_type == 'expense' %}selected{% endif %}>支出</option>
                         </select>
                     </div>
                     
@@ -119,26 +119,24 @@
 document.addEventListener('DOMContentLoaded', function() {
     const typeSelect = document.getElementById('type');
     const categorySelect = document.getElementById('category');
-    const categoryOptions = categorySelect.querySelectorAll('option[data-type]');
     const productSelect = document.getElementById('product');
     const amountInput = document.getElementById('amount');
     const quantityInput = document.getElementById('quantity');
     const unitPriceInput = document.getElementById('unit_price');
     
+    // 设置默认交易类型
+    typeSelect.value = '{{ transaction_type }}';
+    
+    // 交易类型变化时重新加载页面以获取正确的分类
     typeSelect.addEventListener('change', function() {
         const selectedType = this.value;
-        
-        // 重置分类选择
-        categorySelect.value = '';
-        
-        // 显示/隐藏分类选项
-        categoryOptions.forEach(option => {
-            if (selectedType === '' || option.dataset.type === selectedType) {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none';
-            }
-        });
+        if (selectedType === 'income') {
+            // 如果切换到收入，重新加载页面获取收入分类
+            window.location.href = '{{ url_for("add_transaction") }}?type=income';
+        } else if (selectedType === 'expense') {
+            // 如果切换到支出，重新加载页面获取支出分类
+            window.location.href = '{{ url_for("add_transaction") }}';
+        }
     });
     
     // 商品选择时根据交易类型自动填充单价
@@ -161,14 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     unitPriceInput.value = sellingPrice.toFixed(2);
                 }
             }
-        }
-    });
-    
-    // 交易类型变化时重新设置单价
-    typeSelect.addEventListener('change', function() {
-        if (productSelect.value) {
-            // 如果已选择商品，重新触发商品选择事件
-            productSelect.dispatchEvent(new Event('change'));
         }
     });
     
