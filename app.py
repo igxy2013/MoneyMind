@@ -549,6 +549,68 @@ def add_user():
     
     return render_template('add_user.html')
 
+@app.route('/edit_user/<int:id>', methods=['GET', 'POST'])
+@admin_required
+def edit_user(id):
+    user = User.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        role = request.form['role']
+        is_active = 'is_active' in request.form
+        
+        # 检查用户名是否已存在（排除当前用户）
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user and existing_user.id != user.id:
+            flash('用户名已存在', 'error')
+            return render_template('edit_user.html', user=user)
+        
+        # 检查邮箱是否已存在（排除当前用户）
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email and existing_email.id != user.id:
+            flash('邮箱已存在', 'error')
+            return render_template('edit_user.html', user=user)
+        
+        user.username = username
+        user.email = email
+        user.role = role
+        user.is_active = is_active
+        
+        # 如果提供了新密码，则更新密码
+        new_password = request.form.get('password')
+        if new_password:
+            user.password_hash = generate_password_hash(new_password)
+        
+        db.session.commit()
+        flash('用户更新成功！', 'success')
+        return redirect(url_for('users'))
+    
+    return render_template('edit_user.html', user=user)
+
+@app.route('/delete_user/<int:id>')
+@admin_required
+def delete_user(id):
+    user = User.query.get_or_404(id)
+    
+    # 不能删除自己
+    if user.id == current_user.id:
+        flash('不能删除自己的账户', 'error')
+        return redirect(url_for('users'))
+    
+    # 不能删除最后一个管理员
+    if user.role == 'admin':
+        admin_count = User.query.filter_by(role='admin').count()
+        if admin_count <= 1:
+            flash('不能删除最后一个管理员账户', 'error')
+            return redirect(url_for('users'))
+    
+    db.session.delete(user)
+    db.session.commit()
+    flash('用户删除成功！', 'success')
+    
+    return redirect(url_for('users'))
+
 @app.route('/statistics')
 @login_required
 def statistics():
@@ -629,7 +691,8 @@ def statistics():
 @app.route('/receivables')
 @login_required
 def receivables():
-    receivables_list = Receivable.query.filter_by(user_id=current_user.id).order_by(Receivable.created_at.desc()).all()
+    # 显示所有应收款记录，而不是只显示当前用户的
+    receivables_list = Receivable.query.order_by(Receivable.created_at.desc()).all()
     
     # 计算统计数据
     total_amount = sum(r.amount for r in receivables_list)
@@ -678,7 +741,7 @@ def add_receivable():
 @app.route('/receivables/<int:id>/receive')
 @edit_required
 def receive_receivable(id):
-    receivable = Receivable.query.filter_by(id=id, user_id=current_user.id).first()
+    receivable = Receivable.query.get_or_404(id)
     if receivable:
         receivable.status = 'received'
         receivable.received_at = datetime.utcnow()
@@ -692,7 +755,7 @@ def receive_receivable(id):
 @app.route('/receivables/<int:id>/delete')
 @edit_required
 def delete_receivable(id):
-    receivable = Receivable.query.filter_by(id=id, user_id=current_user.id).first()
+    receivable = Receivable.query.get_or_404(id)
     if receivable:
         db.session.delete(receivable)
         db.session.commit()

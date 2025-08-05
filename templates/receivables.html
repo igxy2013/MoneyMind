@@ -77,6 +77,7 @@
                                 <th>金额</th>
                                 <th>状态</th>
                                 <th>到期日期</th>
+                                <th>创建者</th>
                                 <th>创建时间</th>
                                 {% if current_user.role != 'employee' %}
                                 <th>操作</th>
@@ -111,6 +112,9 @@
                                     {% else %}
                                         <span class="text-muted">-</span>
                                     {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ receivable.user.username }}</span>
                                 </td>
                                 <td>{{ receivable.created_at.strftime('%Y-%m-%d') }}</td>
                                 {% if current_user.role != 'employee' %}
