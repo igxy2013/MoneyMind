@@ -85,7 +85,7 @@
     .main-content {
         margin-left: 0;
         width: 100%;
-        background-color: #f0f4f8; /* 浅灰色背景，防止显示为纯白 */
+        background-color: #E6F3FF; /* 浅蓝色背景，匹配图片中的背景色 */
     }
     
     /* 移动端导航按钮 */
@@ -95,7 +95,7 @@
         top: 15px;
         left: 15px;
         z-index: 1060;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #00BFFF 0%, #0099CC 100%);
         border: none;
         border-radius: 8px;
         padding: 10px 12px;
@@ -125,7 +125,7 @@
         align-items: center;
         justify-content: center;
         padding: 15px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #00BFFF 0%, #0099CC 100%);
         color: white;
         margin-bottom: 20px;
         border-radius: 0 0 15px 15px;
@@ -136,9 +136,9 @@
         font-size: 1.2rem;
     }
     
-    /* 调整背景颜色为浅色调 */
+    /* 调整背景颜色为浅蓝色调 */
     .mobile-header, .sidebar {
-        background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); /* 浅灰色渐变，易读 */
+        background: linear-gradient(135deg, #E6F3FF 0%, #CCE6FF 100%); /* 浅蓝色渐变，与背景协调 */
         color: #333; /* 深色文字，确保在浅背景上可读 */
     }
     
