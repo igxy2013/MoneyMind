@@ -11,6 +11,8 @@ from functools import wraps
 import pymysql
 import os
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
+import uuid
 
 # 加载环境变量
 load_dotenv()
@@ -24,6 +26,18 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{os.getenv('DB_USER', '')}:{os.getenv('DB_PASSWORD', '')}@{os.getenv('DB_HOST', '')}/{os.getenv('DB_NAME', '')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# 文件上传配置
+app.config['UPLOAD_FOLDER'] = 'static/uploads/suppliers'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+# 确保上传目录存在
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -31,6 +45,9 @@ login_manager.login_view = 'login'
 
 @login_manager.unauthorized_handler
 def unauthorized():
+    # 检查是否是 AJAX 请求
+    if request.headers.get('Accept') == 'application/json':
+        return jsonify({'error': '请先登录才能访问此页面'}), 401
     flash('请先登录才能访问此页面', 'error')
     return redirect(url_for('login'))
 
@@ -58,8 +75,27 @@ class Supplier(db.Model):
     phone = db.Column(db.String(20))
     email = db.Column(db.String(120))
     address = db.Column(db.String(200))
+    supplier_type = db.Column(db.String(50))  # 保留原字段用于兼容
+    supply_categories = db.Column(db.Text)  # 保留原字段用于兼容
+    image_path = db.Column(db.String(255))  # 保留原字段用于兼容
+    supply_method = db.Column(db.String(50))  # 供应方式：产地直供/合作社、本地批发市场供应商、一件代发供应商、社区本地农户/小农场
+    importance_level = db.Column(db.String(50))  # 重要程度：核心供应商、备用供应商、临时供应商
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
+
+class SupplierImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'), nullable=False)
+    image_path = db.Column(db.String(255), nullable=False)
+    upload_time = db.Column(db.DateTime, default=datetime.utcnow)
+    supplier = db.relationship('Supplier', backref='images')
+
+class SupplierSupplyCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'), nullable=False)
+    product_name = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    supplier = db.relationship('Supplier', backref='supply_categories_list')
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -389,6 +425,12 @@ def suppliers():
     suppliers = Supplier.query.all()
     return render_template('suppliers.html', suppliers=suppliers)
 
+@app.route('/supplier/<int:id>')
+@login_required
+def supplier_detail(id):
+    supplier = Supplier.query.get_or_404(id)
+    return render_template('supplier_detail.html', supplier=supplier)
+
 @app.route('/add_supplier', methods=['GET', 'POST'])
 @edit_required
 def add_supplier():
@@ -396,17 +438,47 @@ def add_supplier():
         name = request.form['name']
         contact_person = request.form['contact_person']
         phone = request.form['phone']
-        email = request.form['email']
         address = request.form['address']
+        supply_method = request.form.get('supply_method', '')
+        importance_level = request.form.get('importance_level', '')
+        supply_categories = request.form.getlist('supply_categories')  # 获取多个品类
         
         supplier = Supplier(
             name=name,
             contact_person=contact_person,
             phone=phone,
-            email=email,
-            address=address
+            address=address,
+            supply_method=supply_method,
+            importance_level=importance_level
         )
         db.session.add(supplier)
+        db.session.flush()  # 获取supplier.id
+        
+        # 添加供货品类
+        for category in supply_categories:
+            if category.strip():
+                supply_category = SupplierSupplyCategory(
+                    supplier_id=supplier.id,
+                    product_name=category.strip()
+                )
+                db.session.add(supply_category)
+        
+        # 处理图片上传
+        if 'images' in request.files:
+            files = request.files.getlist('images')
+            for file in files:
+                if file and file.filename and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                    file.save(file_path)
+                    
+                    supplier_image = SupplierImage(
+                        supplier_id=supplier.id,
+                        image_path=f"uploads/suppliers/{unique_filename}"
+                    )
+                    db.session.add(supplier_image)
+        
         db.session.commit()
         flash('供应商添加成功！', 'success')
         return redirect(url_for('suppliers'))
@@ -422,9 +494,39 @@ def edit_supplier(id):
         supplier.name = request.form['name']
         supplier.contact_person = request.form['contact_person']
         supplier.phone = request.form['phone']
-        supplier.email = request.form['email']
         supplier.address = request.form['address']
+        supplier.supply_method = request.form.get('supply_method', '')
+        supplier.importance_level = request.form.get('importance_level', '')
         supplier.is_active = 'is_active' in request.form
+        
+        # 更新供货品类
+        new_categories = request.form.getlist('supply_categories')
+        # 删除旧的品类
+        SupplierSupplyCategory.query.filter_by(supplier_id=supplier.id).delete()
+        # 添加新的品类
+        for category in new_categories:
+            if category.strip():
+                supply_category = SupplierSupplyCategory(
+                    supplier_id=supplier.id,
+                    product_name=category.strip()
+                )
+                db.session.add(supply_category)
+        
+        # 处理图片上传
+        if 'images' in request.files:
+            files = request.files.getlist('images')
+            for file in files:
+                if file and file.filename and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                    file.save(file_path)
+                    
+                    supplier_image = SupplierImage(
+                        supplier_id=supplier.id,
+                        image_path=f"uploads/suppliers/{unique_filename}"
+                    )
+                    db.session.add(supplier_image)
         
         db.session.commit()
         flash('供应商更新成功！', 'success')
@@ -441,11 +543,87 @@ def delete_supplier(id):
     if supplier.transactions or supplier.products:
         flash('无法删除：该供应商下有关联的交易记录或商品', 'error')
     else:
+        # 删除供应商图片
+        for image in supplier.images:
+            image_path = os.path.join('static', image.image_path)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        
         db.session.delete(supplier)
         db.session.commit()
         flash('供应商删除成功！', 'success')
     
     return redirect(url_for('suppliers'))
+
+@app.route('/api/products')
+@login_required
+def api_products():
+    """获取所有商品名称，用于供货品类选择"""
+    products = Product.query.filter_by(is_active=True).all()
+    product_names = [product.name for product in products]
+    return jsonify(product_names)
+
+@app.route('/api/supplier/<int:id>/images')
+@login_required
+def api_supplier_images(id):
+    """获取供应商的所有图片"""
+    supplier = Supplier.query.get_or_404(id)
+    images = [{'id': img.id, 'path': img.image_path, 'upload_time': img.upload_time.strftime('%Y-%m-%d %H:%M:%S')} for img in supplier.images]
+    return jsonify(images)
+
+@app.route('/api/supplier/<int:id>/images', methods=['POST'])
+@edit_required
+def api_upload_supplier_image(id):
+    """上传供应商图片"""
+    supplier = Supplier.query.get_or_404(id)
+    
+    if 'image' not in request.files:
+        return jsonify({'error': '没有选择文件'}), 400
+    
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': '没有选择文件'}), 400
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        file.save(file_path)
+        
+        image_path = f"uploads/suppliers/{unique_filename}"
+        supplier_image = SupplierImage(supplier_id=supplier.id, image_path=image_path)
+        db.session.add(supplier_image)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'image': {
+                'id': supplier_image.id,
+                'path': supplier_image.image_path,
+                'upload_time': supplier_image.upload_time.strftime('%Y-%m-%d %H:%M:%S')
+            }
+        })
+    
+    return jsonify({'error': '不支持的文件格式'}), 400
+
+@app.route('/api/supplier/<int:supplier_id>/images/<int:image_id>', methods=['DELETE'])
+@edit_required
+def api_delete_supplier_image(supplier_id, image_id):
+    """删除供应商图片"""
+    supplier_image = SupplierImage.query.get_or_404(image_id)
+    
+    if supplier_image.supplier_id != supplier_id:
+        return jsonify({'error': '图片不属于该供应商'}), 400
+    
+    # 删除文件
+    image_path = os.path.join('static', supplier_image.image_path)
+    if os.path.exists(image_path):
+        os.remove(image_path)
+    
+    db.session.delete(supplier_image)
+    db.session.commit()
+    
+    return jsonify({'success': True})
 
 @app.route('/products')
 @login_required

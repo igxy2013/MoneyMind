@@ -24,10 +24,11 @@
                     <thead>
                         <tr>
                             <th>供应商名称</th>
+                            <th>供货品类</th>
+                            <th>供应方式</th>
+                            <th>重要程度</th>
                             <th>联系人</th>
                             <th>电话</th>
-                            <th>邮箱</th>
-                            <th>地址</th>
                             <th>状态</th>
                             <th>创建时间</th>
                             {% if current_user.role != 'employee' %}
@@ -40,13 +41,38 @@
                         <tr>
                             <td>
                                 <strong>{{ supplier.name }}</strong>
+                                {% if supplier.images %}
+                                <br><small class="text-muted"><i class="fas fa-images"></i> {{ supplier.images|length }}张图片</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if supplier.supply_categories_list %}
+                                    {% for category in supplier.supply_categories_list[:3] %}
+                                        <span class="badge bg-light text-dark me-1">{{ category.product_name }}</span>
+                                    {% endfor %}
+                                    {% if supplier.supply_categories_list|length > 3 %}
+                                        <small class="text-muted">+{{ supplier.supply_categories_list|length - 3 }}个</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if supplier.supply_method %}
+                                    <span class="badge bg-info">{{ supplier.supply_method }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if supplier.importance_level %}
+                                    <span class="badge bg-warning">{{ supplier.importance_level }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
                             </td>
                             <td>{{ supplier.contact_person or '-' }}</td>
                             <td>{{ supplier.phone or '-' }}</td>
-                            <td>{{ supplier.email or '-' }}</td>
-                            <td>
-                                <span class="text-muted small">{{ supplier.address or '-' }}</span>
-                            </td>
                             <td>
                                 {% if supplier.is_active %}
                                     <span class="badge bg-success">活跃</span>
@@ -60,13 +86,17 @@
                             {% if current_user.role != 'employee' %}
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('supplier_detail', id=supplier.id) }}" 
+                                       class="btn btn-outline-info btn-sm" title="查看详情">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <a href="{{ url_for('edit_supplier', id=supplier.id) }}" 
-                                       class="btn btn-outline-primary btn-sm">
+                                       class="btn btn-outline-primary btn-sm" title="编辑">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{{ url_for('delete_supplier', id=supplier.id) }}" 
                                        class="btn btn-outline-danger btn-sm"
-                                       onclick="return confirm('确定要删除这个供应商吗？')">
+                                       onclick="return confirm('确定要删除这个供应商吗？')" title="删除">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>

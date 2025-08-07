@@ -15,7 +15,7 @@
     <div class="col-md-8 col-lg-6">
         <div class="card">
             <div class="card-body p-4">
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="name" class="form-label">供应商名称 *</label>
                         <input type="text" class="form-control" id="name" name="name" 
@@ -34,10 +34,55 @@
                                placeholder="联系电话">
                     </div>
                     
+
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="supply_method" class="form-label">供应方式</label>
+                                <select class="form-select" id="supply_method" name="supply_method">
+                                    <option value="">请选择供应方式</option>
+                                    <option value="产地直供/合作社">产地直供/合作社</option>
+                                    <option value="本地批发市场供应商">本地批发市场供应商</option>
+                                    <option value="一件代发供应商">一件代发供应商</option>
+                                    <option value="社区本地农户/小农场">社区本地农户/小农场</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="importance_level" class="form-label">重要程度</label>
+                                <select class="form-select" id="importance_level" name="importance_level">
+                                    <option value="">请选择重要程度</option>
+                                    <option value="核心供应商">核心供应商</option>
+                                    <option value="备用供应商">备用供应商</option>
+                                    <option value="临时供应商">临时供应商</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="mb-3">
-                        <label for="email" class="form-label">邮箱地址</label>
-                        <input type="email" class="form-control" id="email" name="email" 
-                               placeholder="邮箱地址">
+                        <label for="supply_categories" class="form-label">供货品类</label>
+                        <div id="categories-container">
+                            <div class="input-group mb-2">
+                                <select class="form-select" name="supply_categories">
+                                    <option value="">请选择商品</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-success" onclick="addCategory()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">从商品管理中选择该供应商供应的商品</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="images" class="form-label">供应商场地照片</label>
+                        <input type="file" class="form-control" id="images" name="images" 
+                               accept="image/*" multiple>
+                        <small class="form-text text-muted">支持 JPG、PNG、GIF、WEBP 格式，最大 16MB，可多选</small>
+                        <div id="image-preview" class="mt-2"></div>
                     </div>
                     
                     <div class="mb-3">
@@ -59,4 +104,129 @@
         </div>
     </div>
 </div>
+
+<script>
+// 加载商品列表
+async function loadProducts() {
+    try {
+        const response = await fetch('/api/products', {
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const products = await response.json();
+        
+        const selects = document.querySelectorAll('select[name="supply_categories"]');
+        selects.forEach(select => {
+            // 保留第一个选项
+            select.innerHTML = '<option value="">请选择商品</option>';
+            
+            // 添加商品选项
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = product;
+                select.appendChild(option);
+            });
+        });
+    } catch (error) {
+        console.error('加载商品列表失败:', error);
+        // 如果是认证错误，重定向到登录页面
+        if (error.message && error.message.includes('401')) {
+            window.location.href = '/login';
+        }
+    }
+}
+
+// 添加品类选择框
+function addCategory() {
+    const container = document.getElementById('categories-container');
+    const newGroup = document.createElement('div');
+    newGroup.className = 'input-group mb-2';
+    newGroup.innerHTML = `
+        <select class="form-select" name="supply_categories">
+            <option value="">请选择商品</option>
+        </select>
+        <button type="button" class="btn btn-outline-danger" onclick="removeCategory(this)">
+            <i class="fas fa-minus"></i>
+        </button>
+    `;
+    container.appendChild(newGroup);
+    
+    // 为新添加的选择框加载商品列表
+    const newSelect = newGroup.querySelector('select');
+    loadProductsForSelect(newSelect);
+}
+
+// 移除品类选择框
+function removeCategory(button) {
+    button.closest('.input-group').remove();
+}
+
+// 为指定选择框加载商品列表
+async function loadProductsForSelect(select) {
+    try {
+        const response = await fetch('/api/products', {
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const products = await response.json();
+        
+        select.innerHTML = '<option value="">请选择商品</option>';
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product;
+            option.textContent = product;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('加载商品列表失败:', error);
+        // 如果是认证错误，重定向到登录页面
+        if (error.message && error.message.includes('401')) {
+            window.location.href = '/login';
+        }
+    }
+}
+
+// 图片预览
+document.getElementById('images').addEventListener('change', function(e) {
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    
+    for (let file of e.target.files) {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-thumbnail me-2 mb-2';
+                img.style.maxWidth = '150px';
+                img.style.maxHeight = '150px';
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+});
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+});
+</script>
 {% endblock %} 
