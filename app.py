@@ -23,8 +23,15 @@ app = Flask(__name__)
 
 # 从环境变量加载配置
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{os.getenv('DB_USER', '')}:{os.getenv('DB_PASSWORD', '')}@{os.getenv('DB_HOST', '')}/{os.getenv('DB_NAME', '')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{os.getenv('DB_USER', '')}:{os.getenv('DB_PASSWORD', '')}@{os.getenv('DB_HOST', '')}/{os.getenv('DB_NAME', '')}?charset=utf8mb4&connect_timeout=60&read_timeout=60&write_timeout=60"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 10,
+    'pool_timeout': 20,
+    'pool_recycle': 3600,
+    'max_overflow': 20,
+    'pool_pre_ping': True
+}
 
 # 文件上传配置
 app.config['UPLOAD_FOLDER'] = 'static/uploads/suppliers'
