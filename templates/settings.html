@@ -1,0 +1,691 @@
+{% extends "base.html" %}
+
+{% block title %}系统设置 - 七彩果坊{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- 页面标题 -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">系统设置</h1>
+        <p class="text-gray-600">管理系统配置，包括基础设置、权限管理、安全配置等功能模块</p>
+    </div>
+    
+    <!-- 功能模块网格 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- 系统基础配置 -->
+        <div class="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 group cursor-pointer" onclick="openConfigModal('系统基础配置')">
+            <div class="flex items-center justify-between mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-cog text-white text-2xl"></i>
+                </div>
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <i class="fas fa-arrow-right text-gray-600"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">系统基础配置</h3>
+            <p class="text-gray-600 mb-6">系统参数设置、界面主题配置、系统信息维护等基础功能配置</p>
+            <div class="space-y-2 text-sm text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>系统参数管理</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>界面主题设置</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>系统信息维护</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 px-6 py-3 bg-primary/10 text-primary rounded-button whitespace-nowrap hover:bg-primary hover:text-white transition-colors">
+                进入配置
+            </button>
+        </div>
+        
+        <!-- 用户权限设置 -->
+        <div class="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 group cursor-pointer" onclick="openConfigModal('用户权限设置')">
+            <div class="flex items-center justify-between mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <i class="fas fa-arrow-right text-gray-600"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">用户权限设置</h3>
+            <p class="text-gray-600 mb-6">角色权限管理、访问权限控制、权限模板配置等用户权限功能</p>
+            <div class="space-y-2 text-sm text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>角色权限管理</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>访问权限控制</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>权限模板配置</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 px-6 py-3 bg-secondary/10 text-secondary rounded-button whitespace-nowrap hover:bg-secondary hover:text-white transition-colors">
+                权限管理
+            </button>
+        </div>
+        
+        <!-- 数据备份恢复 -->
+        <div class="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 group cursor-pointer" onclick="openConfigModal('数据备份恢复')">
+            <div class="flex items-center justify-between mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-database text-white text-2xl"></i>
+                </div>
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <i class="fas fa-arrow-right text-gray-600"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">数据备份恢复</h3>
+            <p class="text-gray-600 mb-6">数据库备份、数据还原、备份策略设置等数据安全保护功能</p>
+            <div class="space-y-2 text-sm text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>数据库备份</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>数据还原</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>备份策略设置</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 px-6 py-3 bg-orange-100 text-orange-600 rounded-button whitespace-nowrap hover:bg-orange-500 hover:text-white transition-colors">
+                备份管理
+            </button>
+        </div>
+        
+        <!-- 安全设置 -->
+        <div class="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 group cursor-pointer" onclick="openConfigModal('安全设置')">
+            <div class="flex items-center justify-between mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-shield-check text-white text-2xl"></i>
+                </div>
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <i class="fas fa-arrow-right text-gray-600"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">安全设置</h3>
+            <p class="text-gray-600 mb-6">密码策略、登录安全、访问控制等系统安全防护配置</p>
+            <div class="space-y-2 text-sm text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>密码策略</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>登录安全</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>访问控制</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 px-6 py-3 bg-red-100 text-red-600 rounded-button whitespace-nowrap hover:bg-red-500 hover:text-white transition-colors">
+                安全配置
+            </button>
+        </div>
+        
+        <!-- 邮件配置 -->
+        <div class="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 group cursor-pointer" onclick="openConfigModal('邮件配置')">
+            <div class="flex items-center justify-between mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-envelope text-white text-2xl"></i>
+                </div>
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <i class="fas fa-arrow-right text-gray-600"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">邮件配置</h3>
+            <p class="text-gray-600 mb-6">邮件服务器设置、邮件模板管理、发送测试等邮件系统配置</p>
+            <div class="space-y-2 text-sm text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>邮件服务器设置</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>邮件模板管理</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>发送测试</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 px-6 py-3 bg-indigo-100 text-indigo-600 rounded-button whitespace-nowrap hover:bg-indigo-500 hover:text-white transition-colors">
+                邮件设置
+            </button>
+        </div>
+        
+        <!-- 日志管理 -->
+        <div class="bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 group cursor-pointer" onclick="openConfigModal('日志管理')">
+            <div class="flex items-center justify-between mb-6">
+                <div class="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <i class="fas fa-arrow-right text-gray-600"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">日志管理</h3>
+            <p class="text-gray-600 mb-6">操作日志、系统日志、安全日志等系统运行记录管理</p>
+            <div class="space-y-2 text-sm text-gray-500">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>操作日志</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>系统日志</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check text-secondary"></i>
+                    <span>安全日志</span>
+                </div>
+            </div>
+            <button class="w-full mt-6 px-6 py-3 bg-cyan-100 text-cyan-600 rounded-button whitespace-nowrap hover:bg-cyan-500 hover:text-white transition-colors">
+                日志查看
+            </button>
+        </div>
+    </div>
+    
+    <!-- 系统状态概览 -->
+    <div class="mt-12 bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">系统状态概览</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-microchip text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">CPU 使用率</h3>
+                <p class="text-3xl font-bold text-green-600 mb-1">23%</p>
+                <p class="text-sm text-gray-500">运行正常</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-memory text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">内存使用率</h3>
+                <p class="text-3xl font-bold text-blue-600 mb-1">67%</p>
+                <p class="text-sm text-gray-500">运行正常</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-hdd text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">磁盘空间</h3>
+                <p class="text-3xl font-bold text-orange-600 mb-1">45%</p>
+                <p class="text-sm text-gray-500">空间充足</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">系统运行时间</h3>
+                <p class="text-3xl font-bold text-purple-600 mb-1">15</p>
+                <p class="text-sm text-gray-500">天</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 快速操作 -->
+    <div class="mt-8 bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-lg border border-white/20">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">快速操作</h2>
+        <div class="flex flex-wrap gap-4">
+            <button class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2" onclick="performQuickAction('restart')">
+                <div class="w-4 h-4 flex items-center justify-center">
+                    <i class="fas fa-redo"></i>
+                </div>
+                <span>重启系统</span>
+            </button>
+            <button class="px-6 py-3 bg-secondary text-white rounded-button whitespace-nowrap hover:bg-secondary/90 transition-colors flex items-center space-x-2" onclick="performQuickAction('backup')">
+                <div class="w-4 h-4 flex items-center justify-center">
+                    <i class="fas fa-download"></i>
+                </div>
+                <span>立即备份</span>
+            </button>
+            <button class="px-6 py-3 bg-orange-500 text-white rounded-button whitespace-nowrap hover:bg-orange-600 transition-colors flex items-center space-x-2" onclick="performQuickAction('diagnose')">
+                <div class="w-4 h-4 flex items-center justify-center">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <span>系统诊断</span>
+            </button>
+            <button class="px-6 py-3 bg-purple-500 text-white rounded-button whitespace-nowrap hover:bg-purple-600 transition-colors flex items-center space-x-2" onclick="performQuickAction('export_logs')">
+                <div class="w-4 h-4 flex items-center justify-center">
+                    <i class="fas fa-file-export"></i>
+                </div>
+                <span>导出日志</span>
+            </button>
+            <button class="px-6 py-3 bg-red-500 text-white rounded-button whitespace-nowrap hover:bg-red-600 transition-colors flex items-center space-x-2" onclick="performQuickAction('security_scan')">
+                <div class="w-4 h-4 flex items-center justify-center">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <span>安全扫描</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 配置模态框 -->
+<div id="configModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+    <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-2xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 id="configModalTitle" class="text-2xl font-bold text-gray-900">系统基础配置</h3>
+            <button id="closeConfigModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+                <i class="fas fa-times text-gray-600"></i>
+            </button>
+        </div>
+        <div id="configContent" class="space-y-6">
+            <!-- 配置内容将通过 JavaScript 动态加载 -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const configModal = document.getElementById('configModal');
+    const configModalTitle = document.getElementById('configModalTitle');
+    const configContent = document.getElementById('configContent');
+    const closeConfigModal = document.getElementById('closeConfigModal');
+    
+    const configTemplates = {
+        '系统基础配置': `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">系统名称</label>
+                    <input type="text" value="七彩果坊管理系统" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">系统版本</label>
+                    <input type="text" value="v2.1.0" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">时区设置</label>
+                    <select class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+                        <option>Asia/Shanghai (UTC+8)</option>
+                        <option>Asia/Tokyo (UTC+9)</option>
+                        <option>America/New_York (UTC-5)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">语言设置</label>
+                    <select class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+                        <option>简体中文</option>
+                        <option>繁体中文</option>
+                        <option>English</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">主题设置</label>
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="theme" value="light" checked class="sr-only">
+                        <div class="radio-custom w-5 h-5 border-2 border-primary rounded-full flex items-center justify-center cursor-pointer">
+                            <div class="radio-dot w-2 h-2 bg-primary rounded-full"></div>
+                        </div>
+                        <span class="ml-2 text-gray-700">浅色主题</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="theme" value="dark" class="sr-only">
+                        <div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+                            <div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+                        </div>
+                        <span class="ml-2 text-gray-700">深色主题</span>
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200 transition-colors">取消</button>
+                <button class="px-6 py-3 bg-primary text-white rounded-button hover:bg-primary/90 transition-colors">保存设置</button>
+            </div>
+        `,
+        '用户权限设置': `
+            <div class="space-y-6">
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">角色权限配置</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-white rounded-lg">
+                            <div>
+                                <h5 class="font-medium text-gray-900">管理员</h5>
+                                <p class="text-sm text-gray-600">拥有所有系统权限</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">全部权限</span>
+                                <button class="px-4 py-2 bg-primary text-white rounded-button text-sm hover:bg-primary/90">编辑</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white rounded-lg">
+                            <div>
+                                <h5 class="font-medium text-gray-900">经理</h5>
+                                <p class="text-sm text-gray-600">拥有管理和编辑权限</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">管理权限</span>
+                                <button class="px-4 py-2 bg-primary text-white rounded-button text-sm hover:bg-primary/90">编辑</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white rounded-lg">
+                            <div>
+                                <h5 class="font-medium text-gray-900">员工</h5>
+                                <p class="text-sm text-gray-600">只有查看权限</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">查看权限</span>
+                                <button class="px-4 py-2 bg-primary text-white rounded-button text-sm hover:bg-primary/90">编辑</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200 transition-colors">取消</button>
+                <button class="px-6 py-3 bg-secondary text-white rounded-button hover:bg-secondary/90 transition-colors">保存权限</button>
+            </div>
+        `,
+        '数据备份恢复': `
+            <div class="space-y-6">
+                <div class="bg-orange-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">备份策略</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">自动备份频率</label>
+                            <select class="w-full px-4 py-3 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                                <option>每日备份</option>
+                                <option>每周备份</option>
+                                <option>每月备份</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">备份保留天数</label>
+                            <input type="number" value="30" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex space-x-4">
+                        <button class="px-6 py-3 bg-orange-500 text-white rounded-button hover:bg-orange-600 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-download"></i>
+                            <span>立即备份</span>
+                        </button>
+                        <button class="px-6 py-3 bg-blue-500 text-white rounded-button hover:bg-blue-600 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-upload"></i>
+                            <span>恢复数据</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">备份历史</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-900">2024-01-15 02:00:00</div>
+                                <div class="text-sm text-gray-600">自动备份 - 15.2MB</div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 bg-green-100 text-green-800 rounded-button text-sm hover:bg-green-200">下载</button>
+                                <button class="px-3 py-1 bg-blue-100 text-blue-800 rounded-button text-sm hover:bg-blue-200">恢复</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-900">2024-01-14 02:00:00</div>
+                                <div class="text-sm text-gray-600">自动备份 - 14.8MB</div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 bg-green-100 text-green-800 rounded-button text-sm hover:bg-green-200">下载</button>
+                                <button class="px-3 py-1 bg-blue-100 text-blue-800 rounded-button text-sm hover:bg-blue-200">恢复</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200 transition-colors">取消</button>
+                <button class="px-6 py-3 bg-orange-500 text-white rounded-button hover:bg-orange-600 transition-colors">保存设置</button>
+            </div>
+        `,
+        '安全设置': `
+            <div class="space-y-6">
+                <div class="bg-red-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">密码策略</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-gray-700">最小密码长度</label>
+                            <input type="number" value="8" min="6" max="20" class="w-20 px-3 py-2 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-gray-700">密码过期天数</label>
+                            <input type="number" value="90" min="30" max="365" class="w-20 px-3 py-2 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-gray-700">登录失败锁定次数</label>
+                            <input type="number" value="5" min="3" max="10" class="w-20 px-3 py-2 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-yellow-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">安全选项</h4>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="sr-only">
+                            <div class="checkbox-custom w-5 h-5 border-2 border-primary rounded flex items-center justify-center cursor-pointer">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <span class="ml-2 text-gray-700">启用双因素认证</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="sr-only">
+                            <div class="checkbox-custom w-5 h-5 border-2 border-primary rounded flex items-center justify-center cursor-pointer">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <span class="ml-2 text-gray-700">记录登录日志</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="sr-only">
+                            <div class="checkbox-custom w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center cursor-pointer">
+                                <i class="fas fa-check text-white text-xs hidden"></i>
+                            </div>
+                            <span class="ml-2 text-gray-700">强制HTTPS访问</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200 transition-colors">取消</button>
+                <button class="px-6 py-3 bg-red-500 text-white rounded-button hover:bg-red-600 transition-colors">保存安全设置</button>
+            </div>
+        `,
+        '邮件配置': `
+            <div class="space-y-6">
+                <div class="bg-indigo-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">SMTP服务器设置</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">SMTP服务器</label>
+                            <input type="text" placeholder="smtp.example.com" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">端口</label>
+                            <input type="number" value="587" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                            <input type="text" placeholder="your-email@example.com" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                            <input type="password" placeholder="邮箱密码或授权码" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex space-x-4">
+                        <button class="px-6 py-3 bg-indigo-500 text-white rounded-button hover:bg-indigo-600 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>发送测试邮件</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200 transition-colors">取消</button>
+                <button class="px-6 py-3 bg-indigo-500 text-white rounded-button hover:bg-indigo-600 transition-colors">保存邮件设置</button>
+            </div>
+        `,
+        '日志管理': `
+            <div class="space-y-6">
+                <div class="bg-cyan-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">日志设置</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-gray-700">日志保留天数</label>
+                            <input type="number" value="30" min="7" max="365" class="w-20 px-3 py-2 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-gray-700">日志级别</label>
+                            <select class="px-4 py-2 bg-white border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20">
+                                <option>INFO</option>
+                                <option>WARNING</option>
+                                <option>ERROR</option>
+                                <option>DEBUG</option>
+                            </select>
+                        </div>
+                        <label class="flex items-center">
+                            <input type="checkbox" checked class="sr-only">
+                            <div class="checkbox-custom w-5 h-5 border-2 border-primary rounded flex items-center justify-center cursor-pointer">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <span class="ml-2 text-gray-700">启用实时监控</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">日志统计</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">1,234</div>
+                            <div class="text-sm text-gray-600">今日操作日志</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">56</div>
+                            <div class="text-sm text-gray-600">今日系统日志</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-red-600">3</div>
+                            <div class="text-sm text-gray-600">今日安全日志</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-4">
+                        <button class="px-6 py-3 bg-cyan-500 text-white rounded-button whitespace-nowrap hover:bg-cyan-600 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-file-alt"></i>
+                            <span>查看日志</span>
+                        </button>
+                        <button class="px-6 py-3 bg-blue-500 text-white rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-download"></i>
+                            <span>导出日志</span>
+                        </button>
+                        <button class="px-6 py-3 bg-red-500 text-white rounded-button whitespace-nowrap hover:bg-red-600 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-trash"></i>
+                            <span>清理日志</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200 transition-colors">取消</button>
+                <button class="px-6 py-3 bg-cyan-500 text-white rounded-button hover:bg-cyan-600 transition-colors">保存日志设置</button>
+            </div>
+        `
+    };
+    
+    // 打开配置模态框
+    window.openConfigModal = function(configType) {
+        configModalTitle.textContent = configType;
+        configContent.innerHTML = configTemplates[configType] || '<p class="text-gray-600">配置内容正在开发中...</p>';
+        configModal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+        
+        // 重新绑定单选框和复选框事件
+        bindCustomInputs();
+    };
+    
+    // 关闭配置模态框
+    function closeModal() {
+        configModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+    
+    closeConfigModal.addEventListener('click', closeModal);
+    configModal.addEventListener('click', function(e) {
+        if (e.target === configModal) {
+            closeModal();
+        }
+    });
+    
+    // 快速操作
+    window.performQuickAction = function(action) {
+        const actions = {
+            'restart': '重启系统',
+            'backup': '立即备份',
+            'diagnose': '系统诊断',
+            'export_logs': '导出日志',
+            'security_scan': '安全扫描'
+        };
+        
+        if (confirm(`确定要执行 ${actions[action]} 操作吗？`)) {
+            // 这里可以添加实际的操作逻辑
+            alert(`${actions[action]} 操作已启动，请稍候...`);
+        }
+    };
+    
+    // 绑定自定义输入控件事件
+    function bindCustomInputs() {
+        // 单选框
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const name = this.name;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                    const dot = r.parentElement.querySelector('.radio-dot');
+                    const border = r.parentElement.querySelector('.radio-custom');
+                    if (r.checked) {
+                        dot.classList.remove('hidden');
+                        border.classList.add('border-primary');
+                        border.classList.remove('border-gray-300');
+                    } else {
+                        dot.classList.add('hidden');
+                        border.classList.remove('border-primary');
+                        border.classList.add('border-gray-300');
+                    }
+                });
+            });
+        });
+        
+        // 复选框
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const check = this.parentElement.querySelector('.fas.fa-check');
+                const border = this.parentElement.querySelector('.checkbox-custom');
+                if (this.checked) {
+                    check.classList.remove('hidden');
+                    border.classList.add('bg-primary', 'border-primary');
+                    border.classList.remove('border-gray-300');
+                } else {
+                    check.classList.add('hidden');
+                    border.classList.remove('bg-primary', 'border-primary');
+                    border.classList.add('border-gray-300');
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

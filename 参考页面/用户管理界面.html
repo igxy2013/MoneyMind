@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用户管理 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<!-- 左侧导航栏 -->
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/8a66bf01-6d33-496b-8561-3d9b62eda1d6" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>仪表板</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>财务分析</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/5214fb8e-d494-4d6c-9d9a-ca1e0291402e" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span>分类管理</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span class="font-medium">用户管理</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/8efdd0e0-0f0f-48f6-a41b-c28c520b802e" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- 主内容区域 -->
+<main class="ml-64 flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<!-- 页面标题 -->
+<div class="mb-8">
+<h1 class="text-3xl font-bold text-gray-900 mb-2">用户管理</h1>
+<p class="text-gray-600">管理系统用户，包括添加、编辑和分配角色等操作</p>
+</div>
+<!-- 操作区域 -->
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center space-x-4">
+<button id="addUserBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>添加用户</span>
+</button>
+<div class="relative">
+<select id="roleFilter" class="appearance-none bg-white/80 backdrop-blur-lg border border-white/20 rounded-button px-4 py-3 pr-10 text-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+<option value="">全部角色</option>
+<option value="管理员">管理员</option>
+<option value="财务">财务</option>
+<option value="普通用户">普通用户</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line text-gray-400"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="relative">
+<input type="text" id="searchInput" placeholder="搜索用户名或邮箱" class="w-80 pl-10 pr-4 py-3 bg-white/80 backdrop-blur-lg border border-white/20 rounded-button text-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-search-line text-gray-400"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- 用户列表 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-3xl shadow-lg border border-white/20 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-white/40">
+<tr>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">用户信息</th>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">角色</th>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">状态</th>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">创建时间</th>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">最后登录</th>
+<th class="px-6 py-4 text-center text-sm font-medium text-gray-700">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr class="hover:bg-white/40 transition-colors user-row" data-role="管理员" data-status="启用">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+<span class="text-white font-medium text-sm">张</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">张明华</div>
+<div class="text-sm text-gray-500">zhangmh@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">管理员</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">启用</span>
+</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-06-15</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-08-07 09:30</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-id="1" data-name="张明华" data-email="zhangmh@example.com" data-role="管理员" data-status="启用">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="role-btn w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors" data-id="1" data-name="张明华" data-role="管理员">
+<i class="ri-shield-user-line text-green-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-id="1" data-name="张明华">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors user-row" data-role="财务" data-status="启用">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
+<span class="text-white font-medium text-sm">李</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">李雪梅</div>
+<div class="text-sm text-gray-500">lixm@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">财务</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">启用</span>
+</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-06-20</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-08-06 16:45</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-id="2" data-name="李雪梅" data-email="lixm@example.com" data-role="财务" data-status="启用">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="role-btn w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors" data-id="2" data-name="李雪梅" data-role="财务">
+<i class="ri-shield-user-line text-green-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-id="2" data-name="李雪梅">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors user-row" data-role="普通用户" data-status="启用">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+<span class="text-white font-medium text-sm">王</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">王建国</div>
+<div class="text-sm text-gray-500">wangjg@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">普通用户</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">启用</span>
+</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-01</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-08-05 14:20</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-id="3" data-name="王建国" data-email="wangjg@example.com" data-role="普通用户" data-status="启用">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="role-btn w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors" data-id="3" data-name="王建国" data-role="普通用户">
+<i class="ri-shield-user-line text-green-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-id="3" data-name="王建国">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors user-row" data-role="财务" data-status="禁用">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center">
+<span class="text-white font-medium text-sm">陈</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">陈丽娟</div>
+<div class="text-sm text-gray-500">chenlj@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">财务</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">禁用</span>
+</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-10</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-28 11:15</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-id="4" data-name="陈丽娟" data-email="chenlj@example.com" data-role="财务" data-status="禁用">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="role-btn w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors" data-id="4" data-name="陈丽娟" data-role="财务">
+<i class="ri-shield-user-line text-green-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-id="4" data-name="陈丽娟">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors user-row" data-role="普通用户" data-status="启用">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
+<span class="text-white font-medium text-sm">刘</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">刘德华</div>
+<div class="text-sm text-gray-500">liudh@example.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">普通用户</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">启用</span>
+</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-15</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-08-04 08:45</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-id="5" data-name="刘德华" data-email="liudh@example.com" data-role="普通用户" data-status="启用">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="role-btn w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors" data-id="5" data-name="刘德华" data-role="普通用户">
+<i class="ri-shield-user-line text-green-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-id="5" data-name="刘德华">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- 添加/编辑用户模态框 -->
+<div id="userModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl border border-white/20">
+<div class="flex items-center justify-between mb-6">
+<h3 id="userModalTitle" class="text-xl font-bold text-gray-900">添加用户</h3>
+<button id="closeUserModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<form id="userForm" class="space-y-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+<input type="text" id="userName" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900" placeholder="请输入用户名" required>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+<input type="email" id="userEmail" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900" placeholder="请输入邮箱地址" required>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">角色</label>
+<div class="flex flex-col space-y-3">
+<label class="flex items-center">
+<input type="radio" name="userRole" value="管理员" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">管理员</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="userRole" value="财务" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">财务</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="userRole" value="普通用户" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">普通用户</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">状态</label>
+<div class="flex space-x-4">
+<label class="flex items-center">
+<input type="radio" name="userStatus" value="启用" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">启用</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="userStatus" value="禁用" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">禁用</span>
+</label>
+</div>
+</div>
+<div class="flex space-x-4 pt-4">
+<button type="button" id="cancelUserBtn" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="flex-1 px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存</button>
+</div>
+</form>
+</div>
+</div>
+<!-- 角色管理模态框 -->
+<div id="roleModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl border border-white/20">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-bold text-gray-900">角色管理</h3>
+<button id="closeRoleModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<div class="mb-6">
+<p class="text-gray-600">用户：<span id="roleUserName" class="font-medium text-gray-900"></span></p>
+<p class="text-gray-600">当前角色：<span id="currentRole" class="font-medium text-gray-900"></span></p>
+</div>
+<form id="roleForm" class="space-y-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-3">选择新角色</label>
+<div class="flex flex-col space-y-3">
+<label class="flex items-center">
+<input type="radio" name="newRole" value="管理员" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">管理员</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="newRole" value="财务" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">财务</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="newRole" value="普通用户" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">普通用户</span>
+</label>
+</div>
+</div>
+<div class="flex space-x-4 pt-4">
+<button type="button" id="cancelRoleBtn" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="flex-1 px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">更新角色</button>
+</div>
+</form>
+</div>
+</div>
+<!-- 删除确认模态框 -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-sm mx-4 shadow-2xl border border-white/20">
+<div class="text-center">
+<div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-delete-bin-line text-red-600 text-2xl"></i>
+</div>
+<h3 class="text-lg font-bold text-gray-900 mb-2">确认删除</h3>
+<p class="text-gray-600 mb-6">确定要删除用户 "<span id="deleteUserName"></span>" 吗？此操作不可撤销。</p>
+<div class="flex space-x-4">
+<button id="cancelDelete" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button id="confirmDelete" class="flex-1 px-6 py-3 bg-red-500 text-white rounded-button whitespace-nowrap hover:bg-red-600 transition-colors">删除</button>
+</div>
+</div>
+</div>
+</div>
+<script id="user-modal-script">
+document.addEventListener('DOMContentLoaded', function() {
+const userModal = document.getElementById('userModal');
+const roleModal = document.getElementById('roleModal');
+const deleteModal = document.getElementById('deleteModal');
+const addUserBtn = document.getElementById('addUserBtn');
+const closeUserModal = document.getElementById('closeUserModal');
+const closeRoleModal = document.getElementById('closeRoleModal');
+const cancelUserBtn = document.getElementById('cancelUserBtn');
+const cancelRoleBtn = document.getElementById('cancelRoleBtn');
+const cancelDelete = document.getElementById('cancelDelete');
+const confirmDelete = document.getElementById('confirmDelete');
+const userForm = document.getElementById('userForm');
+const roleForm = document.getElementById('roleForm');
+const userModalTitle = document.getElementById('userModalTitle');
+const roleUserName = document.getElementById('roleUserName');
+const currentRole = document.getElementById('currentRole');
+const deleteUserName = document.getElementById('deleteUserName');
+let editingRow = null;
+let roleEditingRow = null;
+let deletingRow = null;
+addUserBtn.addEventListener('click', function() {
+userModalTitle.textContent = '添加用户';
+userForm.reset();
+editingRow = null;
+userModal.classList.remove('hidden');
+});
+closeUserModal.addEventListener('click', function() {
+userModal.classList.add('hidden');
+});
+closeRoleModal.addEventListener('click', function() {
+roleModal.classList.add('hidden');
+});
+cancelUserBtn.addEventListener('click', function() {
+userModal.classList.add('hidden');
+});
+cancelRoleBtn.addEventListener('click', function() {
+roleModal.classList.add('hidden');
+});
+cancelDelete.addEventListener('click', function() {
+deleteModal.classList.add('hidden');
+});
+userForm.addEventListener('submit', function(e) {
+e.preventDefault();
+const name = document.getElementById('userName').value;
+const email = document.getElementById('userEmail').value;
+const role = document.querySelector('input[name="userRole"]:checked').value;
+const status = document.querySelector('input[name="userStatus"]:checked').value;
+const currentDate = new Date().toISOString().split('T')[0];
+if (editingRow) {
+updateUserRow(editingRow, name, email, role, status);
+} else {
+addNewUserRow(name, email, role, status, currentDate);
+}
+userModal.classList.add('hidden');
+});
+roleForm.addEventListener('submit', function(e) {
+e.preventDefault();
+const newRole = document.querySelector('input[name="newRole"]:checked').value;
+updateUserRole(roleEditingRow, newRole);
+roleModal.classList.add('hidden');
+});
+confirmDelete.addEventListener('click', function() {
+if (deletingRow) {
+deletingRow.remove();
+}
+deleteModal.classList.add('hidden');
+});
+function addNewUserRow(name, email, role, status, date) {
+const tbody = document.querySelector('tbody');
+const roleClass = getRoleClass(role);
+const statusClass = getStatusClass(status);
+const avatarGradient = getRandomGradient();
+const avatarText = name.charAt(0);
+const newRow = document.createElement('tr');
+newRow.className = 'hover:bg-white/40 transition-colors user-row';
+newRow.setAttribute('data-role', role);
+newRow.setAttribute('data-status', status);
+newRow.innerHTML = `
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 ${avatarGradient} rounded-full flex items-center justify-center">
+<span class="text-white font-medium text-sm">${avatarText}</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">${name}</div>
+<div class="text-sm text-gray-500">${email}</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${roleClass}">${role}</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusClass}">${status}</span>
+</td>
+<td class="px-6 py-4 text-gray-500 text-sm">${date}</td>
+<td class="px-6 py-4 text-gray-500 text-sm">未登录</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="${name}" data-email="${email}" data-role="${role}" data-status="${status}">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="role-btn w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors" data-name="${name}" data-role="${role}">
+<i class="ri-shield-user-line text-green-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="${name}">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+`;
+tbody.appendChild(newRow);
+}
+function updateUserRow(row, name, email, role, status) {
+const roleClass = getRoleClass(role);
+const statusClass = getStatusClass(status);
+const avatarText = name.charAt(0);
+const avatarElement = row.querySelector('.w-10.h-10 span');
+avatarElement.textContent = avatarText;
+row.setAttribute('data-role', role);
+row.setAttribute('data-status', status);
+row.cells[0].querySelector('.font-medium').textContent = name;
+row.cells[0].querySelector('.text-sm').textContent = email;
+row.cells[1].innerHTML = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${roleClass}">${role}</span>`;
+row.cells[2].innerHTML = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusClass}">${status}</span>`;
+const buttons = row.querySelectorAll('button');
+buttons[0].setAttribute('data-name', name);
+buttons[0].setAttribute('data-email', email);
+buttons[0].setAttribute('data-role', role);
+buttons[0].setAttribute('data-status', status);
+buttons[1].setAttribute('data-name', name);
+buttons[1].setAttribute('data-role', role);
+buttons[2].setAttribute('data-name', name);
+}
+function updateUserRole(row, newRole) {
+const roleClass = getRoleClass(newRole);
+row.setAttribute('data-role', newRole);
+row.cells[1].innerHTML = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${roleClass}">${newRole}</span>`;
+const buttons = row.querySelectorAll('button');
+buttons[0].setAttribute('data-role', newRole);
+buttons[1].setAttribute('data-role', newRole);
+}
+function getRoleClass(role) {
+switch(role) {
+case '管理员': return 'bg-purple-100 text-purple-800';
+case '财务': return 'bg-blue-100 text-blue-800';
+case '普通用户': return 'bg-gray-100 text-gray-800';
+default: return 'bg-gray-100 text-gray-800';
+}
+}
+function getStatusClass(status) {
+return status === '启用' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+}
+function getRandomGradient() {
+const gradients = [
+'bg-gradient-to-r from-blue-500 to-purple-500',
+'bg-gradient-to-r from-green-500 to-teal-500',
+'bg-gradient-to-r from-orange-500 to-red-500',
+'bg-gradient-to-r from-pink-500 to-rose-500',
+'bg-gradient-to-r from-indigo-500 to-purple-500'
+];
+return gradients[Math.floor(Math.random() * gradients.length)];
+}
+document.addEventListener('click', function(e) {
+if (e.target.closest('.edit-btn')) {
+const btn = e.target.closest('.edit-btn');
+const name = btn.getAttribute('data-name');
+const email = btn.getAttribute('data-email');
+const role = btn.getAttribute('data-role');
+const status = btn.getAttribute('data-status');
+userModalTitle.textContent = '编辑用户';
+document.getElementById('userName').value = name;
+document.getElementById('userEmail').value = email;
+document.querySelector(`input[name="userRole"][value="${role}"]`).checked = true;
+document.querySelector(`input[name="userStatus"][value="${status}"]`).checked = true;
+editingRow = btn.closest('tr');
+userModal.classList.remove('hidden');
+}
+if (e.target.closest('.role-btn')) {
+const btn = e.target.closest('.role-btn');
+const name = btn.getAttribute('data-name');
+const role = btn.getAttribute('data-role');
+roleUserName.textContent = name;
+currentRole.textContent = role;
+document.querySelector(`input[name="newRole"][value="${role}"]`).checked = true;
+roleEditingRow = btn.closest('tr');
+roleModal.classList.remove('hidden');
+}
+if (e.target.closest('.delete-btn')) {
+const btn = e.target.closest('.delete-btn');
+const name = btn.getAttribute('data-name');
+deleteUserName.textContent = name;
+deletingRow = btn.closest('tr');
+deleteModal.classList.remove('hidden');
+}
+});
+});
+</script>
+<script id="radio-script">
+document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('click', function(e) {
+if (e.target.closest('.radio-custom')) {
+const radioContainer = e.target.closest('.radio-custom');
+const radioInput = radioContainer.parentElement.querySelector('input[type="radio"]');
+const allRadios = document.querySelectorAll('input[name="' + radioInput.name + '"]');
+const allDots = document.querySelectorAll('input[name="' + radioInput.name + '"] + .radio-custom .radio-dot');
+allDots.forEach(dot => dot.classList.add('hidden'));
+allRadios.forEach(radio => {
+radio.checked = false;
+radio.parentElement.querySelector('.radio-custom').classList.remove('border-primary');
+radio.parentElement.querySelector('.radio-custom').classList.add('border-gray-300');
+});
+radioInput.checked = true;
+radioContainer.classList.remove('border-gray-300');
+radioContainer.classList.add('border-primary');
+radioContainer.querySelector('.radio-dot').classList.remove('hidden');
+}
+});
+});
+</script>
+<script id="filter-script">
+document.addEventListener('DOMContentLoaded', function() {
+const roleFilter = document.getElementById('roleFilter');
+const searchInput = document.getElementById('searchInput');
+const userRows = document.querySelectorAll('.user-row');
+function filterUsers() {
+const selectedRole = roleFilter.value;
+const searchTerm = searchInput.value.toLowerCase();
+userRows.forEach(row => {
+const rowRole = row.getAttribute('data-role');
+const userName = row.cells[0].querySelector('.font-medium').textContent.toLowerCase();
+const userEmail = row.cells[0].querySelector('.text-sm').textContent.toLowerCase();
+const roleMatch = selectedRole === '' || rowRole === selectedRole;
+const searchMatch = searchTerm === '' || userName.includes(searchTerm) || userEmail.includes(searchTerm);
+if (roleMatch && searchMatch) {
+row.style.display = '';
+} else {
+row.style.display = 'none';
+}
+});
+}
+roleFilter.addEventListener('change', filterUsers);
+searchInput.addEventListener('input', filterUsers);
+});
+</script>
+</body>
+</html>

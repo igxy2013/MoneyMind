@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务分析 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<!-- 左侧导航栏 -->
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/8a66bf01-6d33-496b-8561-3d9b62eda1d6" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>仪表板</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span class="font-medium">财务分析</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span>分类管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span>用户管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- 主内容区域 -->
+<main class="ml-64 flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<!-- 面包屑导航 -->
+<div class="flex items-center space-x-2 text-sm text-gray-500 mb-6">
+<span>首页</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-right-s-line"></i>
+</div>
+<span class="text-primary font-medium">财务分析</span>
+</div>
+<!-- 页面标题 -->
+<div class="mb-8">
+<h1 class="text-3xl font-bold text-gray-900 mb-2">财务分析报表</h1>
+<p class="text-gray-600">深度分析财务数据，洞察经营状况和发展趋势</p>
+</div>
+<!-- 顶部关键指标 -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/30">
+<div class="flex items-center justify-between mb-4">
+<span class="text-gray-600 text-sm">总资产</span>
+<div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+<i class="ri-bank-line text-blue-600"></i>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥156,892.35</div>
+<div class="flex items-center text-sm">
+<span class="text-green-600">+8.2%</span>
+<span class="text-gray-500 ml-1">较上月</span>
+</div>
+</div>
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/30">
+<div class="flex items-center justify-between mb-4">
+<span class="text-gray-600 text-sm">总负债</span>
+<div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+<i class="ri-file-warning-line text-red-600"></i>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥89,235.77</div>
+<div class="flex items-center text-sm">
+<span class="text-red-600">+3.1%</span>
+<span class="text-gray-500 ml-1">较上月</span>
+</div>
+</div>
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/30">
+<div class="flex items-center justify-between mb-4">
+<span class="text-gray-600 text-sm">净资产</span>
+<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+<i class="ri-trophy-line text-green-600"></i>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥67,656.58</div>
+<div class="flex items-center text-sm">
+<span class="text-green-600">+15.7%</span>
+<span class="text-gray-500 ml-1">较上月</span>
+</div>
+</div>
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/30">
+<div class="flex items-center justify-between mb-4">
+<span class="text-gray-600 text-sm">资产负债率</span>
+<div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+<i class="ri-scales-line text-purple-600"></i>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">56.9%</div>
+<div class="flex items-center text-sm">
+<span class="text-green-600">-2.3%</span>
+<span class="text-gray-500 ml-1">较上月</span>
+</div>
+</div>
+</div>
+<!-- 收支趋势分析 -->
+<div class="grid grid-cols-3 gap-8 mb-8">
+<div class="col-span-2 bg-white/70 backdrop-blur-lg rounded-2xl p-8 shadow-lg border border-white/30">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-bold text-gray-900">收支趋势分析</h3>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-1 bg-primary text-white rounded-full text-sm whitespace-nowrap">月度</button>
+<button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap">季度</button>
+<button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-full text-sm whitespace-nowrap">年度</button>
+</div>
+</div>
+<div id="trendChart" style="height: 300px;"></div>
+</div>
+<!-- 财务健康度评估 -->
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-8 shadow-lg border border-white/30">
+<h3 class="text-xl font-bold text-gray-900 mb-6">财务健康度</h3>
+<div class="flex items-center justify-center mb-6">
+<div id="healthGauge" style="height: 200px; width: 100%;"></div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">偿债能力</span>
+<span class="text-sm font-medium text-green-600">优秀</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">盈利能力</span>
+<span class="text-sm font-medium text-yellow-600">良好</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">营运能力</span>
+<span class="text-sm font-medium text-green-600">优秀</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-sm text-gray-600">发展能力</span>
+<span class="text-sm font-medium text-blue-600">稳健</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 收支分类统计和现金流分析 -->
+<div class="grid grid-cols-2 gap-8 mb-8">
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-8 shadow-lg border border-white/30">
+<h3 class="text-xl font-bold text-gray-900 mb-6">收支分类统计</h3>
+<div class="flex items-center">
+<div id="categoryChart" style="height: 280px; width: 60%;"></div>
+<div class="flex-1 ml-6 space-y-4">
+<div class="border-b border-gray-200 pb-4">
+<h4 class="font-medium text-gray-900 mb-3">收入构成</h4>
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+<span class="text-sm text-gray-700">产品销售</span>
+</div>
+<span class="text-sm font-medium">¥45,230</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-green-500 rounded-full"></div>
+<span class="text-sm text-gray-700">服务收入</span>
+</div>
+<span class="text-sm font-medium">¥18,650</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+<span class="text-sm text-gray-700">其他收入</span>
+</div>
+<span class="text-sm font-medium">¥13,777</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="font-medium text-gray-900 mb-3">支出构成</h4>
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+<span class="text-sm text-gray-700">原料采购</span>
+</div>
+<span class="text-sm font-medium">¥28,450</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-red-500 rounded-full"></div>
+<span class="text-sm text-gray-700">人工费用</span>
+</div>
+<span class="text-sm font-medium">¥22,180</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+<span class="text-sm text-gray-700">运营费用</span>
+</div>
+<span class="text-sm font-medium">¥15,670</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-8 shadow-lg border border-white/30">
+<h3 class="text-xl font-bold text-gray-900 mb-6">现金流分析</h3>
+<div id="cashflowChart" style="height: 280px;"></div>
+</div>
+</div>
+<!-- 月度对比分析 -->
+<div class="bg-white/70 backdrop-blur-lg rounded-2xl p-8 shadow-lg border border-white/30">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-bold text-gray-900">月度对比分析</h3>
+<div class="flex items-center space-x-3">
+<button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-button text-sm whitespace-nowrap hover:bg-gray-200 transition-colors">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-download-line"></i>
+</div>
+导出数据
+</button>
+<button class="px-4 py-2 bg-primary text-white rounded-button text-sm whitespace-nowrap hover:bg-primary/90 transition-colors">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-calendar-line"></i>
+</div>
+自定义时间
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead>
+<tr class="border-b border-gray-200">
+<th class="text-left py-3 px-4 font-medium text-gray-700">月份</th>
+<th class="text-right py-3 px-4 font-medium text-gray-700">收入</th>
+<th class="text-right py-3 px-4 font-medium text-gray-700">支出</th>
+<th class="text-right py-3 px-4 font-medium text-gray-700">利润</th>
+<th class="text-right py-3 px-4 font-medium text-gray-700">环比增长</th>
+<th class="text-right py-3 px-4 font-medium text-gray-700">同比增长</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="py-4 px-4 font-medium">2025-08</td>
+<td class="py-4 px-4 text-right text-green-600 font-medium">¥3,740.45</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">¥11,111.52</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">-¥7,371.07</td>
+<td class="py-4 px-4 text-right text-red-500">-15.2%</td>
+<td class="py-4 px-4 text-right text-green-500">+8.7%</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="py-4 px-4 font-medium">2025-07</td>
+<td class="py-4 px-4 text-right text-green-600 font-medium">¥4,285.30</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">¥9,850.45</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">-¥5,565.15</td>
+<td class="py-4 px-4 text-right text-green-500">+12.3%</td>
+<td class="py-4 px-4 text-right text-green-500">+15.2%</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="py-4 px-4 font-medium">2025-06</td>
+<td class="py-4 px-4 text-right text-green-600 font-medium">¥3,815.67</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">¥8,765.23</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">-¥4,949.56</td>
+<td class="py-4 px-4 text-right text-green-500">+8.9%</td>
+<td class="py-4 px-4 text-right text-green-500">+22.1%</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="py-4 px-4 font-medium">2025-05</td>
+<td class="py-4 px-4 text-right text-green-600 font-medium">¥3,502.89</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">¥7,890.34</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">-¥4,387.45</td>
+<td class="py-4 px-4 text-right text-red-500">-5.7%</td>
+<td class="py-4 px-4 text-right text-green-500">+18.9%</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="py-4 px-4 font-medium">2025-04</td>
+<td class="py-4 px-4 text-right text-green-600 font-medium">¥3,715.42</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">¥8,234.67</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">-¥4,519.25</td>
+<td class="py-4 px-4 text-right text-green-500">+11.4%</td>
+<td class="py-4 px-4 text-right text-green-500">+25.6%</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="py-4 px-4 font-medium">2025-03</td>
+<td class="py-4 px-4 text-right text-green-600 font-medium">¥3,334.78</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">¥7,456.89</td>
+<td class="py-4 px-4 text-right text-red-600 font-medium">-¥4,122.11</td>
+<td class="py-4 px-4 text-right text-green-500">+7.2%</td>
+<td class="py-4 px-4 text-right text-green-500">+19.8%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script id="trend-chart">
+document.addEventListener('DOMContentLoaded', function() {
+const trendChart = echarts.init(document.getElementById('trendChart'));
+const trendOption = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#e5e7eb',
+textStyle: { color: '#1f2937' }
+},
+legend: {
+data: ['收入', '支出', '利润'],
+top: 10
+},
+grid: { left: 0, right: 0, top: 50, bottom: 0, containLabel: true },
+xAxis: {
+type: 'category',
+data: ['3月', '4月', '5月', '6月', '7月', '8月'],
+axisLine: { lineStyle: { color: '#e5e7eb' } },
+axisTick: { show: false }
+},
+yAxis: {
+type: 'value',
+axisLine: { show: false },
+axisTick: { show: false },
+splitLine: { lineStyle: { color: '#f3f4f6' } }
+},
+series: [
+{
+name: '收入',
+type: 'line',
+smooth: true,
+data: [3334.78, 3715.42, 3502.89, 3815.67, 4285.30, 3740.45],
+lineStyle: { color: 'rgba(87, 181, 231, 1)', width: 3 },
+itemStyle: { color: 'rgba(87, 181, 231, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [
+{ offset: 0, color: 'rgba(87, 181, 231, 0.1)' },
+{ offset: 1, color: 'rgba(87, 181, 231, 0.01)' }
+]
+}
+}
+},
+{
+name: '支出',
+type: 'line',
+smooth: true,
+data: [7456.89, 8234.67, 7890.34, 8765.23, 9850.45, 11111.52],
+lineStyle: { color: 'rgba(252, 141, 98, 1)', width: 3 },
+itemStyle: { color: 'rgba(252, 141, 98, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [
+{ offset: 0, color: 'rgba(252, 141, 98, 0.1)' },
+{ offset: 1, color: 'rgba(252, 141, 98, 0.01)' }
+]
+}
+}
+},
+{
+name: '利润',
+type: 'line',
+smooth: true,
+data: [-4122.11, -4519.25, -4387.45, -4949.56, -5565.15, -7371.07],
+lineStyle: { color: 'rgba(141, 211, 199, 1)', width: 3 },
+itemStyle: { color: 'rgba(141, 211, 199, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [
+{ offset: 0, color: 'rgba(141, 211, 199, 0.1)' },
+{ offset: 1, color: 'rgba(141, 211, 199, 0.01)' }
+]
+}
+}
+}
+]
+};
+trendChart.setOption(trendOption);
+});
+</script>
+<script id="health-gauge">
+document.addEventListener('DOMContentLoaded', function() {
+const healthChart = echarts.init(document.getElementById('healthGauge'));
+const healthOption = {
+animation: false,
+series: [
+{
+type: 'gauge',
+center: ['50%', '60%'],
+startAngle: 200,
+endAngle: -20,
+min: 0,
+max: 100,
+splitNumber: 5,
+title: {
+show: true,
+offsetCenter: [0, '20%'],
+fontSize: 14,
+color: '#64748b'
+},
+itemStyle: {
+color: '#58D9F9'
+},
+progress: {
+show: true,
+width: 20,
+itemStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 1, y2: 0,
+colorStops: [
+{ offset: 0, color: 'rgba(87, 181, 231, 1)' },
+{ offset: 0.5, color: 'rgba(141, 211, 199, 1)' },
+{ offset: 1, color: 'rgba(251, 191, 114, 1)' }
+]
+}
+}
+},
+pointer: {
+show: false
+},
+axisLine: {
+lineStyle: {
+width: 20,
+color: [[1, '#f3f4f6']]
+}
+},
+axisTick: { show: false },
+splitLine: { show: false },
+axisLabel: { show: false },
+detail: {
+valueAnimation: true,
+formatter: '{value}分',
+color: '#1f2937',
+fontSize: 28,
+fontWeight: 'bold',
+offsetCenter: [0, '-10%']
+},
+data: [{ value: 78, name: '财务健康度' }]
+}
+]
+};
+healthChart.setOption(healthOption);
+});
+</script>
+<script id="category-chart">
+document.addEventListener('DOMContentLoaded', function() {
+const categoryChart = echarts.init(document.getElementById('categoryChart'));
+const categoryOption = {
+animation: false,
+tooltip: {
+trigger: 'item',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#e5e7eb',
+textStyle: { color: '#1f2937' }
+},
+series: [
+{
+type: 'pie',
+radius: ['30%', '50%'],
+center: ['50%', '50%'],
+data: [
+{ value: 45230, name: '产品销售', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+{ value: 18650, name: '服务收入', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+{ value: 13777, name: '其他收入', itemStyle: { color: 'rgba(147, 51, 234, 1)' } }
+],
+itemStyle: { borderRadius: 8 }
+},
+{
+type: 'pie',
+radius: ['60%', '80%'],
+center: ['50%', '50%'],
+data: [
+{ value: 28450, name: '原料采购', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+{ value: 22180, name: '人工费用', itemStyle: { color: 'rgba(252, 141, 98, 1)' } },
+{ value: 15670, name: '运营费用', itemStyle: { color: 'rgba(234, 179, 8, 1)' } }
+],
+itemStyle: { borderRadius: 8 }
+}
+]
+};
+categoryChart.setOption(categoryOption);
+});
+</script>
+<script id="cashflow-chart">
+document.addEventListener('DOMContentLoaded', function() {
+const cashflowChart = echarts.init(document.getElementById('cashflowChart'));
+const cashflowOption = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#e5e7eb',
+textStyle: { color: '#1f2937' }
+},
+grid: { left: 0, right: 0, top: 30, bottom: 0, containLabel: true },
+xAxis: {
+type: 'category',
+data: ['期初现金', '经营现金流', '投资现金流', '筹资现金流', '期末现金'],
+axisLine: { lineStyle: { color: '#e5e7eb' } },
+axisTick: { show: false }
+},
+yAxis: {
+type: 'value',
+axisLine: { show: false },
+axisTick: { show: false },
+splitLine: { lineStyle: { color: '#f3f4f6' } }
+},
+series: [
+{
+type: 'bar',
+data: [
+{ value: 15000, itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+{ value: 8500, itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+{ value: -3200, itemStyle: { color: 'rgba(252, 141, 98, 1)' } },
+{ value: -1800, itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+{ value: 18500, itemStyle: { color: 'rgba(87, 181, 231, 1)' } }
+],
+itemStyle: { borderRadius: [4, 4, 0, 0] }
+}
+]
+};
+cashflowChart.setOption(cashflowOption);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>供应商管理 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<!-- 左侧导航栏 -->
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>仪表板</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>财务分析</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/8efdd0e0-0f0f-48f6-a41b-c28c520b802e" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-store-2-line"></i>
+</div>
+<span class="font-medium">供应商管理</span>
+</a>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/123ff5e7-b318-48b7-9474-640ae4c7804e" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-shopping-bag-line"></i>
+</div>
+<span>商品管理</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<span>应收款</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span>分类管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span>用户管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- 主内容区域 -->
+<main class="ml-64 flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<!-- 页面标题和操作栏 -->
+<div class="mb-8">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h1 class="text-3xl font-bold text-gray-900 mb-2">供应商管理</h1>
+<p class="text-gray-600">管理供应商信息，包括基本资料、合作状态、欠款情况等关键数据</p>
+</div>
+<button id="addSupplierBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>新增供应商</span>
+</button>
+</div>
+<!-- 搜索和筛选栏 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20 mb-6">
+<div class="flex flex-wrap items-center gap-4">
+<div class="flex-1 min-w-64">
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-search-line text-gray-400"></i>
+</div>
+</div>
+<input type="text" id="searchInput" placeholder="搜索供应商名称、联系人或电话..." class="w-full pl-10 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<select id="statusFilter" class="px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm pr-8">
+<option value="">全部状态</option>
+<option value="active">合作中</option>
+<option value="inactive">已暂停</option>
+<option value="terminated">已终止</option>
+</select>
+<button id="advancedFilterBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-filter-line"></i>
+</div>
+<span>高级筛选</span>
+</button>
+<button id="batchActionBtn" class="px-6 py-3 bg-secondary/10 text-secondary rounded-button whitespace-nowrap hover:bg-secondary hover:text-white transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-checkbox-multiple-line"></i>
+</div>
+<span>批量操作</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 供应商列表 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-gray-50/80 border-b border-gray-200">
+<tr>
+<th class="px-6 py-4 text-left">
+<input type="checkbox" id="selectAll" class="w-4 h-4 text-primary rounded">
+</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors">
+<div class="flex items-center space-x-1">
+<span>供应商名称</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line text-gray-400"></i>
+</div>
+</div>
+</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">联系人</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">联系电话</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">地址</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">合作状态</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors">
+<div class="flex items-center space-x-1">
+<span>欠款金额</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line text-gray-400"></i>
+</div>
+</div>
+</th>
+<th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer supplier-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="supplier-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+<span class="text-white font-semibold text-sm">华</span>
+</div>
+<div>
+<div class="font-semibold text-gray-900">华润果业有限公司</div>
+<div class="text-sm text-gray-500">成立于 2018 年</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">张明华</div>
+<div class="text-sm text-gray-500">采购经理</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">138-0013-8888</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900 max-w-48 truncate">广东省深圳市南山区科技园南区高新南七道 12 号</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+合作中
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="text-red-600 font-semibold">¥ 25,680</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+<div class="relative">
+<button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors more-actions-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line text-gray-600"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer supplier-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="supplier-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center">
+<span class="text-white font-semibold text-sm">鲜</span>
+</div>
+<div>
+<div class="font-semibold text-gray-900">鲜果优选供应链</div>
+<div class="text-sm text-gray-500">成立于 2020 年</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">李雅琳</div>
+<div class="text-sm text-gray-500">销售总监</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">159-9876-5432</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900 max-w-48 truncate">上海市浦东新区张江高科技园区祖冲之路 899 号</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+合作中
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="text-green-600 font-semibold">¥ 0</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+<div class="relative">
+<button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors more-actions-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line text-gray-600"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer supplier-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="supplier-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
+<span class="text-white font-semibold text-sm">绿</span>
+</div>
+<div>
+<div class="font-semibold text-gray-900">绿色田园农业合作社</div>
+<div class="text-sm text-gray-500">成立于 2015 年</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">王建国</div>
+<div class="text-sm text-gray-500">理事长</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">186-2468-1357</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900 max-w-48 truncate">山东省潍坊市寿光市洛城街道农业示范园区</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+已暂停
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="text-red-600 font-semibold">¥ 12,350</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+<div class="relative">
+<button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors more-actions-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line text-gray-600"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer supplier-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="supplier-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+<span class="text-white font-semibold text-sm">优</span>
+</div>
+<div>
+<div class="font-semibold text-gray-900">优质果品贸易公司</div>
+<div class="text-sm text-gray-500">成立于 2019 年</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">陈美玲</div>
+<div class="text-sm text-gray-500">业务经理</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">137-5555-9999</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900 max-w-48 truncate">浙江省杭州市余杭区良渚街道文化创意园 A 座</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+已终止
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="text-red-600 font-semibold">¥ 8,920</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+<div class="relative">
+<button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors more-actions-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line text-gray-600"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer supplier-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="supplier-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center">
+<span class="text-white font-semibold text-sm">丰</span>
+</div>
+<div>
+<div class="font-semibold text-gray-900">丰收季农产品批发</div>
+<div class="text-sm text-gray-500">成立于 2017 年</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">刘德华</div>
+<div class="text-sm text-gray-500">总经理</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">188-8888-6666</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900 max-w-48 truncate">四川省成都市双流区西航港经济开发区</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+合作中
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="text-orange-600 font-semibold">¥ 5,200</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-supplier-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+<div class="relative">
+<button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors more-actions-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line text-gray-600"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- 分页 -->
+<div class="px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+<div class="flex items-center justify-between">
+<div class="text-sm text-gray-700">
+显示 <span class="font-semibold">1</span> 到 <span class="font-semibold">5</span> 条，共 <span class="font-semibold">23</span> 条记录
+</div>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+上一页
+</button>
+<button class="px-3 py-2 text-sm bg-primary text-white rounded-button">1</button>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">2</button>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">3</button>
+<span class="px-3 py-2 text-sm text-gray-500">...</span>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">5</button>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">
+下一页
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- 新增/编辑供应商模态框 -->
+<div id="supplierModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-2xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<h3 id="supplierModalTitle" class="text-2xl font-bold text-gray-900">新增供应商</h3>
+<button id="closeSupplierModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<form id="supplierForm" class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">供应商名称 <span class="text-red-500">*</span></label>
+<input type="text" id="supplierName" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">联系人姓名</label>
+<input type="text" id="contactName" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">联系电话</label>
+<input type="tel" id="contactPhone" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">合作状态</label>
+<select id="cooperationStatus" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="active">合作中</option>
+<option value="inactive">已暂停</option>
+<option value="terminated">已终止</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">详细地址</label>
+<input type="text" id="supplierAddress" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">备注信息</label>
+<textarea id="supplierNote" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none"></textarea>
+</div>
+<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+<button type="button" id="cancelSupplierBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存供应商</button>
+</div>
+</form>
+</div>
+</div>
+<!-- 供应商详情模态框 -->
+<div id="supplierDetailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-4xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-bold text-gray-900">供应商详情</h3>
+<button id="closeDetailModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<div class="space-y-8">
+<!-- 基本信息 -->
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">基本信息</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div>
+<div class="text-sm text-gray-500 mb-1">供应商名称</div>
+<div class="font-semibold text-gray-900">华润果业有限公司</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">联系人</div>
+<div class="font-semibold text-gray-900">张明华</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">联系电话</div>
+<div class="font-semibold text-gray-900">138-0013-8888</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">合作状态</div>
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+合作中
+</span>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">成立时间</div>
+<div class="font-semibold text-gray-900">2018 年</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">合作开始时间</div>
+<div class="font-semibold text-gray-900">2020-03-15</div>
+</div>
+</div>
+<div class="mt-4">
+<div class="text-sm text-gray-500 mb-1">详细地址</div>
+<div class="font-semibold text-gray-900">广东省深圳市南山区科技园南区高新南七道 12 号</div>
+</div>
+</div>
+<!-- 财务统计 -->
+<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">财务统计</h4>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="text-center">
+<div class="text-2xl font-bold text-blue-600 mb-1">¥ 1,258,600</div>
+<div class="text-sm text-gray-600">累计交易额</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-green-600 mb-1">156</div>
+<div class="text-sm text-gray-600">交易次数</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-red-600 mb-1">¥ 25,680</div>
+<div class="text-sm text-gray-600">当前欠款</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-orange-600 mb-1">15</div>
+<div class="text-sm text-gray-600">逾期天数</div>
+</div>
+</div>
+</div>
+<!-- 欠款记录 -->
+<div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">欠款记录</h4>
+<div class="overflow-x-auto">
+<table class="w-full text-sm">
+<thead>
+<tr class="border-b border-gray-200">
+<th class="text-left py-2 text-gray-700">交易日期</th>
+<th class="text-left py-2 text-gray-700">交易金额</th>
+<th class="text-left py-2 text-gray-700">已付金额</th>
+<th class="text-left py-2 text-gray-700">欠款金额</th>
+<th class="text-left py-2 text-gray-700">状态</th>
+</tr>
+</thead>
+<tbody class="space-y-2">
+<tr class="border-b border-gray-100">
+<td class="py-3 text-gray-900">2024-01-15</td>
+<td class="py-3 text-gray-900">¥ 18,500</td>
+<td class="py-3 text-gray-900">¥ 10,000</td>
+<td class="py-3 text-red-600 font-semibold">¥ 8,500</td>
+<td class="py-3">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+逾期
+</span>
+</td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="py-3 text-gray-900">2024-01-28</td>
+<td class="py-3 text-gray-900">¥ 22,300</td>
+<td class="py-3 text-gray-900">¥ 5,120</td>
+<td class="py-3 text-red-600 font-semibold">¥ 17,180</td>
+<td class="py-3">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+待付款
+</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 合作历史 -->
+<div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">最近交易记录</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-white/20">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+<i class="ri-shopping-cart-line text-white"></i>
+</div>
+<div>
+<div class="font-semibold text-gray-900">采购苹果 500kg</div>
+<div class="text-sm text-gray-500">2024-01-28 14:30</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-semibold text-gray-900">¥ 22,300</div>
+<div class="text-sm text-green-600">已完成</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-white/20">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center">
+<i class="ri-shopping-cart-line text-white"></i>
+</div>
+<div>
+<div class="font-semibold text-gray-900">采购橙子 300kg</div>
+<div class="text-sm text-gray-500">2024-01-15 09:15</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-semibold text-gray-900">¥ 18,500</div>
+<div class="text-sm text-orange-600">部分付款</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 删除确认模态框 -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl border border-white/20">
+<div class="text-center">
+<div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-error-warning-line text-red-600 text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-2">确认删除</h3>
+<p class="text-gray-600 mb-6">您确定要删除这个供应商吗？此操作不可撤销。</p>
+<div class="flex justify-center space-x-4">
+<button id="cancelDeleteBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button id="confirmDeleteBtn" class="px-6 py-3 bg-red-500 text-white rounded-button whitespace-nowrap hover:bg-red-600 transition-colors">确认删除</button>
+</div>
+</div>
+</div>
+</div>
+<script id="supplier-management-script">
+document.addEventListener('DOMContentLoaded', function() {
+const supplierModal = document.getElementById('supplierModal');
+const supplierDetailModal = document.getElementById('supplierDetailModal');
+const deleteModal = document.getElementById('deleteModal');
+const addSupplierBtn = document.getElementById('addSupplierBtn');
+const closeSupplierModal = document.getElementById('closeSupplierModal');
+const closeDetailModal = document.getElementById('closeDetailModal');
+const cancelSupplierBtn = document.getElementById('cancelSupplierBtn');
+const supplierForm = document.getElementById('supplierForm');
+const supplierModalTitle = document.getElementById('supplierModalTitle');
+const selectAll = document.getElementById('selectAll');
+const supplierCheckboxes = document.querySelectorAll('.supplier-checkbox');
+addSupplierBtn.addEventListener('click', function() {
+supplierModalTitle.textContent = '新增供应商';
+supplierForm.reset();
+supplierModal.classList.remove('hidden');
+});
+document.querySelectorAll('.edit-supplier-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+supplierModalTitle.textContent = '编辑供应商';
+supplierModal.classList.remove('hidden');
+});
+});
+document.querySelectorAll('.view-detail-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+supplierDetailModal.classList.remove('hidden');
+});
+});
+closeSupplierModal.addEventListener('click', function() {
+supplierModal.classList.add('hidden');
+});
+closeDetailModal.addEventListener('click', function() {
+supplierDetailModal.classList.add('hidden');
+});
+cancelSupplierBtn.addEventListener('click', function() {
+supplierModal.classList.add('hidden');
+});
+supplierModal.addEventListener('click', function(e) {
+if (e.target === supplierModal) {
+supplierModal.classList.add('hidden');
+}
+});
+supplierDetailModal.addEventListener('click', function(e) {
+if (e.target === supplierDetailModal) {
+supplierDetailModal.classList.add('hidden');
+}
+});
+supplierForm.addEventListener('submit', function(e) {
+e.preventDefault();
+supplierModal.classList.add('hidden');
+});
+selectAll.addEventListener('change', function() {
+supplierCheckboxes.forEach(checkbox => {
+checkbox.checked = selectAll.checked;
+});
+});
+supplierCheckboxes.forEach(checkbox => {
+checkbox.addEventListener('change', function() {
+const checkedCount = document.querySelectorAll('.supplier-checkbox:checked').length;
+selectAll.checked = checkedCount === supplierCheckboxes.length;
+selectAll.indeterminate = checkedCount > 0 && checkedCount < supplierCheckboxes.length;
+});
+});
+});
+</script>
+<script id="delete-confirmation-script">
+document.addEventListener('DOMContentLoaded', function() {
+const deleteModal = document.getElementById('deleteModal');
+const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+document.querySelectorAll('.delete-supplier-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+deleteModal.classList.remove('hidden');
+});
+});
+cancelDeleteBtn.addEventListener('click', function() {
+deleteModal.classList.add('hidden');
+});
+confirmDeleteBtn.addEventListener('click', function() {
+deleteModal.classList.add('hidden');
+});
+deleteModal.addEventListener('click', function(e) {
+if (e.target === deleteModal) {
+deleteModal.classList.add('hidden');
+}
+});
+});
+</script>
+<script id="search-filter-script">
+document.addEventListener('DOMContentLoaded', function() {
+const searchInput = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+const supplierRows = document.querySelectorAll('.supplier-row');
+function filterSuppliers() {
+const searchTerm = searchInput.value.toLowerCase();
+const statusValue = statusFilter.value;
+supplierRows.forEach(row => {
+const supplierName = row.querySelector('td:nth-child(2) .font-semibold').textContent.toLowerCase();
+const contactName = row.querySelector('td:nth-child(3) div:first-child').textContent.toLowerCase();
+const contactPhone = row.querySelector('td:nth-child(4) div').textContent.toLowerCase();
+const statusElement = row.querySelector('td:nth-child(6) span');
+let statusText = '';
+if (statusElement.textContent.includes('合作中')) statusText = 'active';
+else if (statusElement.textContent.includes('已暂停')) statusText = 'inactive';
+else if (statusElement.textContent.includes('已终止')) statusText = 'terminated';
+const matchesSearch = supplierName.includes(searchTerm) ||
+contactName.includes(searchTerm) ||
+contactPhone.includes(searchTerm);
+const matchesStatus = !statusValue || statusText === statusValue;
+if (matchesSearch && matchesStatus) {
+row.style.display = '';
+} else {
+row.style.display = 'none';
+}
+});
+}
+searchInput.addEventListener('input', filterSuppliers);
+statusFilter.addEventListener('change', filterSuppliers);
+});
+</script>
+</body>
+</html>

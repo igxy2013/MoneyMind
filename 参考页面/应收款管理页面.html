@@ -1,15 +1,112 @@
-{% extends "base.html" %}
-
-{% block title %}应收款管理 - MoneyMind{% endblock %}
-
-{% block extra_head %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>应收款管理 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 </style>
-{% endblock %}
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>仪表板</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>财务分析</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-store-2-line"></i>
+</div>
+<span>供应商管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-shopping-bag-line"></i>
+</div>
+<span>商品管理</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/123ff5e7-b318-48b7-9474-640ae4c7804e" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<span class="font-medium">应收款</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span>分类管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span>用户管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</div>
+</div>
+</div>
+</nav>
 
-{% block content %}
+<main class="ml-64 flex-1 p-8">
 <div class="max-w-7xl mx-auto">
 <div class="mb-8">
 <div class="flex items-center justify-between mb-6">
@@ -17,15 +114,14 @@
 <h1 class="text-3xl font-bold text-gray-900 mb-2">应收款管理</h1>
 <p class="text-gray-600">管理客户应收账款，跟踪逾期情况，记录催收进度和收款状态</p>
 </div>
-<a href="{{ url_for('add_receivable') }}" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
+<button id="addReceivableBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
 <div class="w-4 h-4 flex items-center justify-center">
 <i class="ri-add-line"></i>
 </div>
 <span>新增应收款</span>
-</a>
+</button>
 </div>
 
-<!-- 应收款总览卡片 -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 <div class="bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20">
 <div class="flex items-center justify-between">
@@ -81,7 +177,6 @@
 </div>
 </div>
 
-<!-- 搜索和筛选区域 -->
 <div class="bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20 mb-6">
 <div class="flex flex-wrap items-center gap-4">
 <div class="flex-1 min-w-64">
@@ -132,6 +227,7 @@
 </div>
 <span>批量操作</span>
 </button>
+</div>
 </div>
 </div>
 </div>
@@ -307,12 +403,12 @@
 <td class="px-6 py-4">
 <div>
 <div class="font-semibold text-gray-900">家乐福</div>
-<div class="text-sm text-gray-500">联系人：张主管</div>
+<div class="text-sm text-gray-500">联系人：张采购</div>
 <div class="text-sm text-gray-500">电话：136-7890-1234</div>
 </div>
 </td>
 <td class="px-6 py-4">
-<div class="font-semibold text-gray-900">¥ 75,200.00</div>
+<div class="font-semibold text-gray-900">¥ 76,500.00</div>
 </td>
 <td class="px-6 py-4">
 <div class="font-semibold text-gray-600">¥ 0.00</div>
@@ -322,8 +418,128 @@
 <div class="text-sm text-gray-500">30 天账期</div>
 </td>
 <td class="px-6 py-4">
-<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
 还有 5 天
+</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+未收款
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors payment-record-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors collection-record-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-phone-line text-purple-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition-colors edit-receivable-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-orange-600"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer receivable-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="receivable-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">AR202401004</div>
+<div class="text-sm text-gray-500">2024-01-28</div>
+</td>
+<td class="px-6 py-4">
+<div>
+<div class="font-semibold text-gray-900">沃尔玛</div>
+<div class="text-sm text-gray-500">联系人：陈主管</div>
+<div class="text-sm text-gray-500">电话：135-4567-8901</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">¥ 89,200.00</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-green-600">¥ 20,000.00</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">2024-02-28</div>
+<div class="text-sm text-gray-500">30 天账期</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+还有 8 天
+</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+部分收款
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors payment-record-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-purple-100 hover:bg-purple-200 rounded-full flex items-center justify-center transition-colors collection-record-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-phone-line text-purple-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition-colors edit-receivable-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-orange-600"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer receivable-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="receivable-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">AR202401005</div>
+<div class="text-sm text-gray-500">2024-01-30</div>
+</td>
+<td class="px-6 py-4">
+<div>
+<div class="font-semibold text-gray-900">大润发超市</div>
+<div class="text-sm text-gray-500">联系人：刘经理</div>
+<div class="text-sm text-gray-500">电话：137-8901-2345</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">¥ 63,400.00</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-600">¥ 0.00</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-gray-900">2024-03-01</div>
+<div class="text-sm text-gray-500">30 天账期</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+还有 10 天
 </span>
 </td>
 <td class="px-6 py-4">
@@ -362,7 +578,7 @@
 <div class="px-6 py-4 border-t border-gray-200 bg-gray-50/50">
 <div class="flex items-center justify-between">
 <div class="text-sm text-gray-700">
-显示 <span class="font-semibold">1</span> 到 <span class="font-semibold">3</span> 条，共 <span class="font-semibold">28</span> 条记录
+显示 <span class="font-semibold">1</span> 到 <span class="font-semibold">5</span> 条，共 <span class="font-semibold">28</span> 条记录
 </div>
 <div class="flex items-center space-x-2">
 <button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
@@ -381,8 +597,8 @@
 </div>
 </div>
 </div>
+</main>
 
-<!-- 新增/编辑应收款模态框 -->
 <div id="receivableModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
 <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-4xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
 <div class="flex items-center justify-between mb-6">
@@ -460,7 +676,6 @@
 </div>
 </div>
 
-<!-- 应收款详情模态框 -->
 <div id="receivableDetailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
 <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-5xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
 <div class="flex items-center justify-between mb-6">
@@ -600,7 +815,6 @@
 </div>
 </div>
 
-<!-- 收款登记模态框 -->
 <div id="paymentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
 <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-2xl mx-4 shadow-2xl border border-white/20">
 <div class="flex items-center justify-between mb-6">
@@ -613,32 +827,37 @@
 <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
 <h4 class="text-lg font-semibold text-gray-900 mb-4">应收款信息</h4>
 <div class="grid grid-cols-2 gap-6">
-<div>
-<div class="text-sm text-gray-500 mb-1">应收总额</div>
-<div class="text-xl font-bold text-gray-900">¥ 58,600.00</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-gray-900 mb-2">¥ 58,600.00</div>
+<div class="text-sm text-gray-600">应收总额</div>
 </div>
-<div>
-<div class="text-sm text-gray-500 mb-1">未收金额</div>
-<div class="text-xl font-bold text-red-600">¥ 23,600.00</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-red-600 mb-2">¥ 23,600.00</div>
+<div class="text-sm text-gray-600">未收金额</div>
 </div>
 </div>
 </div>
 <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
 <h4 class="text-lg font-semibold text-gray-900 mb-4">收款信息</h4>
-<form class="space-y-4">
+<form id="paymentForm" class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
 <div>
-<label class="block text-sm font-medium text-gray-700 mb-2">收款金额 *</label>
-<input type="number" step="0.01" placeholder="请输入收款金额" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+<label class="block text-sm font-medium text-gray-700 mb-2">收款金额 <span class="text-red-500">*</span></label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
+<input type="number" id="paymentAmount" required step="0.01" min="0" max="23600" class="w-full pl-8 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
 </div>
 <div>
-<label class="block text-sm font-medium text-gray-700 mb-2">收款日期 *</label>
-<input type="date" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+<label class="block text-sm font-medium text-gray-700 mb-2">收款日期 <span class="text-red-500">*</span></label>
+<input type="date" id="paymentDate" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
 </div>
 <div>
-<label class="block text-sm font-medium text-gray-700 mb-2">收款方式 *</label>
-<select class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+<label class="block text-sm font-medium text-gray-700 mb-2">收款方式 <span class="text-red-500">*</span></label>
+<select id="paymentMethod" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
 <option value="">请选择收款方式</option>
-<option value="bank_transfer">银行转账</option>
+<option value="bank">银行转账</option>
 <option value="cash">现金</option>
 <option value="check">支票</option>
 <option value="other">其他</option>
@@ -646,23 +865,18 @@
 </div>
 <div>
 <label class="block text-sm font-medium text-gray-700 mb-2">收款备注</label>
-<textarea rows="3" placeholder="请输入收款备注" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"></textarea>
+<textarea id="paymentRemark" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none" placeholder="请输入收款相关备注..."></textarea>
+</div>
+<div class="flex justify-end space-x-4 pt-4">
+<button type="button" id="cancelPaymentBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">确认收款</button>
 </div>
 </form>
-</div>
-<div class="flex justify-end space-x-4">
-<button class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors">
-取消
-</button>
-<button class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all transform hover:scale-105">
-确认收款
-</button>
 </div>
 </div>
 </div>
 </div>
 
-<!-- 催收记录模态框 -->
 <div id="collectionModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
 <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-2xl mx-4 shadow-2xl border border-white/20">
 <div class="flex items-center justify-between mb-6">
@@ -674,176 +888,272 @@
 <div class="space-y-6">
 <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6">
 <h4 class="text-lg font-semibold text-gray-900 mb-4">新增催收记录</h4>
-<form class="space-y-4">
+<form id="collectionForm" class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
 <div>
-<label class="block text-sm font-medium text-gray-700 mb-2">催收方式 *</label>
-<select class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+<label class="block text-sm font-medium text-gray-700 mb-2">催收方式 <span class="text-red-500">*</span></label>
+<select id="collectionMethod" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
 <option value="">请选择催收方式</option>
 <option value="phone">电话催收</option>
 <option value="email">邮件催收</option>
 <option value="visit">上门拜访</option>
 <option value="letter">催收函</option>
-<option value="other">其他</option>
 </select>
 </div>
 <div>
-<label class="block text-sm font-medium text-gray-700 mb-2">催收时间 *</label>
-<input type="datetime-local" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+<label class="block text-sm font-medium text-gray-700 mb-2">催收日期 <span class="text-red-500">*</span></label>
+<input type="date" id="collectionDate" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
 </div>
-<div>
-<label class="block text-sm font-medium text-gray-700 mb-2">催收人 *</label>
-<input type="text" placeholder="请输入催收人姓名" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
 </div>
 <div>
 <label class="block text-sm font-medium text-gray-700 mb-2">客户反馈</label>
-<textarea rows="3" placeholder="请输入客户反馈内容" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"></textarea>
+<textarea id="customerFeedback" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none" placeholder="请输入客户反馈信息..."></textarea>
 </div>
 <div>
-<label class="block text-sm font-medium text-gray-700 mb-2">下次跟进时间</label>
-<input type="date" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+<label class="block text-sm font-medium text-gray-700 mb-2">下次跟进日期</label>
+<input type="date" id="nextFollowDate" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
 </div>
 <div>
-<label class="block text-sm font-medium text-gray-700 mb-2">备注说明</label>
-<textarea rows="3" placeholder="请输入备注说明" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"></textarea>
+<label class="block text-sm font-medium text-gray-700 mb-2">催收备注</label>
+<textarea id="collectionRemark" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none" placeholder="请输入催收相关备注..."></textarea>
+</div>
+<div class="flex justify-end space-x-4 pt-4">
+<button type="button" id="cancelCollectionBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存记录</button>
 </div>
 </form>
 </div>
-<div class="flex justify-end space-x-4">
-<button class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors">
-取消
-</button>
-<button class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white rounded-xl transition-all transform hover:scale-105">
-保存记录
-</button>
+<div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">历史催收记录</h4>
+<div class="space-y-4 max-h-64 overflow-y-auto">
+<div class="bg-white/60 rounded-xl p-4 border border-white/40">
+<div class="flex items-center justify-between mb-2">
+<div class="font-semibold text-gray-900">电话催收</div>
+<div class="text-sm text-gray-500">2024-02-16</div>
+</div>
+<div class="text-sm text-gray-600 mb-2">客户反馈：承诺本周内付款</div>
+<div class="text-sm text-gray-500">催收人：王建国 | 下次跟进：2024-02-23</div>
+</div>
+<div class="bg-white/60 rounded-xl p-4 border border-white/40">
+<div class="flex items-center justify-between mb-2">
+<div class="font-semibold text-gray-900">上门拜访</div>
+<div class="text-sm text-gray-500">2024-02-20</div>
+</div>
+<div class="text-sm text-gray-600 mb-2">客户反馈：资金周转困难，申请延期</div>
+<div class="text-sm text-gray-500">催收人：张明华 | 下次跟进：2024-02-27</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 
-<script>
-// 模态框控制
-const addReceivableBtn = document.getElementById('addReceivableBtn');
+<script id="receivable-management-script">
+document.addEventListener('DOMContentLoaded', function() {
 const receivableModal = document.getElementById('receivableModal');
-const closeReceivableModal = document.getElementById('closeReceivableModal');
 const receivableDetailModal = document.getElementById('receivableDetailModal');
-const closeDetailModal = document.getElementById('closeDetailModal');
 const paymentModal = document.getElementById('paymentModal');
-const closePaymentModal = document.getElementById('closePaymentModal');
 const collectionModal = document.getElementById('collectionModal');
+const addReceivableBtn = document.getElementById('addReceivableBtn');
+const closeReceivableModal = document.getElementById('closeReceivableModal');
+const closeDetailModal = document.getElementById('closeDetailModal');
+const closePaymentModal = document.getElementById('closePaymentModal');
 const closeCollectionModal = document.getElementById('closeCollectionModal');
+const cancelReceivableBtn = document.getElementById('cancelReceivableBtn');
+const cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
+const cancelCollectionBtn = document.getElementById('cancelCollectionBtn');
+const receivableForm = document.getElementById('receivableForm');
+const paymentForm = document.getElementById('paymentForm');
+const collectionForm = document.getElementById('collectionForm');
+const receivableModalTitle = document.getElementById('receivableModalTitle');
+const selectAll = document.getElementById('selectAll');
+const receivableCheckboxes = document.querySelectorAll('.receivable-checkbox');
 
-// 新增应收款模态框
-addReceivableBtn.addEventListener('click', () => {
-    receivableModal.classList.remove('hidden');
+addReceivableBtn.addEventListener('click', function() {
+receivableModalTitle.textContent = '新增应收款';
+receivableForm.reset();
+document.getElementById('receivableNumber').value = 'AR202402001';
+receivableModal.classList.remove('hidden');
 });
 
-closeReceivableModal.addEventListener('click', () => {
-    receivableModal.classList.add('hidden');
+document.querySelectorAll('.edit-receivable-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+receivableModalTitle.textContent = '编辑应收款';
+receivableModal.classList.remove('hidden');
+});
 });
 
-// 应收款详情模态框
 document.querySelectorAll('.view-detail-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        receivableDetailModal.classList.remove('hidden');
-    });
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+receivableDetailModal.classList.remove('hidden');
+});
 });
 
-closeDetailModal.addEventListener('click', () => {
-    receivableDetailModal.classList.add('hidden');
+document.querySelectorAll('.payment-record-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+paymentModal.classList.remove('hidden');
+});
 });
 
-// 收款登记模态框
-document.querySelectorAll('.payment-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        paymentModal.classList.remove('hidden');
-    });
+document.querySelectorAll('.collection-record-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+document.getElementById('collectionDate').value = new Date().toISOString().split('T')[0];
+collectionModal.classList.remove('hidden');
+});
 });
 
-closePaymentModal.addEventListener('click', () => {
-    paymentModal.classList.add('hidden');
+closeReceivableModal.addEventListener('click', function() {
+receivableModal.classList.add('hidden');
 });
 
-// 催收记录模态框
-document.querySelectorAll('.collection-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        collectionModal.classList.remove('hidden');
-    });
+closeDetailModal.addEventListener('click', function() {
+receivableDetailModal.classList.add('hidden');
 });
 
-closeCollectionModal.addEventListener('click', () => {
-    collectionModal.classList.add('hidden');
+closePaymentModal.addEventListener('click', function() {
+paymentModal.classList.add('hidden');
 });
 
-// 点击模态框背景关闭
-[receivableModal, receivableDetailModal, paymentModal, collectionModal].forEach(modal => {
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.add('hidden');
-        }
-    });
+closeCollectionModal.addEventListener('click', function() {
+collectionModal.classList.add('hidden');
 });
 
-// ESC键关闭模态框
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        [receivableModal, receivableDetailModal, paymentModal, collectionModal].forEach(modal => {
-            modal.classList.add('hidden');
-        });
-    }
+cancelReceivableBtn.addEventListener('click', function() {
+receivableModal.classList.add('hidden');
 });
 
-// 筛选功能
-const statusFilter = document.getElementById('statusFilter');
-const customerFilter = document.getElementById('customerFilter');
+cancelPaymentBtn.addEventListener('click', function() {
+paymentModal.classList.add('hidden');
+});
 
-if (statusFilter) {
-    statusFilter.addEventListener('change', () => {
-        // 这里可以添加筛选逻辑
-        console.log('状态筛选:', statusFilter.value);
-    });
+cancelCollectionBtn.addEventListener('click', function() {
+collectionModal.classList.add('hidden');
+});
+
+receivableModal.addEventListener('click', function(e) {
+if (e.target === receivableModal) {
+receivableModal.classList.add('hidden');
 }
+});
 
-if (customerFilter) {
-    customerFilter.addEventListener('change', () => {
-        // 这里可以添加筛选逻辑
-        console.log('客户筛选:', customerFilter.value);
-    });
+receivableDetailModal.addEventListener('click', function(e) {
+if (e.target === receivableDetailModal) {
+receivableDetailModal.classList.add('hidden');
 }
+});
 
-// 搜索功能
-const searchInput = document.querySelector('input[placeholder="搜索应收款单号、客户名称..."]');
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        // 这里可以添加搜索逻辑
-        console.log('搜索:', e.target.value);
-    });
+paymentModal.addEventListener('click', function(e) {
+if (e.target === paymentModal) {
+paymentModal.classList.add('hidden');
 }
+});
 
-// 全选功能
-const selectAllCheckbox = document.getElementById('selectAll');
-const rowCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#selectAll)');
-
-if (selectAllCheckbox) {
-    selectAllCheckbox.addEventListener('change', () => {
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
-        });
-    });
+collectionModal.addEventListener('click', function(e) {
+if (e.target === collectionModal) {
+collectionModal.classList.add('hidden');
 }
+});
 
-// 批量操作
-const batchActionBtn = document.querySelector('button[title="批量操作"]');
-if (batchActionBtn) {
-    batchActionBtn.addEventListener('click', () => {
-        const selectedRows = Array.from(rowCheckboxes).filter(cb => cb.checked);
-        if (selectedRows.length === 0) {
-            alert('请先选择要操作的应收款记录');
-            return;
-        }
-        // 这里可以添加批量操作逻辑
-        console.log('批量操作:', selectedRows.length + '条记录');
-    });
-}
+receivableForm.addEventListener('submit', function(e) {
+e.preventDefault();
+receivableModal.classList.add('hidden');
+});
+
+paymentForm.addEventListener('submit', function(e) {
+e.preventDefault();
+paymentModal.classList.add('hidden');
+});
+
+collectionForm.addEventListener('submit', function(e) {
+e.preventDefault();
+collectionModal.classList.add('hidden');
+});
+
+selectAll.addEventListener('change', function() {
+receivableCheckboxes.forEach(checkbox => {
+checkbox.checked = selectAll.checked;
+});
+});
+
+receivableCheckboxes.forEach(checkbox => {
+checkbox.addEventListener('change', function() {
+const checkedCount = document.querySelectorAll('.receivable-checkbox:checked').length;
+selectAll.checked = checkedCount === receivableCheckboxes.length;
+selectAll.indeterminate = checkedCount > 0 && checkedCount < receivableCheckboxes.length;
+});
+});
+});
 </script>
 
-{% endblock %}
+<script id="search-filter-script">
+document.addEventListener('DOMContentLoaded', function() {
+const searchInput = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+const customerFilter = document.getElementById('customerFilter');
+const receivableRows = document.querySelectorAll('.receivable-row');
+
+function filterReceivables() {
+const searchTerm = searchInput.value.toLowerCase();
+const statusValue = statusFilter.value;
+const customerValue = customerFilter.value;
+
+receivableRows.forEach(row => {
+const receivableNumber = row.querySelector('td:nth-child(2) .font-semibold').textContent.toLowerCase();
+const customerName = row.querySelector('td:nth-child(3) .font-semibold').textContent.toLowerCase();
+const contactInfo = row.querySelector('td:nth-child(3) .text-sm').textContent.toLowerCase();
+const statusElement = row.querySelector('td:nth-child(8) span');
+let statusText = '';
+if (statusElement.textContent.includes('未收款')) statusText = 'unpaid';
+else if (statusElement.textContent.includes('部分收款')) statusText = 'partial';
+else if (statusElement.textContent.includes('已收款')) statusText = 'paid';
+else if (statusElement.textContent.includes('逾期')) statusText = 'overdue';
+
+let customerText = '';
+if (customerName.includes('华润万家')) customerText = 'customer1';
+else if (customerName.includes('永辉超市')) customerText = 'customer2';
+else if (customerName.includes('家乐福')) customerText = 'customer3';
+else if (customerName.includes('沃尔玛')) customerText = 'customer4';
+
+const matchesSearch = receivableNumber.includes(searchTerm) || customerName.includes(searchTerm) || contactInfo.includes(searchTerm);
+const matchesStatus = !statusValue || statusText === statusValue;
+const matchesCustomer = !customerValue || customerText === customerValue;
+
+if (matchesSearch && matchesStatus && matchesCustomer) {
+row.style.display = '';
+} else {
+row.style.display = 'none';
+}
+});
+}
+
+searchInput.addEventListener('input', filterReceivables);
+statusFilter.addEventListener('change', filterReceivables);
+customerFilter.addEventListener('change', filterReceivables);
+
+document.getElementById('invoiceDate').addEventListener('change', function() {
+const invoiceDate = new Date(this.value);
+const paymentTerms = parseInt(document.getElementById('paymentTerms').value) || 30;
+const dueDate = new Date(invoiceDate);
+dueDate.setDate(dueDate.getDate() + paymentTerms);
+document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+});
+
+document.getElementById('paymentTerms').addEventListener('change', function() {
+const invoiceDateValue = document.getElementById('invoiceDate').value;
+if (invoiceDateValue) {
+const invoiceDate = new Date(invoiceDateValue);
+const paymentTerms = parseInt(this.value) || 30;
+const dueDate = new Date(invoiceDate);
+dueDate.setDate(dueDate.getDate() + paymentTerms);
+document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+}
+});
+});
+</script>
+</body>
+</html>

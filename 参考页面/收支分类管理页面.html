@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分类管理 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<!-- 左侧导航栏 -->
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/8a66bf01-6d33-496b-8561-3d9b62eda1d6" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>仪表板</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>财务分析</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span class="font-medium">分类管理</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/2f8e21cb-eb42-40f5-900a-01fcd6f7f4b4" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span>用户管理</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- 主内容区域 -->
+<main class="ml-64 flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<!-- 页面标题 -->
+<div class="mb-8">
+<h1 class="text-3xl font-bold text-gray-900 mb-2">分类管理</h1>
+<p class="text-gray-600">管理收支分类，包括添加、编辑和删除收支类别</p>
+</div>
+<!-- 操作区域 -->
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center space-x-4">
+<button id="addCategoryBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>添加新分类</span>
+</button>
+<div class="relative">
+<select id="typeFilter" class="appearance-none bg-white/80 backdrop-blur-lg border border-white/20 rounded-button px-4 py-3 pr-10 text-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+<option value="">全部类型</option>
+<option value="收入">收入</option>
+<option value="支出">支出</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line text-gray-400"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 分类列表 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-3xl shadow-lg border border-white/20 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-white/40">
+<tr>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">分类名称</th>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">类型</th>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">描述</th>
+<th class="px-6 py-4 text-left text-sm font-medium text-gray-700">创建时间</th>
+<th class="px-6 py-4 text-center text-sm font-medium text-gray-700">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr class="hover:bg-white/40 transition-colors category-row" data-type="收入">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+<i class="ri-money-dollar-circle-line text-green-600"></i>
+</div>
+<span class="font-medium text-gray-900">销售收入</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+</td>
+<td class="px-6 py-4 text-gray-600">农产品销售所得收入</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-08-01</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="销售收入" data-type="收入" data-desc="农产品销售所得收入">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="销售收入">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors category-row" data-type="收入">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+<i class="ri-bank-line text-blue-600"></i>
+</div>
+<span class="font-medium text-gray-900">利息收入</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+</td>
+<td class="px-6 py-4 text-gray-600">银行存款利息收入</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-28</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="利息收入" data-type="收入" data-desc="银行存款利息收入">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="利息收入">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors category-row" data-type="支出">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+<i class="ri-shopping-cart-line text-orange-600"></i>
+</div>
+<span class="font-medium text-gray-900">原料采购</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="px-6 py-4 text-gray-600">种子、肥料等原料采购费用</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-25</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="原料采购" data-type="支出" data-desc="种子、肥料等原料采购费用">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="原料采购">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors category-row" data-type="支出">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+<i class="ri-team-line text-purple-600"></i>
+</div>
+<span class="font-medium text-gray-900">人工费用</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="px-6 py-4 text-gray-600">员工工资及临时工费用</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-20</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="人工费用" data-type="支出" data-desc="员工工资及临时工费用">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="人工费用">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors category-row" data-type="支出">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+<i class="ri-file-paper-line text-gray-600"></i>
+</div>
+<span class="font-medium text-gray-900">办公用品</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="px-6 py-4 text-gray-600">办公文具、纸张等用品采购</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-15</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="办公用品" data-type="支出" data-desc="办公文具、纸张等用品采购">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="办公用品">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/40 transition-colors category-row" data-type="支出">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+<i class="ri-tools-line text-indigo-600"></i>
+</div>
+<span class="font-medium text-gray-900">工具设备</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="px-6 py-4 text-gray-600">农具、机械设备采购维修</td>
+<td class="px-6 py-4 text-gray-500 text-sm">2024-07-10</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="工具设备" data-type="支出" data-desc="农具、机械设备采购维修">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="工具设备">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- 添加/编辑分类模态框 -->
+<div id="categoryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl border border-white/20">
+<div class="flex items-center justify-between mb-6">
+<h3 id="modalTitle" class="text-xl font-bold text-gray-900">添加新分类</h3>
+<button id="closeModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<form id="categoryForm" class="space-y-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">分类名称</label>
+<input type="text" id="categoryName" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900" placeholder="请输入分类名称" required>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">类型</label>
+<div class="flex space-x-4">
+<label class="flex items-center">
+<input type="radio" name="categoryType" value="收入" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">收入</span>
+</label>
+<label class="flex items-center">
+<input type="radio" name="categoryType" value="支出" class="sr-only">
+<div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+<div class="radio-dot w-2 h-2 bg-primary rounded-full hidden"></div>
+</div>
+<span class="ml-2 text-gray-700">支出</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+<textarea id="categoryDesc" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none" rows="3" placeholder="请输入分类描述"></textarea>
+</div>
+<div class="flex space-x-4 pt-4">
+<button type="button" id="cancelBtn" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="flex-1 px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存</button>
+</div>
+</form>
+</div>
+</div>
+<!-- 删除确认模态框 -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-sm mx-4 shadow-2xl border border-white/20">
+<div class="text-center">
+<div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-delete-bin-line text-red-600 text-2xl"></i>
+</div>
+<h3 class="text-lg font-bold text-gray-900 mb-2">确认删除</h3>
+<p class="text-gray-600 mb-6">确定要删除分类 "<span id="deleteItemName"></span>" 吗？此操作不可撤销。</p>
+<div class="flex space-x-4">
+<button id="cancelDelete" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button id="confirmDelete" class="flex-1 px-6 py-3 bg-red-500 text-white rounded-button whitespace-nowrap hover:bg-red-600 transition-colors">删除</button>
+</div>
+</div>
+</div>
+</div>
+<script id="modal-script">
+document.addEventListener('DOMContentLoaded', function() {
+const categoryModal = document.getElementById('categoryModal');
+const deleteModal = document.getElementById('deleteModal');
+const addCategoryBtn = document.getElementById('addCategoryBtn');
+const closeModal = document.getElementById('closeModal');
+const cancelBtn = document.getElementById('cancelBtn');
+const categoryForm = document.getElementById('categoryForm');
+const modalTitle = document.getElementById('modalTitle');
+const cancelDelete = document.getElementById('cancelDelete');
+const confirmDelete = document.getElementById('confirmDelete');
+const deleteItemName = document.getElementById('deleteItemName');
+let editingRow = null;
+let deletingRow = null;
+addCategoryBtn.addEventListener('click', function() {
+modalTitle.textContent = '添加新分类';
+categoryForm.reset();
+editingRow = null;
+categoryModal.classList.remove('hidden');
+});
+closeModal.addEventListener('click', function() {
+categoryModal.classList.add('hidden');
+});
+cancelBtn.addEventListener('click', function() {
+categoryModal.classList.add('hidden');
+});
+cancelDelete.addEventListener('click', function() {
+deleteModal.classList.add('hidden');
+});
+categoryForm.addEventListener('submit', function(e) {
+e.preventDefault();
+const name = document.getElementById('categoryName').value;
+const type = document.querySelector('input[name="categoryType"]:checked').value;
+const desc = document.getElementById('categoryDesc').value;
+const currentDate = new Date().toISOString().split('T')[0];
+if (editingRow) {
+updateRow(editingRow, name, type, desc);
+} else {
+addNewRow(name, type, desc, currentDate);
+}
+categoryModal.classList.add('hidden');
+});
+confirmDelete.addEventListener('click', function() {
+if (deletingRow) {
+deletingRow.remove();
+}
+deleteModal.classList.add('hidden');
+});
+function addNewRow(name, type, desc, date) {
+const tbody = document.querySelector('tbody');
+const icons = {
+'收入': { icon: 'ri-money-dollar-circle-line', color: 'green' },
+'支出': { icon: 'ri-shopping-cart-line', color: 'orange' }
+};
+const iconData = icons[type];
+const typeClass = type === '收入' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+const newRow = document.createElement('tr');
+newRow.className = 'hover:bg-white/40 transition-colors category-row';
+newRow.setAttribute('data-type', type);
+newRow.innerHTML = `
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-${iconData.color}-100 rounded-full flex items-center justify-center">
+<i class="${iconData.icon} text-${iconData.color}-600"></i>
+</div>
+<span class="font-medium text-gray-900">${name}</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${typeClass}">${type}</span>
+</td>
+<td class="px-6 py-4 text-gray-600">${desc}</td>
+<td class="px-6 py-4 text-gray-500 text-sm">${date}</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="${name}" data-type="${type}" data-desc="${desc}">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="${name}">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+`;
+tbody.appendChild(newRow);
+}
+function updateRow(row, name, type, desc) {
+const icons = {
+'收入': { icon: 'ri-money-dollar-circle-line', color: 'green' },
+'支出': { icon: 'ri-shopping-cart-line', color: 'orange' }
+};
+const iconData = icons[type];
+const typeClass = type === '收入' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+row.setAttribute('data-type', type);
+row.innerHTML = `
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 bg-${iconData.color}-100 rounded-full flex items-center justify-center">
+<i class="${iconData.icon} text-${iconData.color}-600"></i>
+</div>
+<span class="font-medium text-gray-900">${name}</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${typeClass}">${type}</span>
+</td>
+<td class="px-6 py-4 text-gray-600">${desc}</td>
+<td class="px-6 py-4 text-gray-500 text-sm">${row.cells[3].textContent}</td>
+<td class="px-6 py-4 text-center">
+<div class="flex items-center justify-center space-x-2">
+<button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" data-name="${name}" data-type="${type}" data-desc="${desc}">
+<i class="ri-edit-line text-blue-600 text-sm"></i>
+</button>
+<button class="delete-btn w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" data-name="${name}">
+<i class="ri-delete-bin-line text-red-600 text-sm"></i>
+</button>
+</div>
+</td>
+`;
+}
+document.addEventListener('click', function(e) {
+if (e.target.closest('.edit-btn')) {
+const btn = e.target.closest('.edit-btn');
+const name = btn.getAttribute('data-name');
+const type = btn.getAttribute('data-type');
+const desc = btn.getAttribute('data-desc');
+modalTitle.textContent = '编辑分类';
+document.getElementById('categoryName').value = name;
+document.querySelector(`input[name="categoryType"][value="${type}"]`).checked = true;
+document.getElementById('categoryDesc').value = desc;
+editingRow = btn.closest('tr');
+categoryModal.classList.remove('hidden');
+}
+if (e.target.closest('.delete-btn')) {
+const btn = e.target.closest('.delete-btn');
+const name = btn.getAttribute('data-name');
+deleteItemName.textContent = name;
+deletingRow = btn.closest('tr');
+deleteModal.classList.remove('hidden');
+}
+});
+});
+</script>
+<script id="radio-script">
+document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('click', function(e) {
+if (e.target.closest('.radio-custom')) {
+const radioContainer = e.target.closest('.radio-custom');
+const radioInput = radioContainer.parentElement.querySelector('input[type="radio"]');
+const allRadios = document.querySelectorAll('input[name="' + radioInput.name + '"]');
+const allDots = document.querySelectorAll('input[name="' + radioInput.name + '"] + .radio-custom .radio-dot');
+allDots.forEach(dot => dot.classList.add('hidden'));
+allRadios.forEach(radio => {
+radio.checked = false;
+radio.parentElement.querySelector('.radio-custom').classList.remove('border-primary');
+radio.parentElement.querySelector('.radio-custom').classList.add('border-gray-300');
+});
+radioInput.checked = true;
+radioContainer.classList.remove('border-gray-300');
+radioContainer.classList.add('border-primary');
+radioContainer.querySelector('.radio-dot').classList.remove('hidden');
+}
+});
+});
+</script>
+<script id="filter-script">
+document.addEventListener('DOMContentLoaded', function() {
+const typeFilter = document.getElementById('typeFilter');
+const categoryRows = document.querySelectorAll('.category-row');
+typeFilter.addEventListener('change', function() {
+const selectedType = this.value;
+categoryRows.forEach(row => {
+const rowType = row.getAttribute('data-type');
+if (selectedType === '' || rowType === selectedType) {
+row.style.display = '';
+} else {
+row.style.display = 'none';
+}
+});
+});
+});
+</script>
+</body>
+</html>

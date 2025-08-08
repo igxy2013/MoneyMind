@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary: #6366F1;
+    --secondary: #34D399;
+}
+
+@layer base {
+    body {
+        @apply bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen;
+    }
+}
+
+@layer components {
+    .rounded-button {
+        @apply rounded-lg;
+    }
+}
+
+@layer utilities {
+    .bg-primary {
+        background-color: var(--primary);
+    }
+    .bg-secondary {
+        background-color: var(--secondary);
+    }
+    .text-primary {
+        color: var(--primary);
+    }
+    .text-secondary {
+        color: var(--secondary);
+    }
+    .from-primary {
+        --tw-gradient-from: var(--primary);
+    }
+    .from-secondary {
+        --tw-gradient-from: var(--secondary);
+    }
+}

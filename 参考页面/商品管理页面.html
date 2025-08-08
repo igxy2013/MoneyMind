@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品管理 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<!-- 左侧导航栏 -->
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>仪表板</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>财务分析</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/b6dcb037-fd7b-4031-ab70-c7498dd90783" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-store-2-line"></i>
+</div>
+<span>供应商管理</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-shopping-bag-line"></i>
+</div>
+<span class="font-medium">商品管理</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/5ff09e9d-167a-4164-b36c-76dde0bdf60d" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<span>应收款</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span>分类管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span>用户管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- 主内容区域 -->
+<main class="ml-64 flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<!-- 页面标题和操作栏 -->
+<div class="mb-8">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h1 class="text-3xl font-bold text-gray-900 mb-2">商品管理</h1>
+<p class="text-gray-600">管理商品信息，包括商品分类、库存状态、价格设置等核心数据</p>
+</div>
+<button id="addProductBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>新增商品</span>
+</button>
+</div>
+<!-- 搜索和筛选栏 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20 mb-6">
+<div class="flex flex-wrap items-center gap-4">
+<div class="flex-1 min-w-64">
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-search-line text-gray-400"></i>
+</div>
+</div>
+<input type="text" id="searchInput" placeholder="搜索商品名称、编号或描述..." class="w-full pl-10 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<select id="categoryFilter" class="px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm pr-8">
+<option value="">全部分类</option>
+<option value="fresh-fruit">新鲜水果</option>
+<option value="dried-fruit">干果坚果</option>
+<option value="fruit-juice">果汁饮品</option>
+<option value="fruit-snack">果脯零食</option>
+</select>
+<select id="stockFilter" class="px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm pr-8">
+<option value="">库存状态</option>
+<option value="in-stock">有库存</option>
+<option value="low-stock">库存不足</option>
+<option value="out-of-stock">缺货</option>
+</select>
+<button id="advancedFilterBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-filter-line"></i>
+</div>
+<span>高级筛选</span>
+</button>
+<button id="batchActionBtn" class="px-6 py-3 bg-secondary/10 text-secondary rounded-button whitespace-nowrap hover:bg-secondary hover:text-white transition-colors flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-checkbox-multiple-line"></i>
+</div>
+<span>批量操作</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- 商品列表 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-gray-50/80 border-b border-gray-200">
+<tr>
+<th class="px-6 py-4 text-left">
+<input type="checkbox" id="selectAll" class="w-4 h-4 text-primary rounded">
+</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">商品图片</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors">
+<div class="flex items-center space-x-1">
+<span>商品名称</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line text-gray-400"></i>
+</div>
+</div>
+</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">分类</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors">
+<div class="flex items-center space-x-1">
+<span>售价</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line text-gray-400"></i>
+</div>
+</div>
+</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors">
+<div class="flex items-center space-x-1">
+<span>库存</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-up-down-line text-gray-400"></i>
+</div>
+</div>
+</th>
+<th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">状态</th>
+<th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100">
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer product-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="product-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-red-100 to-orange-100">
+<img src="https://readdy.ai/api/search-image?query=fresh%20red%20apples%20on%20white%20background%2C%20clean%20product%20photography%2C%20high%20quality%2C%20professional%20lighting%2C%20simple%20composition&width=64&height=64&seq=apple001&orientation=squarish" alt="红富士苹果" class="w-full h-full object-cover object-top">
+</div>
+</td>
+<td class="px-6 py-4">
+<div>
+<div class="font-semibold text-gray-900">红富士苹果</div>
+<div class="text-sm text-gray-500">编号: FRT001</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+新鲜水果
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">¥ 12.80/kg</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-green-600">580 kg</div>
+<div class="text-sm text-gray-500">安全库存</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+在售
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition-colors stock-manage-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-archive-line text-orange-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer product-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="product-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-orange-100 to-yellow-100">
+<img src="https://readdy.ai/api/search-image?query=fresh%20oranges%20on%20white%20background%2C%20clean%20product%20photography%2C%20high%20quality%2C%20professional%20lighting%2C%20simple%20composition&width=64&height=64&seq=orange001&orientation=squarish" alt="脐橙" class="w-full h-full object-cover object-top">
+</div>
+</td>
+<td class="px-6 py-4">
+<div>
+<div class="font-semibold text-gray-900">赣南脐橙</div>
+<div class="text-sm text-gray-500">编号: FRT002</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+新鲜水果
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">¥ 15.60/kg</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-orange-600">45 kg</div>
+<div class="text-sm text-orange-500">库存不足</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+在售
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition-colors stock-manage-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-archive-line text-orange-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer product-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="product-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-purple-100 to-pink-100">
+<img src="https://readdy.ai/api/search-image?query=fresh%20bananas%20on%20white%20background%2C%20clean%20product%20photography%2C%20high%20quality%2C%20professional%20lighting%2C%20simple%20composition&width=64&height=64&seq=banana001&orientation=squarish" alt="香蕉" class="w-full h-full object-cover object-top">
+</div>
+</td>
+<td class="px-6 py-4">
+<div>
+<div class="font-semibold text-gray-900">进口香蕉</div>
+<div class="text-sm text-gray-500">编号: FRT003</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+新鲜水果
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">¥ 8.90/kg</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-red-600">0 kg</div>
+<div class="text-sm text-red-500">缺货</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+下架
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition-colors stock-manage-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-archive-line text-orange-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer product-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="product-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-yellow-100 to-orange-100">
+<img src="https://readdy.ai/api/search-image?query=mixed%20nuts%20and%20dried%20fruits%20on%20white%20background%2C%20clean%20product%20photography%2C%20high%20quality%2C%20professional%20lighting%2C%20simple%20composition&width=64&height=64&seq=nuts001&orientation=squarish" alt="坚果" class="w-full h-full object-cover object-top">
+</div>
+</td>
+<td class="px-6 py-4">
+<div>
+<div class="font-semibold text-gray-900">每日坚果</div>
+<div class="text-sm text-gray-500">编号: NUT001</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+干果坚果
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">¥ 28.80/盒</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-green-600">320 盒</div>
+<div class="text-sm text-gray-500">安全库存</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+在售
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition-colors stock-manage-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-archive-line text-orange-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors cursor-pointer product-row">
+<td class="px-6 py-4">
+<input type="checkbox" class="product-checkbox w-4 h-4 text-primary rounded">
+</td>
+<td class="px-6 py-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100">
+<img src="https://readdy.ai/api/search-image?query=fruit%20juice%20bottles%20on%20white%20background%2C%20clean%20product%20photography%2C%20high%20quality%2C%20professional%20lighting%2C%20simple%20composition&width=64&height=64&seq=juice001&orientation=squarish" alt="果汁" class="w-full h-full object-cover object-top">
+</div>
+</td>
+<td class="px-6 py-4">
+<div>
+<div class="font-semibold text-gray-900">鲜榨橙汁</div>
+<div class="text-sm text-gray-500">编号: JUC001</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+果汁饮品
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-gray-900">¥ 18.50/瓶</div>
+</td>
+<td class="px-6 py-4">
+<div class="font-semibold text-green-600">156 瓶</div>
+<div class="text-sm text-gray-500">安全库存</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+在售
+</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-center space-x-2">
+<button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line text-blue-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line text-green-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-orange-100 hover:bg-orange-200 rounded-full flex items-center justify-center transition-colors stock-manage-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-archive-line text-orange-600"></i>
+</div>
+</button>
+<button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-product-btn">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-delete-bin-line text-red-600"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- 分页 -->
+<div class="px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+<div class="flex items-center justify-between">
+<div class="text-sm text-gray-700">
+显示 <span class="font-semibold">1</span> 到 <span class="font-semibold">5</span> 条，共 <span class="font-semibold">18</span> 条记录
+</div>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+上一页
+</button>
+<button class="px-3 py-2 text-sm bg-primary text-white rounded-button">1</button>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">2</button>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">3</button>
+<span class="px-3 py-2 text-sm text-gray-500">...</span>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">4</button>
+<button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">
+下一页
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- 新增/编辑商品模态框 -->
+<div id="productModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-4xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<h3 id="productModalTitle" class="text-2xl font-bold text-gray-900">新增商品</h3>
+<button id="closeProductModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<form id="productForm" class="space-y-8">
+<!-- 基本信息 -->
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">基本信息</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品名称 <span class="text-red-500">*</span></label>
+<input type="text" id="productName" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品编号</label>
+<input type="text" id="productCode" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品分类 <span class="text-red-500">*</span></label>
+<select id="productCategory" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="">请选择分类</option>
+<option value="fresh-fruit">新鲜水果</option>
+<option value="dried-fruit">干果坚果</option>
+<option value="fruit-juice">果汁饮品</option>
+<option value="fruit-snack">果脯零食</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品状态</label>
+<select id="productStatus" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="active">在售</option>
+<option value="inactive">下架</option>
+<option value="draft">草稿</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品描述</label>
+<textarea id="productDescription" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none"></textarea>
+</div>
+</div>
+<!-- 价格设置 -->
+<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">价格设置</h4>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">售价 <span class="text-red-500">*</span></label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
+<input type="number" id="productPrice" required step="0.01" min="0" class="w-full pl-8 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">成本价</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
+<input type="number" id="productCost" step="0.01" min="0" class="w-full pl-8 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">计量单位</label>
+<select id="productUnit" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="kg">千克(kg)</option>
+<option value="g">克(g)</option>
+<option value="个">个</option>
+<option value="盒">盒</option>
+<option value="瓶">瓶</option>
+<option value="袋">袋</option>
+</select>
+</div>
+</div>
+</div>
+<!-- 库存管理 -->
+<div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">库存管理</h4>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">当前库存</label>
+<input type="number" id="currentStock" min="0" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">最低库存预警</label>
+<input type="number" id="minStock" min="0" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">最高库存</label>
+<input type="number" id="maxStock" min="0" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+</div>
+</div>
+<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+<button type="button" id="cancelProductBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存商品</button>
+</div>
+</form>
+</div>
+</div>
+<!-- 商品详情模态框 -->
+<div id="productDetailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-5xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-bold text-gray-900">商品详情</h3>
+<button id="closeDetailModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<div class="space-y-8">
+<!-- 商品信息 -->
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">商品信息</h4>
+<div class="flex items-start space-x-6">
+<div class="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-red-100 to-orange-100 flex-shrink-0">
+<img src="https://readdy.ai/api/search-image?query=fresh%20red%20apples%20on%20white%20background%2C%20clean%20product%20photography%2C%20high%20quality%2C%20professional%20lighting%2C%20simple%20composition&width=128&height=128&seq=apple002&orientation=squarish" alt="红富士苹果" class="w-full h-full object-cover object-top">
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div>
+<div class="text-sm text-gray-500 mb-1">商品名称</div>
+<div class="font-semibold text-gray-900">红富士苹果</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">商品编号</div>
+<div class="font-semibold text-gray-900">FRT001</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">商品分类</div>
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+新鲜水果
+</span>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">售价</div>
+<div class="font-semibold text-gray-900">¥ 12.80/kg</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">成本价</div>
+<div class="font-semibold text-gray-900">¥ 8.50/kg</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">商品状态</div>
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+在售
+</span>
+</div>
+</div>
+</div>
+<div class="mt-4">
+<div class="text-sm text-gray-500 mb-1">商品描述</div>
+<div class="text-gray-900">精选山东烟台红富士苹果，果形端正，色泽鲜艳，口感清脆香甜，富含维生素和膳食纤维，是健康生活的优质选择。</div>
+</div>
+</div>
+<!-- 库存统计 -->
+<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">库存统计</h4>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="text-center">
+<div class="text-2xl font-bold text-green-600 mb-1">580 kg</div>
+<div class="text-sm text-gray-600">当前库存</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-orange-600 mb-1">50 kg</div>
+<div class="text-sm text-gray-600">最低库存</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-blue-600 mb-1">1000 kg</div>
+<div class="text-sm text-gray-600">最高库存</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-purple-600 mb-1">安全</div>
+<div class="text-sm text-gray-600">库存状态</div>
+</div>
+</div>
+</div>
+<!-- 销售统计 -->
+<div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">销售统计</h4>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="text-center">
+<div class="text-2xl font-bold text-blue-600 mb-1">¥ 45,680</div>
+<div class="text-sm text-gray-600">本月销售额</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-green-600 mb-1">356 kg</div>
+<div class="text-sm text-gray-600">本月销量</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-orange-600 mb-1">128</div>
+<div class="text-sm text-gray-600">订单数量</div>
+</div>
+<div class="text-center">
+<div class="text-2xl font-bold text-purple-600 mb-1">4.8</div>
+<div class="text-sm text-gray-600">平均评分</div>
+</div>
+</div>
+</div>
+<!-- 库存记录 -->
+<div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">库存变动记录</h4>
+<div class="overflow-x-auto">
+<table class="w-full text-sm">
+<thead>
+<tr class="border-b border-gray-200">
+<th class="text-left py-2 text-gray-700">变动时间</th>
+<th class="text-left py-2 text-gray-700">变动类型</th>
+<th class="text-left py-2 text-gray-700">变动数量</th>
+<th class="text-left py-2 text-gray-700">变动后库存</th>
+<th class="text-left py-2 text-gray-700">操作人</th>
+<th class="text-left py-2 text-gray-700">备注</th>
+</tr>
+</thead>
+<tbody class="space-y-2">
+<tr class="border-b border-gray-100">
+<td class="py-3 text-gray-900">2024-01-28 14:30</td>
+<td class="py-3">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+入库
+</span>
+</td>
+<td class="py-3 text-green-600 font-semibold">+200 kg</td>
+<td class="py-3 text-gray-900">580 kg</td>
+<td class="py-3 text-gray-900">张明华</td>
+<td class="py-3 text-gray-600">供应商补货</td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="py-3 text-gray-900">2024-01-27 16:45</td>
+<td class="py-3">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+出库
+</span>
+</td>
+<td class="py-3 text-red-600 font-semibold">-50 kg</td>
+<td class="py-3 text-gray-900">380 kg</td>
+<td class="py-3 text-gray-900">李雅琳</td>
+<td class="py-3 text-gray-600">客户订单</td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="py-3 text-gray-900">2024-01-25 10:20</td>
+<td class="py-3">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+调整
+</span>
+</td>
+<td class="py-3 text-orange-600 font-semibold">-5 kg</td>
+<td class="py-3 text-gray-900">430 kg</td>
+<td class="py-3 text-gray-900">王建国</td>
+<td class="py-3 text-gray-600">盘点调整</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 库存管理模态框 -->
+<div id="stockModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-2xl mx-4 shadow-2xl border border-white/20">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-bold text-gray-900">库存管理</h3>
+<button id="closeStockModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<div class="space-y-6">
+<!-- 当前库存信息 -->
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">当前库存信息</h4>
+<div class="grid grid-cols-2 gap-6">
+<div class="text-center">
+<div class="text-3xl font-bold text-green-600 mb-2">580 kg</div>
+<div class="text-sm text-gray-600">当前库存</div>
+</div>
+<div class="text-center">
+<div class="text-3xl font-bold text-orange-600 mb-2">50 kg</div>
+<div class="text-sm text-gray-600">最低库存</div>
+</div>
+</div>
+</div>
+<!-- 库存操作 -->
+<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">库存操作</h4>
+<form id="stockForm" class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">操作类型</label>
+<select id="stockOperationType" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="in">入库</option>
+<option value="out">出库</option>
+<option value="adjust">调整</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">变动数量</label>
+<input type="number" id="stockQuantity" min="1" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">操作备注</label>
+<textarea id="stockRemark" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none" placeholder="请输入操作备注..."></textarea>
+</div>
+<div class="flex justify-end space-x-4 pt-4">
+<button type="button" id="cancelStockBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">确认操作</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+<!-- 删除确认模态框 -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl border border-white/20">
+<div class="text-center">
+<div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-error-warning-line text-red-600 text-2xl"></i>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-2">确认删除</h3>
+<p class="text-gray-600 mb-6">您确定要删除这个商品吗？此操作不可撤销。</p>
+<div class="flex justify-center space-x-4">
+<button id="cancelDeleteBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+<button id="confirmDeleteBtn" class="px-6 py-3 bg-red-500 text-white rounded-button whitespace-nowrap hover:bg-red-600 transition-colors">确认删除</button>
+</div>
+</div>
+</div>
+</div>
+<script id="product-management-script">
+document.addEventListener('DOMContentLoaded', function() {
+const productModal = document.getElementById('productModal');
+const productDetailModal = document.getElementById('productDetailModal');
+const stockModal = document.getElementById('stockModal');
+const deleteModal = document.getElementById('deleteModal');
+const addProductBtn = document.getElementById('addProductBtn');
+const closeProductModal = document.getElementById('closeProductModal');
+const closeDetailModal = document.getElementById('closeDetailModal');
+const closeStockModal = document.getElementById('closeStockModal');
+const cancelProductBtn = document.getElementById('cancelProductBtn');
+const cancelStockBtn = document.getElementById('cancelStockBtn');
+const productForm = document.getElementById('productForm');
+const stockForm = document.getElementById('stockForm');
+const productModalTitle = document.getElementById('productModalTitle');
+const selectAll = document.getElementById('selectAll');
+const productCheckboxes = document.querySelectorAll('.product-checkbox');
+addProductBtn.addEventListener('click', function() {
+productModalTitle.textContent = '新增商品';
+productForm.reset();
+productModal.classList.remove('hidden');
+});
+document.querySelectorAll('.edit-product-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+productModalTitle.textContent = '编辑商品';
+productModal.classList.remove('hidden');
+});
+});
+document.querySelectorAll('.view-detail-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+productDetailModal.classList.remove('hidden');
+});
+});
+document.querySelectorAll('.stock-manage-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+stockModal.classList.remove('hidden');
+});
+});
+closeProductModal.addEventListener('click', function() {
+productModal.classList.add('hidden');
+});
+closeDetailModal.addEventListener('click', function() {
+productDetailModal.classList.add('hidden');
+});
+closeStockModal.addEventListener('click', function() {
+stockModal.classList.add('hidden');
+});
+cancelProductBtn.addEventListener('click', function() {
+productModal.classList.add('hidden');
+});
+cancelStockBtn.addEventListener('click', function() {
+stockModal.classList.add('hidden');
+});
+productModal.addEventListener('click', function(e) {
+if (e.target === productModal) {
+productModal.classList.add('hidden');
+}
+});
+productDetailModal.addEventListener('click', function(e) {
+if (e.target === productDetailModal) {
+productDetailModal.classList.add('hidden');
+}
+});
+stockModal.addEventListener('click', function(e) {
+if (e.target === stockModal) {
+stockModal.classList.add('hidden');
+}
+});
+productForm.addEventListener('submit', function(e) {
+e.preventDefault();
+productModal.classList.add('hidden');
+});
+stockForm.addEventListener('submit', function(e) {
+e.preventDefault();
+stockModal.classList.add('hidden');
+});
+selectAll.addEventListener('change', function() {
+productCheckboxes.forEach(checkbox => {
+checkbox.checked = selectAll.checked;
+});
+});
+productCheckboxes.forEach(checkbox => {
+checkbox.addEventListener('change', function() {
+const checkedCount = document.querySelectorAll('.product-checkbox:checked').length;
+selectAll.checked = checkedCount === productCheckboxes.length;
+selectAll.indeterminate = checkedCount > 0 && checkedCount < productCheckboxes.length;
+});
+});
+});
+</script>
+<script id="delete-confirmation-script">
+document.addEventListener('DOMContentLoaded', function() {
+const deleteModal = document.getElementById('deleteModal');
+const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+document.querySelectorAll('.delete-product-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+e.stopPropagation();
+deleteModal.classList.remove('hidden');
+});
+});
+cancelDeleteBtn.addEventListener('click', function() {
+deleteModal.classList.add('hidden');
+});
+confirmDeleteBtn.addEventListener('click', function() {
+deleteModal.classList.add('hidden');
+});
+deleteModal.addEventListener('click', function(e) {
+if (e.target === deleteModal) {
+deleteModal.classList.add('hidden');
+}
+});
+});
+</script>
+<script id="search-filter-script">
+document.addEventListener('DOMContentLoaded', function() {
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const stockFilter = document.getElementById('stockFilter');
+const productRows = document.querySelectorAll('.product-row');
+function filterProducts() {
+const searchTerm = searchInput.value.toLowerCase();
+const categoryValue = categoryFilter.value;
+const stockValue = stockFilter.value;
+productRows.forEach(row => {
+const productName = row.querySelector('td:nth-child(3) .font-semibold').textContent.toLowerCase();
+const productCode = row.querySelector('td:nth-child(3) .text-sm').textContent.toLowerCase();
+const categoryElement = row.querySelector('td:nth-child(4) span');
+let categoryText = '';
+if (categoryElement.textContent.includes('新鲜水果')) categoryText = 'fresh-fruit';
+else if (categoryElement.textContent.includes('干果坚果')) categoryText = 'dried-fruit';
+else if (categoryElement.textContent.includes('果汁饮品')) categoryText = 'fruit-juice';
+else if (categoryElement.textContent.includes('果脯零食')) categoryText = 'fruit-snack';
+const stockElement = row.querySelector('td:nth-child(6) .text-sm');
+let stockStatus = '';
+if (stockElement.textContent.includes('安全库存')) stockStatus = 'in-stock';
+else if (stockElement.textContent.includes('库存不足')) stockStatus = 'low-stock';
+else if (stockElement.textContent.includes('缺货')) stockStatus = 'out-of-stock';
+const matchesSearch = productName.includes(searchTerm) || productCode.includes(searchTerm);
+const matchesCategory = !categoryValue || categoryText === categoryValue;
+const matchesStock = !stockValue || stockStatus === stockValue;
+if (matchesSearch && matchesCategory && matchesStock) {
+row.style.display = '';
+} else {
+row.style.display = 'none';
+}
+});
+}
+searchInput.addEventListener('input', filterProducts);
+categoryFilter.addEventListener('change', filterProducts);
+stockFilter.addEventListener('change', filterProducts);
+});
+</script>
+</body>
+</html>

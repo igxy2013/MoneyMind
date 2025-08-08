@@ -2,6 +2,10 @@
 
 {% block title %}供应商详情 - {{ supplier.name }}{% endblock %}
 
+{% block extra_head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="row mb-4">
     <div class="col-12 d-flex justify-content-between align-items-center">
@@ -89,16 +93,13 @@
             <div class="card-header">
                 <h6 class="mb-0">场地照片</h6>
             </div>
-            <div class="card-body text-center">
-                {% if supplier.image_path %}
-                    <img src="{{ url_for('static', filename=supplier.image_path) }}" 
-                         alt="供应商场地照片" class="img-fluid rounded">
-                {% else %}
+            <div class="card-body">
+                <div id="supplierImages" class="text-center">
                     <div class="text-muted py-4">
-                        <i class="fas fa-image fa-3x mb-3"></i>
-                        <p>暂无场地照片</p>
+                        <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                        <p>加载中...</p>
                     </div>
-                {% endif %}
+                </div>
             </div>
         </div>
         
@@ -124,4 +125,125 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadSupplierImages();
+});
+
+async function loadSupplierImages() {
+    const supplierId = {{ supplier.id }};
+    const supplierImagesContainer = document.getElementById('supplierImages');
+    
+    try {
+        const response = await fetch(`/api/supplier/${supplierId}/images`);
+        if (response.ok) {
+            const images = await response.json();
+            displaySupplierImages(images);
+        } else {
+            showNoImages();
+        }
+    } catch (error) {
+        console.error('加载供应商图片时出错:', error);
+        showNoImages();
+    }
+}
+
+function displaySupplierImages(images) {
+    const supplierImagesContainer = document.getElementById('supplierImages');
+    
+    if (!images || images.length === 0) {
+        showNoImages();
+        return;
+    }
+    
+    let imagesHtml = '';
+    
+    if (images.length === 1) {
+        // 单张图片，居中显示
+        const image = images[0];
+        const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+        imagesHtml = `
+            <div class="text-center">
+                <img src="${imagePath}" alt="供应商场地照片" 
+                     class="img-fluid rounded shadow cursor-pointer" 
+                     style="max-height: 300px; max-width: 100%;" 
+                     onclick="showImageModal('${imagePath}')">
+                <p class="text-muted mt-2 small">上传时间: ${image.upload_time || '未知'}</p>
+            </div>
+        `;
+    } else {
+        // 多张图片，网格显示
+        imagesHtml = '<div class="row">';
+        images.forEach(image => {
+            const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+            imagesHtml += `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="position-relative">
+                        <img src="${imagePath}" alt="供应商场地照片" 
+                             class="img-fluid rounded shadow cursor-pointer w-100" 
+                             style="height: 150px; object-fit: cover;" 
+                             onclick="showImageModal('${imagePath}')">
+                        <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-75 text-white p-1 rounded-end small">
+                            ${image.upload_time || '未知时间'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        imagesHtml += '</div>';
+    }
+    
+    supplierImagesContainer.innerHTML = imagesHtml;
+}
+
+function showNoImages() {
+    const supplierImagesContainer = document.getElementById('supplierImages');
+    supplierImagesContainer.innerHTML = `
+        <div class="text-center text-muted py-4">
+            <i class="fas fa-image fa-3x mb-3"></i>
+            <p>暂无场地照片</p>
+        </div>
+    `;
+}
+
+function showImageModal(imageSrc) {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade show';
+    modal.style.display = 'block';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body p-0 text-center">
+                    <img src="${imageSrc}" alt="供应商场地照片" class="img-fluid rounded" style="max-height: 80vh;">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" 
+                            onclick="this.closest('.modal').remove()"></button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // 点击模态框背景关闭
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+    
+    document.body.appendChild(modal);
+}
+</script>
+
+<style>
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-pointer:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease;
+}
+</style>
+
 {% endblock %}

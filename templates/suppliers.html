@@ -1,124 +1,1024 @@
 {% extends "base.html" %}
 
-{% block title %}供应商管理 - 七彩果坊{% endblock %}
+{% block title %}供应商管理 - MoneyMind{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12 d-flex justify-content-between align-items-center">
-        <h2 class="mb-0">
-            <i class="fas fa-truck me-2"></i>供应商管理
-        </h2>
-        {% if current_user.role != 'employee' %}
-        <a href="{{ url_for('add_supplier') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i>添加供应商
-        </a>
-        {% endif %}
+<div class="max-w-7xl mx-auto">
+<!-- 页面标题和操作栏 -->
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">供应商管理</h1>
+            <p class="text-gray-600">管理供应商信息，包括基本资料、合作状态、欠款情况等关键数据</p>
+        </div>
+        <button id="addSupplierBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
+            <div class="w-4 h-4 flex items-center justify-center">
+                <i class="ri-add-line"></i>
+            </div>
+            <span>新增供应商</span>
+        </button>
+    </div>
+    
+    <!-- 搜索和筛选栏 -->
+    <div class="bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/20 mb-6">
+        <div class="flex flex-wrap items-center gap-4">
+            <div class="flex-1 min-w-64">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                            <i class="ri-search-line text-gray-400"></i>
+                        </div>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="搜索供应商名称、联系人或电话..." class="w-full pl-10 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <select id="statusFilter" class="px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm pr-8">
+                    <option value="">全部状态</option>
+                    <option value="active">合作中</option>
+                    <option value="inactive">已暂停</option>
+                    <option value="terminated">已终止</option>
+                </select>
+                <button id="advancedFilterBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors flex items-center space-x-2">
+                    <div class="w-4 h-4 flex items-center justify-center">
+                        <i class="ri-filter-line"></i>
+                    </div>
+                    <span>高级筛选</span>
+                </button>
+                <button id="batchActionBtn" class="px-6 py-3 bg-secondary/10 text-secondary rounded-button whitespace-nowrap hover:bg-secondary hover:text-white transition-colors flex items-center space-x-2">
+                     <div class="w-4 h-4 flex items-center justify-center">
+                         <i class="ri-checkbox-multiple-line"></i>
+                     </div>
+                     <span>批量操作</span>
+                 </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        {% if suppliers %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>供应商名称</th>
-                            <th>供货品类</th>
-                            <th>供应方式</th>
-                            <th>重要程度</th>
-                            <th>联系人</th>
-                            <th>电话</th>
-                            <th>状态</th>
-                            <th>创建时间</th>
-                            {% if current_user.role != 'employee' %}
-                            <th>操作</th>
-                            {% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for supplier in suppliers %}
-                        <tr>
-                            <td>
-                                <strong>{{ supplier.name }}</strong>
-                                {% if supplier.images %}
-                                <br><small class="text-muted"><i class="fas fa-images"></i> {{ supplier.images|length }}张图片</small>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if supplier.supply_categories_list %}
-                                    {% for category in supplier.supply_categories_list[:3] %}
-                                        <span class="badge bg-light text-dark me-1">{{ category.product_name }}</span>
-                                    {% endfor %}
-                                    {% if supplier.supply_categories_list|length > 3 %}
-                                        <small class="text-muted">+{{ supplier.supply_categories_list|length - 3 }}个</small>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if supplier.supply_method %}
-                                    <span class="badge bg-info">{{ supplier.supply_method }}</span>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if supplier.importance_level %}
-                                    <span class="badge bg-warning">{{ supplier.importance_level }}</span>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ supplier.contact_person or '-' }}</td>
-                            <td>{{ supplier.phone or '-' }}</td>
-                            <td>
-                                {% if supplier.is_active %}
-                                    <span class="badge bg-success">活跃</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">停用</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <small class="text-muted">{{ supplier.created_at.strftime('%Y-%m-%d') }}</small>
-                            </td>
-                            {% if current_user.role != 'employee' %}
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ url_for('supplier_detail', id=supplier.id) }}" 
-                                       class="btn btn-outline-info btn-sm" title="查看详情">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ url_for('edit_supplier', id=supplier.id) }}" 
-                                       class="btn btn-outline-primary btn-sm" title="编辑">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ url_for('delete_supplier', id=supplier.id) }}" 
-                                       class="btn btn-outline-danger btn-sm"
-                                       onclick="return confirm('确定要删除这个供应商吗？')" title="删除">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+<!-- 供应商列表 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50/80 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-4 text-left">
+                        <input type="checkbox" id="selectAll" class="w-4 h-4 text-primary rounded">
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors">
+                        <div class="flex items-center space-x-1">
+                        <span>供应商名称</span>
+                        <div class="w-4 h-4 flex items-center justify-center">
+                            <i class="ri-arrow-up-down-line text-gray-400"></i>
+                        </div>
+                    </div>
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">联系人</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">联系电话</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">详细地址</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">合作状态</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors">
+                        <div class="flex items-center space-x-1">
+                        <span>欠款金额</span>
+                        <div class="w-4 h-4 flex items-center justify-center">
+                            <i class="ri-arrow-up-down-line text-gray-400"></i>
+                        </div>
+                    </div>
+                    </th>
+                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">操作</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% if suppliers %}
+                    {% for supplier in suppliers %}
+                    <tr class="hover:bg-gray-50/50 transition-colors cursor-pointer supplier-row">
+                        <td class="px-6 py-4">
+                            <input type="checkbox" class="supplier-checkbox w-4 h-4 text-primary rounded">
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                                    <span class="text-white font-semibold text-sm">{{ supplier.name[0] if supplier.name else '供' }}</span>
                                 </div>
-                            </td>
+                                <div>
+                                    <div class="font-semibold text-gray-900">{{ supplier.name }}</div>
+                                    <div class="text-sm text-gray-500">成立于 {{ supplier.created_at.strftime('%Y') }} 年</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-gray-900">{{ supplier.contact_person or '-' }}</div>
+                            <div class="text-sm text-gray-500">
+                                {% if supplier.supply_categories_list %}
+                                    {{ supplier.supply_categories_list[0].product_name if supplier.supply_categories_list else '-' }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-gray-900">{{ supplier.phone or '-' }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-gray-900 max-w-48 truncate">{{ supplier.address or '-' }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if supplier.is_active %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    合作中
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    已终止
+                                </span>
                             {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-truck fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">暂无供应商</h5>
-                <p class="text-muted">添加您的第一个供应商吧！</p>
-                {% if current_user.role != 'employee' %}
-                <a href="{{ url_for('add_supplier') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i>添加供应商
-                </a>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-red-600 font-semibold">¥ 0</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-center space-x-2">
+                                <button class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors view-detail-btn" data-id="{{ supplier.id }}">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-eye-line text-blue-600"></i>
+                                    </div>
+                                </button>
+                                <button class="w-8 h-8 bg-green-100 hover:bg-green-200 rounded-full flex items-center justify-center transition-colors edit-supplier-btn" data-id="{{ supplier.id }}">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-edit-line text-green-600"></i>
+                                    </div>
+                                </button>
+                                <button class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors delete-supplier-btn" data-id="{{ supplier.id }}">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-delete-bin-line text-red-600"></i>
+                                    </div>
+                                </button>
+                                <div class="relative">
+                                    <button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors more-actions-btn">
+                                        <div class="w-4 h-4 flex items-center justify-center">
+                                            <i class="ri-more-line text-gray-600"></i>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                    <i class="ri-truck-line text-gray-400 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">暂无供应商</h3>
+                                <p class="text-gray-600 mb-4">添加您的第一个供应商吧！</p>
+                                <a href="{{ url_for('add_supplier') }}" class="px-6 py-3 bg-primary text-white rounded-button hover:bg-primary/90 transition-colors">
+                                    <i class="ri-add-line mr-2"></i>添加供应商
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
                 {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 分页 -->
+    {% if suppliers and suppliers|length > 0 %}
+    <div class="px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+        <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+                显示 <span class="font-semibold">1</span> 到 <span class="font-semibold">{{ suppliers|length }}</span> 条，共 <span class="font-semibold">{{ suppliers|length }}</span> 条记录
             </div>
-        {% endif %}
+            <div class="flex items-center space-x-2">
+                <button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    上一页
+                </button>
+                <button class="px-3 py-2 text-sm bg-primary text-white rounded-button">1</button>
+                <button class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-button hover:bg-gray-50 transition-colors">
+                    下一页
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 新增/编辑供应商模态框 -->
+<div id="supplierModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+    <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-2xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 id="supplierModalTitle" class="text-2xl font-bold text-gray-900">新增供应商</h3>
+            <button id="closeSupplierModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+                <i class="ri-close-line text-gray-600"></i>
+            </button>
+        </div>
+        <form id="supplierForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">供应商名称 <span class="text-red-500">*</span></label>
+                    <input type="text" id="supplierName" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">联系人姓名</label>
+                    <input type="text" id="contactName" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">联系电话</label>
+                    <input type="tel" id="contactPhone" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">合作状态</label>
+                    <select id="cooperationStatus" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+                        <option value="active">合作中</option>
+                        <option value="inactive">已暂停</option>
+                        <option value="terminated">已终止</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">详细地址</label>
+                <input type="text" id="supplierAddress" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">备注信息</label>
+                <textarea id="supplierNote" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">场地照片</label>
+                <!-- 已有图片显示区域 -->
+                <div id="existingImages" class="mb-4 hidden">
+                    <div class="text-sm text-gray-600 mb-2">已有照片：</div>
+                    <div id="existingImagesList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                </div>
+                <!-- 文件上传区域 -->
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
+                    <input type="file" id="supplierImages" name="images" accept="image/*" multiple class="hidden">
+                    <div class="cursor-pointer" onclick="document.getElementById('supplierImages').click()">
+                        <i class="ri-image-add-line text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-600 mb-1">点击选择图片或拖拽图片到此处</p>
+                        <p class="text-sm text-gray-500">支持 JPG、PNG、GIF、WEBP 格式，最大 16MB，可多选</p>
+                    </div>
+                </div>
+                <!-- 新选择图片预览区域 -->
+                <div id="imagePreview" class="mt-4 hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="text-sm text-gray-600">新选择的图片：</div>
+                        <button type="button" id="addMoreImages" class="text-sm text-blue-600 hover:text-blue-800 flex items-center transition-colors">
+                            <i class="ri-add-line mr-1"></i>继续添加
+                        </button>
+                    </div>
+                    <div id="imagePreviewList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <button type="button" id="cancelSupplierBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+                <button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存供应商</button>
+            </div>
+        </form>
     </div>
 </div>
-{% endblock %} 
+
+<!-- 供应商详情模态框 -->
+<div id="supplierDetailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+    <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-4xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">供应商详情</h3>
+            <button id="closeDetailModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+                <i class="ri-close-line text-gray-600"></i>
+            </button>
+        </div>
+        <div class="space-y-8">
+            <!-- 基本信息 -->
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">基本信息</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">供应商名称</div>
+                        <div id="detailSupplierName" class="font-semibold text-gray-900">-</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">联系人</div>
+                        <div id="detailContactPerson" class="font-semibold text-gray-900">-</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">联系电话</div>
+                        <div id="detailPhone" class="font-semibold text-gray-900">-</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">合作状态</div>
+                        <span id="detailStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            合作中
+                        </span>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">邮箱地址</div>
+                        <div id="detailEmail" class="font-semibold text-gray-900">-</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">创建时间</div>
+                        <div id="detailCreatedAt" class="font-semibold text-gray-900">-</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="text-sm text-gray-500 mb-1">详细地址</div>
+                    <div id="detailAddress" class="font-semibold text-gray-900">-</div>
+                </div>
+            </div>
+            
+            <!-- 场地照片 -->
+            <div id="detailImages" class="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 hidden">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">场地照片</h4>
+                <div id="detailImagesList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </div>
+            
+            <!-- 财务统计 -->
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">财务统计</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div id="detailTotalAmount" class="text-2xl font-bold text-blue-600 mb-1">¥ 0</div>
+                        <div class="text-sm text-gray-600">累计交易额</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="detailTransactionCount" class="text-2xl font-bold text-green-600 mb-1">0</div>
+                        <div class="text-sm text-gray-600">交易次数</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="detailDebtAmount" class="text-2xl font-bold text-red-600 mb-1">¥ 0</div>
+                        <div class="text-sm text-gray-600">当前欠款</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="detailOverdueDays" class="text-2xl font-bold text-orange-600 mb-1">0</div>
+                        <div class="text-sm text-gray-600">逾期天数</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 最近交易记录 -->
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">最近交易记录</h4>
+                <div id="recentTransactions" class="space-y-4">
+                    <div class="text-center text-gray-500 py-8">
+                        暂无交易记录
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+    <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl border border-white/20">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ri-error-warning-line text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">确认删除</h3>
+            <p class="text-gray-600 mb-6">您确定要删除这个供应商吗？此操作不可撤销。</p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancelDeleteBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</button>
+                <button id="confirmDeleteBtn" class="px-6 py-3 bg-red-500 text-white rounded-button whitespace-nowrap hover:bg-red-600 transition-colors">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</main>
+</div>
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const supplierModal = document.getElementById('supplierModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const addSupplierBtn = document.getElementById('addSupplierBtn');
+    const closeSupplierModal = document.getElementById('closeSupplierModal');
+    const cancelSupplierBtn = document.getElementById('cancelSupplierBtn');
+    const supplierForm = document.getElementById('supplierForm');
+    const supplierModalTitle = document.getElementById('supplierModalTitle');
+    const selectAll = document.getElementById('selectAll');
+    const supplierCheckboxes = document.querySelectorAll('.supplier-checkbox');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const supplierRows = document.querySelectorAll('.supplier-row');
+
+    // 新增供应商
+    if (addSupplierBtn) {
+        addSupplierBtn.addEventListener('click', function() {
+            supplierModalTitle.textContent = '新增供应商';
+            resetSupplierForm();
+            supplierModal.classList.remove('hidden');
+        });
+    }
+
+    // 编辑供应商
+    document.querySelectorAll('.edit-supplier-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const supplierId = this.getAttribute('data-id');
+            supplierModalTitle.textContent = '编辑供应商';
+            loadSupplierData(supplierId);
+            supplierModal.classList.remove('hidden');
+        });
+    });
+
+    // 加载供应商数据到模态框
+    async function loadSupplierData(supplierId) {
+        try {
+            const response = await fetch(`/api/supplier/${supplierId}`);
+            if (response.ok) {
+                const supplier = await response.json();
+                
+                // 填充表单数据
+                document.getElementById('supplierName').value = supplier.name || '';
+                document.getElementById('contactName').value = supplier.contact_person || '';
+                document.getElementById('contactPhone').value = supplier.phone || '';
+                document.getElementById('supplierAddress').value = supplier.address || '';
+                
+                // 设置合作状态
+                const statusSelect = document.getElementById('cooperationStatus');
+                if (supplier.is_active) {
+                    statusSelect.value = 'active';
+                } else {
+                    statusSelect.value = 'terminated';
+                }
+                
+                // 设置当前供应商ID
+                window.currentSupplierId = supplierId;
+                
+                // 加载已有图片
+                await loadExistingImages(supplierId);
+                
+                // 存储供应商ID用于更新
+                supplierForm.setAttribute('data-supplier-id', supplierId);
+            } else {
+                console.error('获取供应商数据失败:', response.statusText);
+                alert('获取供应商数据失败，请重试');
+            }
+        } catch (error) {
+            console.error('获取供应商数据时出错:', error);
+            alert('获取供应商数据时出错，请重试');
+        }
+    }
+
+    // 查看详情
+    document.querySelectorAll('.view-detail-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const supplierId = this.getAttribute('data-id');
+            loadSupplierDetail(supplierId);
+            supplierDetailModal.classList.remove('hidden');
+        });
+    });
+    
+    // 关闭详情模态框
+    const supplierDetailModal = document.getElementById('supplierDetailModal');
+    const closeDetailModal = document.getElementById('closeDetailModal');
+    
+    if (closeDetailModal) {
+        closeDetailModal.addEventListener('click', function() {
+            supplierDetailModal.classList.add('hidden');
+        });
+    }
+    
+    if (supplierDetailModal) {
+        supplierDetailModal.addEventListener('click', function(e) {
+            if (e.target === supplierDetailModal) {
+                supplierDetailModal.classList.add('hidden');
+            }
+        });
+    }
+    
+    // 加载供应商详情数据
+    async function loadSupplierDetail(supplierId) {
+        try {
+            const response = await fetch(`/api/supplier/${supplierId}`);
+            if (response.ok) {
+                const supplier = await response.json();
+                
+                // 填充基本信息
+                document.getElementById('detailSupplierName').textContent = supplier.name || '-';
+                document.getElementById('detailContactPerson').textContent = supplier.contact_person || '-';
+                document.getElementById('detailPhone').textContent = supplier.phone || '-';
+                document.getElementById('detailEmail').textContent = supplier.email || '-';
+                document.getElementById('detailAddress').textContent = supplier.address || '-';
+                document.getElementById('detailCreatedAt').textContent = supplier.created_at || '-';
+                
+                // 设置合作状态
+                const statusElement = document.getElementById('detailStatus');
+                if (supplier.is_active) {
+                    statusElement.textContent = '合作中';
+                    statusElement.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                } else {
+                    statusElement.textContent = '已暂停';
+                    statusElement.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+                }
+                
+                // 加载财务统计和交易记录
+                await loadSupplierFinancialData(supplierId);
+                
+                // 加载供应商图片
+                await loadSupplierDetailImages(supplierId);
+            } else {
+                alert('获取供应商详情失败');
+            }
+        } catch (error) {
+            console.error('获取供应商详情时出错:', error);
+            alert('获取供应商详情时出错，请重试');
+        }
+    }
+    
+    // 加载供应商财务数据和交易记录
+    async function loadSupplierFinancialData(supplierId) {
+        try {
+            // 这里可以调用API获取财务统计数据
+            // 暂时使用模拟数据
+            document.getElementById('detailTotalAmount').textContent = '¥ 0';
+            document.getElementById('detailTransactionCount').textContent = '0';
+            document.getElementById('detailDebtAmount').textContent = '¥ 0';
+            document.getElementById('detailOverdueDays').textContent = '0';
+            
+            // 显示暂无交易记录
+            const recentTransactions = document.getElementById('recentTransactions');
+            recentTransactions.innerHTML = `
+                <div class="text-center text-gray-500 py-8">
+                    暂无交易记录
+                </div>
+            `;
+        } catch (error) {
+            console.error('获取财务数据时出错:', error);
+        }
+    }
+    
+    // 加载供应商详情页面的图片
+    async function loadSupplierDetailImages(supplierId) {
+        try {
+            const response = await fetch(`/api/supplier/${supplierId}/images`);
+            if (response.ok) {
+                const images = await response.json();
+                displaySupplierDetailImages(images);
+            } else {
+                document.getElementById('detailImages').classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('加载供应商图片时出错:', error);
+            document.getElementById('detailImages').classList.add('hidden');
+        }
+    }
+    
+    // 显示供应商详情页面的图片
+    function displaySupplierDetailImages(images) {
+        const detailImages = document.getElementById('detailImages');
+        const detailImagesList = document.getElementById('detailImagesList');
+        
+        if (!images || images.length === 0) {
+            detailImages.classList.add('hidden');
+            return;
+        }
+        
+        detailImagesList.innerHTML = '';
+        
+        images.forEach(image => {
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'relative group cursor-pointer';
+            const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+            imageContainer.innerHTML = `
+                <img src="${imagePath}" alt="供应商场地图片" class="w-full h-32 object-cover rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                    ${image.upload_time || '未知时间'}
+                </div>
+            `;
+            
+            // 点击图片放大查看
+            imageContainer.addEventListener('click', function() {
+                showImageModal(imagePath);
+            });
+            
+            detailImagesList.appendChild(imageContainer);
+        });
+        
+        detailImages.classList.remove('hidden');
+    }
+    
+    // 显示图片放大模态框
+    function showImageModal(imageSrc) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center';
+        modal.innerHTML = `
+            <div class="relative max-w-4xl max-h-[90vh] mx-4">
+                <img src="${imageSrc}" alt="供应商场地图片" class="max-w-full max-h-full object-contain rounded-lg">
+                <button class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
+                    <i class="ri-close-line text-white text-xl"></i>
+                </button>
+            </div>
+        `;
+        
+        // 点击关闭按钮或背景关闭模态框
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal || e.target.closest('button')) {
+                document.body.removeChild(modal);
+            }
+        });
+        
+        document.body.appendChild(modal);
+    }
+
+    // 删除供应商
+    document.querySelectorAll('.delete-supplier-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const supplierId = this.getAttribute('data-id');
+            deleteModal.classList.remove('hidden');
+        });
+    });
+
+    // 关闭模态框
+    closeSupplierModal.addEventListener('click', function() {
+        supplierModal.classList.add('hidden');
+    });
+
+    cancelSupplierBtn.addEventListener('click', function() {
+        supplierModal.classList.add('hidden');
+    });
+
+    // 点击模态框外部关闭
+    supplierModal.addEventListener('click', function(e) {
+        if (e.target === supplierModal) {
+            supplierModal.classList.add('hidden');
+        }
+    });
+
+    // 全选功能
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            supplierCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        });
+    }
+
+    supplierCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const checkedCount = document.querySelectorAll('.supplier-checkbox:checked').length;
+            if (selectAll) {
+                selectAll.checked = checkedCount === supplierCheckboxes.length;
+                selectAll.indeterminate = checkedCount > 0 && checkedCount < supplierCheckboxes.length;
+            }
+        });
+    });
+
+    // 搜索和筛选功能
+    function filterSuppliers() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value;
+
+        supplierRows.forEach(row => {
+            const supplierName = row.querySelector('td:nth-child(2) .font-semibold').textContent.toLowerCase();
+            const contactName = row.querySelector('td:nth-child(3) div:first-child').textContent.toLowerCase();
+            const contactPhone = row.querySelector('td:nth-child(4) div').textContent.toLowerCase();
+            const statusElement = row.querySelector('td:nth-child(6) span');
+            
+            let statusText = '';
+            if (statusElement.textContent.includes('合作中')) statusText = 'active';
+            else if (statusElement.textContent.includes('已暂停')) statusText = 'inactive';
+            else if (statusElement.textContent.includes('已终止')) statusText = 'terminated';
+
+            const matchesSearch = supplierName.includes(searchTerm) ||
+                                contactName.includes(searchTerm) ||
+                                contactPhone.includes(searchTerm);
+            const matchesStatus = !statusValue || statusText === statusValue;
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterSuppliers);
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterSuppliers);
+    }
+
+    // 删除确认
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.add('hidden');
+        });
+    }
+
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            // 这里执行删除操作
+            deleteModal.classList.add('hidden');
+        });
+    }
+
+    if (deleteModal) {
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                deleteModal.classList.add('hidden');
+            }
+        });
+    }
+
+    // 表单提交
+    supplierForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const supplierId = supplierForm.getAttribute('data-supplier-id');
+        const formData = new FormData();
+        
+        // 准备供应商基本数据
+         const supplierData = {
+             name: document.getElementById('supplierName').value,
+             contact_person: document.getElementById('contactName').value,
+             phone: document.getElementById('contactPhone').value,
+             address: document.getElementById('supplierAddress').value,
+             is_active: document.getElementById('cooperationStatus').value === 'active'
+         };
+         
+         try {
+             let url, method;
+             if (supplierId) {
+                 // 编辑模式
+                 url = `/api/supplier/${supplierId}`;
+                 method = 'PUT';
+             } else {
+                 // 新增模式
+                 url = '/api/supplier';
+                 method = 'POST';
+             }
+             
+             const response = await fetch(url, {
+                 method: method,
+                 headers: {
+                     'Content-Type': 'application/json'
+                 },
+                 body: JSON.stringify(supplierData)
+             });
+             
+             if (response.ok) {
+                 const result = await response.json();
+                 
+                 // 如果有新图片需要上传
+                 if (newSelectedFiles.length > 0) {
+                     const uploadFormData = new FormData();
+                     newSelectedFiles.forEach(file => {
+                         uploadFormData.append('images', file);
+                     });
+                     
+                     const imageUploadUrl = supplierId ? 
+                         `/api/supplier/${supplierId}/images` : 
+                         `/api/supplier/${result.id}/images`;
+                     
+                     const imageResponse = await fetch(imageUploadUrl, {
+                         method: 'POST',
+                         body: uploadFormData
+                     });
+                     
+                     if (!imageResponse.ok) {
+                          console.warn('图片上传失败，但供应商信息已保存');
+                      }
+                  }
+                  
+                  // 成功保存
+                supplierModal.classList.add('hidden');
+                // 刷新页面以显示更新后的数据
+                window.location.reload();
+            } else {
+                const errorText = await response.text();
+                alert('保存失败，请重试');
+            }
+        } catch (error) {
+            console.error('保存供应商时出错:', error);
+            alert('保存供应商时出错，请重试');
+        }
+    });
+    
+    // 重置表单数据（用于新增模式）
+    function resetSupplierForm() {
+        supplierForm.removeAttribute('data-supplier-id');
+        document.getElementById('supplierName').value = '';
+        document.getElementById('contactName').value = '';
+        document.getElementById('contactPhone').value = '';
+        document.getElementById('supplierAddress').value = '';
+        document.getElementById('cooperationStatus').value = 'active';
+        
+        // 清除当前供应商ID
+        window.currentSupplierId = null;
+        
+        // 重置图片相关
+        resetImageUpload();
+    }
+    
+    // 图片上传相关功能
+    const supplierImages = document.getElementById('supplierImages');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePreviewList = document.getElementById('imagePreviewList');
+    const existingImages = document.getElementById('existingImages');
+    const existingImagesList = document.getElementById('existingImagesList');
+    
+    // 图片文件选择处理
+    if (supplierImages) {
+        supplierImages.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                // 将新选择的文件添加到现有文件列表中
+                addNewImages(files);
+            }
+            // 清空input的值，允许重复选择相同文件
+            e.target.value = '';
+        });
+    }
+    
+    // 继续添加图片按钮点击事件
+    const addMoreImagesBtn = document.getElementById('addMoreImages');
+    if (addMoreImagesBtn) {
+        addMoreImagesBtn.addEventListener('click', function() {
+            supplierImages.click();
+        });
+    }
+    
+    // 存储所有新选择的文件
+    let newSelectedFiles = [];
+    
+    // 添加新图片到列表
+    function addNewImages(files) {
+        files.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                newSelectedFiles.push(file);
+            }
+        });
+        previewNewImages();
+    }
+    
+    // 预览新选择的图片
+    function previewNewImages() {
+        if (newSelectedFiles.length === 0) {
+            imagePreview.classList.add('hidden');
+            return;
+        }
+        
+        imagePreviewList.innerHTML = '';
+        
+        newSelectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'relative group';
+                imageContainer.innerHTML = `
+                    <img src="${e.target.result}" alt="预览图片" class="w-full h-24 object-cover rounded-lg border border-gray-200">
+                    <button type="button" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeNewImage(${index})">
+                        <i class="ri-close-line text-xs"></i>
+                    </button>
+                    <div class="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-1 rounded">
+                        ${(file.size / 1024 / 1024).toFixed(1)}MB
+                    </div>
+                `;
+                imagePreviewList.appendChild(imageContainer);
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        imagePreview.classList.remove('hidden');
+    }
+    
+    // 移除新选择的图片
+    window.removeNewImage = function(index) {
+        newSelectedFiles.splice(index, 1);
+        previewNewImages();
+    };
+    
+    // 加载已有图片
+    async function loadExistingImages(supplierId) {
+        try {
+            const response = await fetch(`/api/supplier/${supplierId}/images`);
+            if (response.ok) {
+                const images = await response.json();
+                displayExistingImages(images);
+            } else {
+                existingImages.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('加载已有图片时出错:', error);
+            existingImages.classList.add('hidden');
+        }
+    }
+    
+    // 显示已有图片
+     function displayExistingImages(images) {
+         if (!images || images.length === 0) {
+             existingImages.classList.add('hidden');
+             return;
+         }
+         
+         existingImagesList.innerHTML = '';
+         
+         images.forEach(image => {
+             const imageContainer = document.createElement('div');
+             imageContainer.className = 'relative group';
+             const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+             imageContainer.innerHTML = `
+                 <img src="${imagePath}" alt="供应商图片" class="w-full h-24 object-cover rounded-lg border border-gray-200">
+                 <button type="button" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeExistingImage('${image.id}', this)">
+                     <i class="ri-close-line text-xs"></i>
+                 </button>
+                 <div class="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-1 rounded">
+                     ${image.upload_time}
+                 </div>
+             `;
+             existingImagesList.appendChild(imageContainer);
+         });
+         
+         existingImages.classList.remove('hidden');
+     }
+    
+    // 移除已有图片
+     window.removeExistingImage = async function(imageId, buttonElement) {
+         if (confirm('确定要删除这张图片吗？')) {
+             try {
+                 const supplierId = window.currentSupplierId || supplierForm.getAttribute('data-supplier-id');
+                 const response = await fetch(`/api/supplier/${supplierId}/images/${imageId}`, {
+                     method: 'DELETE'
+                 });
+                 
+                 if (response.ok) {
+                     // 移除DOM元素
+                     buttonElement.closest('.relative').remove();
+                     
+                     // 检查是否还有图片，如果没有则隐藏容器
+                     if (existingImagesList.children.length === 0) {
+                         existingImages.classList.add('hidden');
+                     }
+                 } else {
+                     alert('删除图片失败，请重试');
+                 }
+             } catch (error) {
+                 console.error('删除图片时出错:', error);
+                 alert('删除图片时出错，请重试');
+             }
+         }
+     };
+    
+    // 重置图片上传
+    function resetImageUpload() {
+        supplierImages.value = '';
+        newSelectedFiles = [];
+        imagePreview.classList.add('hidden');
+        existingImages.classList.add('hidden');
+        imagePreviewList.innerHTML = '';
+        existingImagesList.innerHTML = '';
+    }
+    
+    // 拖拽上传功能
+    const uploadArea = supplierImages.parentElement;
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight(e) {
+        uploadArea.classList.add('border-primary');
+    }
+    
+    function unhighlight(e) {
+        uploadArea.classList.remove('border-primary');
+    }
+    
+    uploadArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = Array.from(dt.files);
+        
+        addNewImages(files);
+    }
+});
+</script>
+{% endblock %}

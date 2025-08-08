@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>仪表板 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span class="font-medium">仪表板</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>财务分析</span>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/096b7c54-7d4f-42f8-9f9f-86147b557e37" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-store-2-line"></i>
+</div>
+<span>供应商管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-shopping-bag-line"></i>
+</div>
+<span>商品管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<span>应收款</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span>分类管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span>用户管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</div>
+</div>
+</div>
+</nav>
+
+<main class="ml-64 flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h1 class="text-3xl font-bold text-gray-900 mb-2">仪表板</h1>
+<p class="text-gray-600">财务数据概览与分析</p>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center bg-white/60 backdrop-blur-lg rounded-xl border border-white/20 px-1 py-1">
+<button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-full transition-colors whitespace-nowrap !rounded-button" id="monthBtn">本月</button>
+<button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap !rounded-button" id="yearBtn">本年</button>
+</div>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/096b7c54-7d4f-42f8-9f9f-86147b557e37" data-readdy="true" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors font-medium flex items-center space-x-2 !rounded-button">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>添加收支</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-arrow-up-line text-green-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">同比上月</div>
+<div class="text-green-600 font-semibold">+12.5%</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥128,560</div>
+<div class="text-gray-600 text-sm">本月收入总额</div>
+</div>
+
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-arrow-down-line text-red-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">同比上月</div>
+<div class="text-red-600 font-semibold">+8.3%</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥89,240</div>
+<div class="text-gray-600 text-sm">本月支出总额</div>
+</div>
+
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-trending-up-line text-blue-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">同比上月</div>
+<div class="text-green-600 font-semibold">+18.7%</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥39,320</div>
+<div class="text-gray-600 text-sm">本月利润</div>
+</div>
+
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-wallet-line text-purple-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">现金流</div>
+<div class="text-green-600 font-semibold">健康</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥156,780</div>
+<div class="text-gray-600 text-sm">现金余额</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-semibold text-gray-900">收支趋势</h3>
+<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
+<button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-lg transition-colors whitespace-nowrap !rounded-button" id="trendMonthBtn">月度</button>
+<button class="px-3 py-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap !rounded-button" id="trendYearBtn">年度</button>
+</div>
+</div>
+<div id="trendChart" class="h-80"></div>
+</div>
+
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-semibold text-gray-900">收支构成</h3>
+<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
+<button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-lg transition-colors whitespace-nowrap !rounded-button" id="pieIncomeBtn">收入</button>
+<button class="px-3 py-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap !rounded-button" id="pieExpenseBtn">支出</button>
+</div>
+</div>
+<div id="pieChart" class="h-80"></div>
+</div>
+</div>
+
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-semibold text-gray-900">最近交易记录</h3>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/096b7c54-7d4f-42f8-9f9f-86147b557e37" data-readdy="true" class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors text-sm font-medium !rounded-button">添加收支</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead>
+<tr class="border-b border-gray-200">
+<th class="text-left py-3 px-4 font-medium text-gray-700">日期</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">类型</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">分类</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">交易对象</th>
+<th class="text-right py-3 px-4 font-medium text-gray-700">金额</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">支付方式</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">操作</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-08</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+</td>
+<td class="py-3 px-4 text-gray-700">销售收入</td>
+<td class="py-3 px-4 text-gray-700">张明华</td>
+<td class="py-3 px-4 text-right font-medium text-green-600">+¥2,580</td>
+<td class="py-3 px-4 text-gray-700">微信支付</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-08</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="py-3 px-4 text-gray-700">采购成本</td>
+<td class="py-3 px-4 text-gray-700">果品批发市场</td>
+<td class="py-3 px-4 text-right font-medium text-red-600">-¥1,250</td>
+<td class="py-3 px-4 text-gray-700">银行转账</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-07</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+</td>
+<td class="py-3 px-4 text-gray-700">销售收入</td>
+<td class="py-3 px-4 text-gray-700">李佳琪</td>
+<td class="py-3 px-4 text-right font-medium text-green-600">+¥1,890</td>
+<td class="py-3 px-4 text-gray-700">支付宝</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-07</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="py-3 px-4 text-gray-700">租金费用</td>
+<td class="py-3 px-4 text-gray-700">商铺房东</td>
+<td class="py-3 px-4 text-right font-medium text-red-600">-¥8,000</td>
+<td class="py-3 px-4 text-gray-700">银行转账</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-06</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+</td>
+<td class="py-3 px-4 text-gray-700">销售收入</td>
+<td class="py-3 px-4 text-gray-700">王建国</td>
+<td class="py-3 px-4 text-right font-medium text-green-600">+¥3,200</td>
+<td class="py-3 px-4 text-gray-700">现金</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-06</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="py-3 px-4 text-gray-700">水电费</td>
+<td class="py-3 px-4 text-gray-700">供电局</td>
+<td class="py-3 px-4 text-right font-medium text-red-600">-¥680</td>
+<td class="py-3 px-4 text-gray-700">银行转账</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-05</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+</td>
+<td class="py-3 px-4 text-gray-700">销售收入</td>
+<td class="py-3 px-4 text-gray-700">陈雅婷</td>
+<td class="py-3 px-4 text-right font-medium text-green-600">+¥1,460</td>
+<td class="py-3 px-4 text-gray-700">微信支付</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-05</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="py-3 px-4 text-gray-700">工资薪酬</td>
+<td class="py-3 px-4 text-gray-700">员工工资</td>
+<td class="py-3 px-4 text-right font-medium text-red-600">-¥12,000</td>
+<td class="py-3 px-4 text-gray-700">银行转账</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-04</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+</td>
+<td class="py-3 px-4 text-gray-700">销售收入</td>
+<td class="py-3 px-4 text-gray-700">刘志强</td>
+<td class="py-3 px-4 text-right font-medium text-green-600">+¥2,890</td>
+<td class="py-3 px-4 text-gray-700">支付宝</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">2025-01-04</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+</td>
+<td class="py-3 px-4 text-gray-700">营销推广</td>
+<td class="py-3 px-4 text-gray-700">广告公司</td>
+<td class="py-3 px-4 text-right font-medium text-red-600">-¥3,500</td>
+<td class="py-3 px-4 text-gray-700">银行转账</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+<div class="text-sm text-gray-600">显示 1-10 条，共 156 条记录</div>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap !rounded-button">上一页</button>
+<button class="px-3 py-2 text-sm bg-primary text-white rounded-button whitespace-nowrap !rounded-button">1</button>
+<button class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap !rounded-button">2</button>
+<button class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap !rounded-button">3</button>
+<button class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap !rounded-button">下一页</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<script id="period-toggle-script">
+document.addEventListener('DOMContentLoaded', function() {
+const monthBtn = document.getElementById('monthBtn');
+const yearBtn = document.getElementById('yearBtn');
+
+function togglePeriod(activeBtn, inactiveBtn) {
+activeBtn.classList.add('bg-primary', 'text-white');
+activeBtn.classList.remove('text-gray-600');
+inactiveBtn.classList.remove('bg-primary', 'text-white');
+inactiveBtn.classList.add('text-gray-600');
+}
+
+monthBtn.addEventListener('click', () => togglePeriod(monthBtn, yearBtn));
+yearBtn.addEventListener('click', () => togglePeriod(yearBtn, monthBtn));
+});
+</script>
+
+<script id="trend-chart-script">
+document.addEventListener('DOMContentLoaded', function() {
+const trendChart = echarts.init(document.getElementById('trendChart'));
+const trendMonthBtn = document.getElementById('trendMonthBtn');
+const trendYearBtn = document.getElementById('trendYearBtn');
+
+const monthData = {
+xAxis: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+income: [85000, 92000, 78000, 105000, 118000, 125000, 132000, 128000, 115000, 108000, 98000, 128560],
+expense: [62000, 68000, 58000, 75000, 82000, 88000, 95000, 89000, 78000, 72000, 65000, 89240]
+};
+
+const yearData = {
+xAxis: ['2020', '2021', '2022', '2023', '2024', '2025'],
+income: [980000, 1150000, 1280000, 1420000, 1580000, 128560],
+expense: [720000, 850000, 950000, 1050000, 1180000, 89240]
+};
+
+function updateTrendChart(data) {
+const option = {
+animation: false,
+grid: { top: 20, right: 20, bottom: 40, left: 60 },
+xAxis: {
+type: 'category',
+data: data.xAxis,
+axisLine: { lineStyle: { color: '#e5e7eb' } },
+axisLabel: { color: '#6b7280' }
+},
+yAxis: {
+type: 'value',
+axisLine: { show: false },
+axisTick: { show: false },
+axisLabel: { color: '#6b7280' },
+splitLine: { lineStyle: { color: '#f3f4f6' } }
+},
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.95)',
+borderColor: '#e5e7eb',
+textStyle: { color: '#1f2937' }
+},
+series: [
+{
+name: '收入',
+type: 'line',
+data: data.income,
+smooth: true,
+symbol: 'none',
+lineStyle: { color: 'rgba(87, 181, 231, 1)', width: 3 },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [
+{ offset: 0, color: 'rgba(87, 181, 231, 0.1)' },
+{ offset: 1, color: 'rgba(87, 181, 231, 0.01)' }
+]
+}
+}
+},
+{
+name: '支出',
+type: 'line',
+data: data.expense,
+smooth: true,
+symbol: 'none',
+lineStyle: { color: 'rgba(252, 141, 98, 1)', width: 3 },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [
+{ offset: 0, color: 'rgba(252, 141, 98, 0.1)' },
+{ offset: 1, color: 'rgba(252, 141, 98, 0.01)' }
+]
+}
+}
+}
+]
+};
+trendChart.setOption(option);
+}
+
+function toggleTrendPeriod(activeBtn, inactiveBtn, data) {
+activeBtn.classList.add('bg-primary', 'text-white');
+activeBtn.classList.remove('text-gray-600');
+inactiveBtn.classList.remove('bg-primary', 'text-white');
+inactiveBtn.classList.add('text-gray-600');
+updateTrendChart(data);
+}
+
+trendMonthBtn.addEventListener('click', () => toggleTrendPeriod(trendMonthBtn, trendYearBtn, monthData));
+trendYearBtn.addEventListener('click', () => toggleTrendPeriod(trendYearBtn, trendMonthBtn, yearData));
+
+updateTrendChart(monthData);
+});
+</script>
+
+<script id="pie-chart-script">
+document.addEventListener('DOMContentLoaded', function() {
+const pieChart = echarts.init(document.getElementById('pieChart'));
+const pieIncomeBtn = document.getElementById('pieIncomeBtn');
+const pieExpenseBtn = document.getElementById('pieExpenseBtn');
+
+const incomeData = [
+{ value: 68500, name: '销售收入' },
+{ value: 32800, name: '服务收入' },
+{ value: 18600, name: '投资收益' },
+{ value: 8660, name: '其他收入' }
+];
+
+const expenseData = [
+{ value: 35600, name: '采购成本' },
+{ value: 18900, name: '工资薪酬' },
+{ value: 12400, name: '租金费用' },
+{ value: 8800, name: '水电费' },
+{ value: 7200, name: '营销推广' },
+{ value: 6340, name: '其他支出' }
+];
+
+function updatePieChart(data) {
+const option = {
+animation: false,
+tooltip: {
+trigger: 'item',
+backgroundColor: 'rgba(255, 255, 255, 0.95)',
+borderColor: '#e5e7eb',
+textStyle: { color: '#1f2937' },
+formatter: '{a} <br/>{b}: ¥{c} ({d}%)'
+},
+series: [
+{
+name: '金额分布',
+type: 'pie',
+radius: ['40%', '70%'],
+center: ['50%', '50%'],
+data: data,
+itemStyle: {
+borderRadius: 8,
+borderColor: '#fff',
+borderWidth: 2
+},
+label: {
+show: true,
+formatter: '{b}\n¥{c}',
+color: '#1f2937'
+},
+labelLine: {
+show: true
+},
+color: ['rgba(87, 181, 231, 1)', 'rgba(141, 211, 199, 1)', 'rgba(251, 191, 114, 1)', 'rgba(252, 141, 98, 1)']
+}
+]
+};
+pieChart.setOption(option);
+}
+
+function togglePieType(activeBtn, inactiveBtn, data) {
+activeBtn.classList.add('bg-primary', 'text-white');
+activeBtn.classList.remove('text-gray-600');
+inactiveBtn.classList.remove('bg-primary', 'text-white');
+inactiveBtn.classList.add('text-gray-600');
+updatePieChart(data);
+}
+
+pieIncomeBtn.addEventListener('click', () => togglePieType(pieIncomeBtn, pieExpenseBtn, incomeData));
+pieExpenseBtn.addEventListener('click', () => togglePieType(pieExpenseBtn, pieIncomeBtn, expenseData));
+updatePieChart(incomeData);
+});
+</script>
+
+</body>
+</html>

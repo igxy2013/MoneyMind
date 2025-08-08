@@ -105,6 +105,9 @@ class Product(db.Model):
     cost_price = db.Column(db.Float)
     selling_price = db.Column(db.Float)
     unit = db.Column(db.String(20))
+    stock = db.Column(db.Integer, default=0)  # 库存数量
+    description = db.Column(db.Text)  # 商品描述
+    image_path = db.Column(db.String(255))  # 商品图片路径
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     supplier = db.relationship('Supplier', backref='products')
@@ -162,6 +165,7 @@ def edit_required(f):
     return decorated_function
 
 @app.route('/')
+@app.route('/dashboard')
 @login_required
 def dashboard():
     today = datetime.now().date()
@@ -226,9 +230,114 @@ def dashboard():
     received_receivables = sum(r.amount for r in receivables_list if r.status == 'received')
     pending_receivables = total_receivables - received_receivables
     
+    # 计算现金余额（总收入 - 总支出）
+    cash_balance = total_income - total_expense
+    
+    # 获取过去12个月的收支数据用于趋势图
+    trend_data = []
+    for i in range(12):
+        month_date = (today.replace(day=1) - timedelta(days=32*i)).replace(day=1)
+        next_month = (month_date.replace(day=28) + timedelta(days=4)).replace(day=1)
+        
+        month_income_trend = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'income',
+            Transaction.date >= month_date,
+            Transaction.date < next_month
+        ).scalar() or 0
+        
+        month_expense_trend = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'expense',
+            Transaction.date >= month_date,
+            Transaction.date < next_month
+        ).scalar() or 0
+        
+        trend_data.insert(0, {
+            'month': month_date.strftime('%m月'),
+            'income': float(month_income_trend),
+            'expense': float(month_expense_trend)
+        })
+    
+    # 获取收入分类数据用于饼图
+    income_category_stats = db.session.query(
+        Category.name,
+        db.func.sum(Transaction.amount).label('total')
+    ).join(Transaction).filter(
+        Transaction.type == 'income',
+        Transaction.date >= month_start
+    ).group_by(Category.name).all()
+    
+    # 获取支出分类数据用于饼图
+    expense_category_stats = db.session.query(
+        Category.name,
+        db.func.sum(Transaction.amount).label('total')
+    ).join(Transaction).filter(
+        Transaction.type == 'expense',
+        Transaction.date >= month_start
+    ).group_by(Category.name).all()
+    
+    # 本年收支统计
+    year_start = today.replace(month=1, day=1)
+    year_income = db.session.query(db.func.sum(Transaction.amount)).filter(
+        Transaction.type == 'income',
+        Transaction.date >= year_start
+    ).scalar() or 0
+    
+    year_expense = db.session.query(db.func.sum(Transaction.amount)).filter(
+        Transaction.type == 'expense',
+        Transaction.date >= year_start
+    ).scalar() or 0
+    
+    # 获取年度收入分类数据用于饼图
+    year_income_category_stats = db.session.query(
+        Category.name,
+        db.func.sum(Transaction.amount).label('total')
+    ).join(Transaction).filter(
+        Transaction.type == 'income',
+        Transaction.date >= year_start
+    ).group_by(Category.name).all()
+    
+    # 获取年度支出分类数据用于饼图
+    year_expense_category_stats = db.session.query(
+        Category.name,
+        db.func.sum(Transaction.amount).label('total')
+    ).join(Transaction).filter(
+        Transaction.type == 'expense',
+        Transaction.date >= year_start
+    ).group_by(Category.name).all()
+    
+    # 获取年度数据用于趋势图
+    current_year = today.year
+    year_data = []
+    
+    # 获取过去6年的数据
+    for year_offset in range(5, -1, -1):
+        target_year = current_year - year_offset
+        year_start_trend = datetime(target_year, 1, 1)
+        year_end_trend = datetime(target_year + 1, 1, 1)
+        
+        year_income_trend = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'income',
+            Transaction.date >= year_start_trend,
+            Transaction.date < year_end_trend
+        ).scalar() or 0
+        
+        year_expense_trend = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'expense',
+            Transaction.date >= year_start_trend,
+            Transaction.date < year_end_trend
+        ).scalar() or 0
+        
+        year_data.append({
+            'year': str(target_year),
+            'income': float(year_income_trend),
+            'expense': float(year_expense_trend)
+        })
+    
     return render_template('dashboard.html', 
                          month_income=month_income,
                          month_expense=month_expense,
+                         year_income=year_income,
+                         year_expense=year_expense,
                          recent_transactions=recent_transactions,
                          category_stats=category_stats,
                          supplier_stats=supplier_stats,
@@ -244,7 +353,14 @@ def dashboard():
                          total_expense=total_expense,
                          total_receivables=total_receivables,
                          received_receivables=received_receivables,
-                         pending_receivables=pending_receivables)
+                         pending_receivables=pending_receivables,
+                         cash_balance=cash_balance,
+                         trend_data=trend_data,
+                         year_data=year_data,
+                         income_category_stats=income_category_stats,
+                         expense_category_stats=expense_category_stats,
+                         year_income_category_stats=year_income_category_stats,
+                         year_expense_category_stats=year_expense_category_stats)
 
 @app.route('/transactions')
 @login_required
@@ -563,6 +679,136 @@ def api_products():
     product_names = [product.name for product in products]
     return jsonify(product_names)
 
+@app.route('/api/product/<int:id>')
+@login_required
+def api_product_detail(id):
+    """获取单个商品的详细信息"""
+    product = Product.query.get_or_404(id)
+    return jsonify({
+        'id': product.id,
+        'name': product.name,
+        'code': f'PRD{product.id:03d}',  # 生成商品编号
+        'category': product.category,
+        'category_id': product.category,  # 暂时使用category字段
+        'supplier_id': product.supplier_id,
+        'cost': product.cost_price,
+        'cost_price': product.cost_price,
+        'price': product.selling_price,  # 前端使用price字段
+        'selling_price': product.selling_price,
+        'unit': product.unit,
+        'stock': product.stock or 0,
+        'min_stock': 10,  # 默认最低库存
+        'max_stock': 1000,  # 默认最高库存
+        'description': product.description or '',
+        'image_path': product.image_path,
+        'is_active': product.is_active,
+        'created_at': product.created_at.strftime('%Y-%m-%d %H:%M:%S') if product.created_at else None
+    })
+
+@app.route('/api/product/<int:id>/stock', methods=['POST'])
+@edit_required
+def api_product_stock_operation(id):
+    """商品库存操作"""
+    product = Product.query.get_or_404(id)
+    data = request.get_json()
+    
+    operation_type = data.get('operation_type')
+    quantity = data.get('quantity', 0)
+    remark = data.get('remark', '')
+    
+    try:
+        if operation_type == 'in':
+            # 入库
+            product.stock += quantity
+        elif operation_type == 'out':
+            # 出库
+            if product.stock < quantity:
+                return jsonify({'success': False, 'message': '库存不足，无法出库'}), 400
+            product.stock -= quantity
+        elif operation_type == 'adjust':
+            # 调整
+            product.stock = quantity
+        else:
+            return jsonify({'success': False, 'message': '无效的操作类型'}), 400
+        
+        # 记录库存变动（这里可以添加库存变动记录表）
+        # 暂时只更新商品库存
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '库存操作成功',
+            'new_stock': product.stock
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'操作失败: {str(e)}'}), 500
+
+@app.route('/api/supplier/<int:id>')
+@login_required
+def api_supplier_detail(id):
+    """获取单个供应商的详细信息"""
+    supplier = Supplier.query.get_or_404(id)
+    return jsonify({
+        'id': supplier.id,
+        'name': supplier.name,
+        'contact_person': supplier.contact_person,
+        'phone': supplier.phone,
+        'email': supplier.email,
+        'address': supplier.address,
+        'supplier_type': supplier.supplier_type,
+        'supply_categories': supplier.supply_categories,
+        'supply_method': supplier.supply_method,
+        'importance_level': supplier.importance_level,
+        'is_active': supplier.is_active,
+        'created_at': supplier.created_at.strftime('%Y-%m-%d %H:%M:%S') if supplier.created_at else None
+    })
+
+@app.route('/api/supplier/<int:id>', methods=['PUT'])
+@edit_required
+def api_update_supplier(id):
+    """更新供应商信息"""
+    supplier = Supplier.query.get_or_404(id)
+    data = request.get_json()
+    
+    try:
+        supplier.name = data.get('name', supplier.name)
+        supplier.contact_person = data.get('contact_person', supplier.contact_person)
+        supplier.phone = data.get('phone', supplier.phone)
+        supplier.email = data.get('email', supplier.email)
+        supplier.address = data.get('address', supplier.address)
+        supplier.is_active = data.get('is_active', supplier.is_active)
+        
+        db.session.commit()
+        return jsonify({'message': '供应商更新成功'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'更新失败: {str(e)}'}), 500
+
+@app.route('/api/supplier', methods=['POST'])
+@edit_required
+def api_create_supplier():
+    """创建新供应商"""
+    data = request.get_json()
+    
+    try:
+        supplier = Supplier(
+            name=data.get('name'),
+            contact_person=data.get('contact_person'),
+            phone=data.get('phone'),
+            email=data.get('email'),
+            address=data.get('address'),
+            is_active=data.get('is_active', True)
+        )
+        
+        db.session.add(supplier)
+        db.session.commit()
+        return jsonify({'message': '供应商创建成功', 'id': supplier.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'创建失败: {str(e)}'}), 500
+
 @app.route('/api/supplier/<int:id>/images')
 @login_required
 def api_supplier_images(id):
@@ -630,34 +876,55 @@ def api_delete_supplier_image(supplier_id, image_id):
 def products():
     products = Product.query.all()
     suppliers = Supplier.query.filter_by(is_active=True).all()
-    return render_template('products.html', products=products, suppliers=suppliers)
+    categories = Category.query.all()
+    return render_template('products.html', products=products, suppliers=suppliers, categories=categories)
 
 @app.route('/add_product', methods=['GET', 'POST'])
 @edit_required
 def add_product():
     if request.method == 'POST':
+        # 检查是否为AJAX请求
+        is_ajax = 'X-Requested-With' in request.headers and request.headers['X-Requested-With'] == 'XMLHttpRequest'
+        
         name = request.form['name']
-        category = request.form['category']
-        supplier_id = int(request.form['supplier']) if request.form['supplier'] else None
-        cost_price = float(request.form['cost_price']) if request.form['cost_price'] else None
-        selling_price = float(request.form['selling_price']) if request.form['selling_price'] else None
-        unit = request.form['unit']
+        category_id = request.form.get('category_id')
+        supplier_id = int(request.form['supplier']) if request.form.get('supplier') else None
+        cost_price = float(request.form['cost_price']) if request.form.get('cost_price') else None
+        selling_price = float(request.form['selling_price']) if request.form.get('selling_price') else None
+        unit = request.form.get('unit', '件')
+        description = request.form.get('description', '')
+        is_active = request.form.get('is_active', '1') == '1'
+        
+        # 检查商品名称是否已存在
+        if Product.query.filter_by(name=name).first():
+            if is_ajax:
+                return jsonify({'success': False, 'message': '商品名称已存在'}), 400
+            flash('商品名称已存在', 'error')
+            suppliers = Supplier.query.filter_by(is_active=True).all()
+            return render_template('add_product.html', suppliers=suppliers)
         
         product = Product(
             name=name,
-            category=category,
+            category=category_id,  # 使用category_id而不是category
             supplier_id=supplier_id,
             cost_price=cost_price,
             selling_price=selling_price,
-            unit=unit
+            unit=unit,
+            description=description,
+            is_active=is_active
         )
         db.session.add(product)
         db.session.commit()
+        
+        if is_ajax:
+            return jsonify({'success': True, 'message': '商品添加成功！'})
+        
         flash('商品添加成功！', 'success')
         return redirect(url_for('products'))
     
     suppliers = Supplier.query.filter_by(is_active=True).all()
-    return render_template('add_product.html', suppliers=suppliers)
+    categories = Category.query.all()  # 添加分类数据
+    return render_template('add_product.html', suppliers=suppliers, categories=categories)
 
 @app.route('/edit_product/<int:id>', methods=['GET', 'POST'])
 @edit_required
@@ -665,17 +932,38 @@ def edit_product(id):
     product = Product.query.get_or_404(id)
     
     if request.method == 'POST':
+        # 更新基本信息
         product.name = request.form['name']
         product.category = request.form['category']
-        product.supplier_id = int(request.form['supplier']) if request.form['supplier'] else None
-        product.cost_price = float(request.form['cost_price']) if request.form['cost_price'] else None
         product.selling_price = float(request.form['selling_price']) if request.form['selling_price'] else None
-        product.unit = request.form['unit']
+        product.stock = int(request.form['stock']) if request.form['stock'] else 0
+        product.description = request.form['description']
         product.is_active = 'is_active' in request.form
         
+        # 处理图片上传
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename != '' and allowed_file(file.filename):
+                # 删除旧图片
+                if product.image_path:
+                    old_image_path = os.path.join('static', product.image_path.lstrip('/'))
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+                
+                # 保存新图片
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                
+                # 确保商品图片目录存在
+                product_upload_folder = 'static/uploads/products'
+                os.makedirs(product_upload_folder, exist_ok=True)
+                
+                file_path = os.path.join(product_upload_folder, unique_filename)
+                file.save(file_path)
+                product.image_path = f'/uploads/products/{unique_filename}'
+        
         db.session.commit()
-        flash('商品更新成功！', 'success')
-        return redirect(url_for('products'))
+        return jsonify({'success': True, 'message': '商品更新成功！'})
     
     suppliers = Supplier.query.filter_by(is_active=True).all()
     return render_template('edit_product.html', product=product, suppliers=suppliers)
@@ -705,23 +993,42 @@ def users():
 @admin_required
 def add_user():
     if request.method == 'POST':
+        # 检查是否为AJAX请求
+        is_ajax = request.headers.get('Content-Type') == 'multipart/form-data' or request.is_json or 'XMLHttpRequest' in request.headers.get('X-Requested-With', '')
+        
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
         role = request.form['role']
+        is_active = request.form.get('is_active', '1') == '1'
         
+        # 检查用户名是否已存在
         if User.query.filter_by(username=username).first():
+            if is_ajax:
+                return jsonify({'success': False, 'message': '用户名已存在'}), 400
             flash('用户名已存在', 'error')
+            return render_template('add_user.html')
+        
+        # 检查邮箱是否已存在
+        if User.query.filter_by(email=email).first():
+            if is_ajax:
+                return jsonify({'success': False, 'message': '邮箱已存在'}), 400
+            flash('邮箱已存在', 'error')
             return render_template('add_user.html')
         
         user = User(
             username=username,
             email=email,
             password_hash=generate_password_hash(password),
-            role=role
+            role=role,
+            is_active=is_active
         )
         db.session.add(user)
         db.session.commit()
+        
+        if is_ajax:
+            return jsonify({'success': True, 'message': '用户添加成功！'})
+        
         flash('用户添加成功！', 'success')
         return redirect(url_for('users'))
     
@@ -733,6 +1040,9 @@ def edit_user(id):
     user = User.query.get_or_404(id)
     
     if request.method == 'POST':
+        # 检查是否为AJAX请求
+        is_ajax = request.headers.get('Content-Type') == 'multipart/form-data' or request.is_json or 'XMLHttpRequest' in request.headers.get('X-Requested-With', '')
+        
         username = request.form['username']
         email = request.form['email']
         role = request.form['role']
@@ -741,12 +1051,16 @@ def edit_user(id):
         # 检查用户名是否已存在（排除当前用户）
         existing_user = User.query.filter_by(username=username).first()
         if existing_user and existing_user.id != user.id:
+            if is_ajax:
+                return jsonify({'success': False, 'message': '用户名已存在'}), 400
             flash('用户名已存在', 'error')
             return render_template('edit_user.html', user=user)
         
         # 检查邮箱是否已存在（排除当前用户）
         existing_email = User.query.filter_by(email=email).first()
         if existing_email and existing_email.id != user.id:
+            if is_ajax:
+                return jsonify({'success': False, 'message': '邮箱已存在'}), 400
             flash('邮箱已存在', 'error')
             return render_template('edit_user.html', user=user)
         
@@ -761,6 +1075,10 @@ def edit_user(id):
             user.password_hash = generate_password_hash(new_password)
         
         db.session.commit()
+        
+        if is_ajax:
+            return jsonify({'success': True, 'message': '用户更新成功！'})
+        
         flash('用户更新成功！', 'success')
         return redirect(url_for('users'))
     
@@ -792,79 +1110,206 @@ def delete_user(id):
 @app.route('/statistics')
 @login_required
 def statistics():
-    days = request.args.get('days', 30, type=int)
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=days)
+    """财务分析页面 - 重新设计的简洁版本"""
+    try:
+        # 获取当前日期
+        today = datetime.now().date()
+        month_start = today.replace(day=1)
+        
+        # 基础财务数据
+        total_income = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'income'
+        ).scalar() or 0
+        
+        total_expense = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'expense'
+        ).scalar() or 0
+        
+        net_assets = total_income - total_expense
+        liability_ratio = (total_expense / total_income * 100) if total_income > 0 else 0
+        
+        # 财务健康度评分（简化版）
+        if net_assets > 0:
+            health_score = min(100, max(0, int(100 - liability_ratio)))
+        else:
+            health_score = 0
+        
+        # 获取最近6个月的趋势数据
+        six_months_ago = datetime.now() - timedelta(days=180)
+        
+        monthly_stats = db.session.query(
+            db.func.date_format(Transaction.date, '%Y-%m').label('month'),
+            Transaction.type,
+            db.func.sum(Transaction.amount).label('total')
+        ).filter(
+            Transaction.date >= six_months_ago
+        ).group_by(
+            db.func.date_format(Transaction.date, '%Y-%m'),
+            Transaction.type
+        ).order_by('month').all()
+        
+        # 处理趋势数据
+        month_data = defaultdict(lambda: {'income': 0, 'expense': 0})
+        for stat in monthly_stats:
+            month_data[stat.month][stat.type] = stat.total
+        
+        trend_months = []
+        trend_income = []
+        trend_expense = []
+        trend_profit = []
+        monthly_data = []
+        
+        for month in sorted(month_data.keys()):
+            income = month_data[month]['income']
+            expense = month_data[month]['expense']
+            profit = income - expense
+            
+            trend_months.append(month)
+            trend_income.append(income)
+            trend_expense.append(expense)
+            trend_profit.append(profit)
+            
+            monthly_data.append({
+                'date': month,
+                'income': income,
+                'expense': expense,
+                'profit': profit,
+                'mom_growth': 0,  # 简化版暂不计算增长率
+                'yoy_growth': 0
+            })
+        
+        # 收支分类数据
+        income_categories = db.session.query(
+            Category.name,
+            db.func.sum(Transaction.amount).label('amount')
+        ).join(Transaction).filter(
+            Transaction.type == 'income',
+            Transaction.date >= six_months_ago
+        ).group_by(Category.name).all()
+        
+        expense_categories = db.session.query(
+            Category.name,
+            db.func.sum(Transaction.amount).label('amount')
+        ).join(Transaction).filter(
+            Transaction.type == 'expense',
+            Transaction.date >= six_months_ago
+        ).group_by(Category.name).all()
+        
+        # 饼图数据
+        income_colors = ['#57B5E7', '#8DD3C7', '#9333EA', '#FB923C', '#F59E0B']
+        expense_colors = ['#FBBF72', '#FC8D62', '#EAB308', '#EF4444', '#8B5CF6']
+        
+        income_pie_data = [
+            {
+                'value': cat.amount, 
+                'name': cat.name, 
+                'itemStyle': {'color': income_colors[i % len(income_colors)]}
+            }
+            for i, cat in enumerate(income_categories)
+        ]
+        
+        expense_pie_data = [
+            {
+                'value': cat.amount, 
+                'name': cat.name, 
+                'itemStyle': {'color': expense_colors[i % len(expense_colors)]}
+            }
+            for i, cat in enumerate(expense_categories)
+        ]
+        
+        # 现金流瀑布图数据（简化版）
+        # 本月数据
+        current_month_income = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'income',
+            Transaction.date >= month_start,
+            Transaction.date <= today
+        ).scalar() or 0
+        
+        current_month_expense = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'expense',
+            Transaction.date >= month_start,
+            Transaction.date <= today
+        ).scalar() or 0
+        
+        # 上月结余（简化计算）
+        last_month_end = month_start - timedelta(days=1)
+        last_month_start = last_month_end.replace(day=1)
+        
+        last_month_income = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'income',
+            Transaction.date >= last_month_start,
+            Transaction.date <= last_month_end
+        ).scalar() or 0
+        
+        last_month_expense = db.session.query(db.func.sum(Transaction.amount)).filter(
+            Transaction.type == 'expense',
+            Transaction.date >= last_month_start,
+            Transaction.date <= last_month_end
+        ).scalar() or 0
+        
+        initial_cash = last_month_income - last_month_expense
+        operating_cash = current_month_income
+        investing_cash = -current_month_expense * 0.3  # 假设30%为投资支出
+        financing_cash = -current_month_expense * 0.7  # 假设70%为运营支出
+        final_cash = initial_cash + operating_cash + investing_cash + financing_cash
+        
+        cashflow_data = [
+            {'value': float(initial_cash), 'itemStyle': {'color': '#57B5E7'}},
+            {'value': float(operating_cash), 'itemStyle': {'color': '#8DD3C7'}},
+            {'value': float(investing_cash), 'itemStyle': {'color': '#FC8D62'}},
+            {'value': float(financing_cash), 'itemStyle': {'color': '#FBBF72'}},
+            {'value': float(final_cash), 'itemStyle': {'color': '#57B5E7'}}
+        ]
+        
+        # 增长率数据（简化版）
+        assets_growth = 0
+        liabilities_growth = 0
+        net_assets_growth = 0
+        liability_ratio_change = 0
+        
+        return render_template('statistics.html',
+                             total_assets=total_income,
+                             total_liabilities=total_expense,
+                             net_assets=net_assets,
+                             liability_ratio=liability_ratio,
+                             health_score=health_score,
+                             trend_months=trend_months,
+                             trend_income=trend_income,
+                             trend_expense=trend_expense,
+                             trend_profit=trend_profit,
+                             income_categories=income_categories,
+                             expense_categories=expense_categories,
+                             income_pie_data=income_pie_data,
+                             expense_pie_data=expense_pie_data,
+                             cashflow_data=cashflow_data,
+                             monthly_data=monthly_data,
+                             assets_growth=assets_growth,
+                             liabilities_growth=liabilities_growth,
+                             net_assets_growth=net_assets_growth,
+                             liability_ratio_change=liability_ratio_change)
     
-    transactions = Transaction.query.filter(
-        Transaction.date >= start_date,
-        Transaction.date <= end_date
-    ).all()
-    
-    if transactions:
-        income_by_date = defaultdict(float)
-        expense_by_date = defaultdict(float)
-        
-        for transaction in transactions:
-            date_str = transaction.date.strftime('%Y-%m-%d')
-            if transaction.type == 'income':
-                income_by_date[date_str] += transaction.amount
-            else:
-                expense_by_date[date_str] += transaction.amount
-        
-        all_dates = sorted(set(list(income_by_date.keys()) + list(expense_by_date.keys())))
-        income_data = [income_by_date.get(date, 0) for date in all_dates]
-        expense_data = [expense_by_date.get(date, 0) for date in all_dates]
-        
-        fig = go.Figure()
-        
-        # 添加收入柱形图
-        fig.add_trace(go.Bar(
-            x=all_dates, 
-            y=income_data, 
-            name='收入', 
-            marker_color='green',
-            opacity=0.8
-        ))
-        
-        # 添加支出柱形图
-        fig.add_trace(go.Bar(
-            x=all_dates, 
-            y=expense_data, 
-            name='支出', 
-            marker_color='red',
-            opacity=0.8
-        ))
-        
-        # 更新布局
-        fig.update_layout(
-            title='收支趋势图',
-            xaxis_title='日期',
-            yaxis_title='金额 (元)',
-            barmode='group',  # 分组显示柱形图
-            xaxis=dict(
-                type='category',  # 确保横坐标按日期分类显示
-                tickformat='%m-%d',  # 显示月-日格式
-                tickangle=45  # 倾斜标签避免重叠
-            ),
-            yaxis=dict(
-                tickformat='.2f',  # 金额保留两位小数
-                tickprefix='¥'  # 添加货币符号
-            ),
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1
-            )
-        )
-        
-        chart_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-    else:
-        chart_json = None
-    
-    return render_template('statistics.html', chart_json=chart_json)
+    except Exception as e:
+        flash(f'财务分析数据加载失败: {str(e)}', 'error')
+        return render_template('statistics.html',
+                             total_assets=0,
+                             total_liabilities=0,
+                             net_assets=0,
+                             liability_ratio=0,
+                             health_score=0,
+                             trend_months=[],
+                             trend_income=[],
+                             trend_expense=[],
+                             trend_profit=[],
+                             income_categories=[],
+                             expense_categories=[],
+                             income_pie_data=[],
+                             expense_pie_data=[],
+                             cashflow_data=[],
+                             monthly_data=[],
+                             assets_growth=0,
+                             liabilities_growth=0,
+                             net_assets_growth=0,
+                             liability_ratio_change=0)
 
 @app.route('/receivables')
 @login_required
@@ -958,18 +1403,24 @@ def login():
     
     return render_template('login.html')
 
+@app.route('/settings')
+@admin_required
+def settings():
+    return render_template('settings.html')
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
+# 仅在直接运行app.py时启动开发服务器（用于开发调试）
 if __name__ == '__main__':
     with app.app_context():
         try:
             db.create_all()
             print("数据库表创建成功")
-            
+
             if not User.query.filter_by(username='admin').first():
                 admin = User(
                     username='admin',
@@ -988,5 +1439,7 @@ if __name__ == '__main__':
             print("请检查MySQL连接配置和数据库是否存在")
             exit(1)
     
-    # 生产环境配置
-    app.run(host='0.0.0.0', port=5085, debug=False) 
+    print("\n注意: 当前使用Flask开发服务器")
+    print("生产环境请使用: python wsgi.py 或 start_wsgi.bat")
+    print("="*50)
+    app.run(host='0.0.0.0', port=5085, debug=True)

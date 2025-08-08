@@ -1,335 +1,483 @@
 {% extends "base.html" %}
 
-{% block title %}仪表板 - 七彩果坊{% endblock %}
+{% block title %}仪表板 - MoneyMind{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h2 class="mb-3">
-            <i class="fas fa-chart-line me-2"></i>七彩果坊 - 企业仪表板
-        </h2>
-    </div>
+
+<div class="max-w-7xl mx-auto">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h1 class="text-3xl font-bold text-gray-900 mb-2">仪表板</h1>
+<p class="text-gray-600">经营数据概览与分析</p>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center bg-white/60 backdrop-blur-lg rounded-xl border border-white/20 px-1 py-1">
+<button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="monthBtn">本月</button>
+<button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button" id="yearBtn">本年</button>
+</div>
+<a href="{{ url_for('add_transaction') }}" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors font-medium flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+<span>添加收支</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-arrow-up-line text-green-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">同比上月</div>
+<div class="text-green-600 font-semibold">+12.5%</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥{{ "%.2f"|format(month_income) }}</div>
+<div class="text-gray-600 text-sm">本月收入总额</div>
 </div>
 
-<!-- 本月统计卡片 -->
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card income-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">本月收入</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(month_income) }}</h3>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-arrow-up fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card expense-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">本月支出</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(month_expense) }}</h3>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-arrow-down fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">本月利润</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(month_income - month_expense) }}</h3>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-arrow-down-line text-red-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">同比上月</div>
+<div class="text-red-600 font-semibold">+8.3%</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥{{ "%.2f"|format(month_expense) }}</div>
+<div class="text-gray-600 text-sm">本月支出总额</div>
 </div>
 
-<!-- 收支统计卡片 -->
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">总收入</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(total_income) }}</h3>
-                        <small class="opacity-75">历史累计</small>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-arrow-up fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card bg-danger text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">总支出</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(total_expense) }}</h3>
-                        <small class="opacity-75">历史累计</small>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-arrow-down fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">总结余</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(total_income - total_expense) }}</h3>
-                        <small class="opacity-75">历史累计</small>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-trending-up-line text-blue-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">同比上月</div>
+<div class="text-green-600 font-semibold">+18.7%</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥{{ "%.2f"|format(month_income - month_expense) }}</div>
+<div class="text-gray-600 text-sm">本月利润</div>
 </div>
 
-<!-- 应收款统计卡片 -->
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">总应收款</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(total_receivables) }}</h3>
-                        <small class="opacity-75">所有应收款</small>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-hand-holding-dollar fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">已收金额</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(received_receivables) }}</h3>
-                        <small class="opacity-75">已收回</small>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title mb-1">待收金额</h6>
-                        <h3 class="mb-0">¥{{ "%.2f"|format(pending_receivables) }}</h3>
-                        <small class="opacity-75">待收回</small>
-                    </div>
-                    <div class="text-end">
-                        <i class="fas fa-clock fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-4">
+<div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-wallet-line text-purple-600 text-xl"></i>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm text-gray-500">现金流</div>
+<div class="text-green-600 font-semibold">健康</div>
+</div>
+</div>
+<div class="text-2xl font-bold text-gray-900 mb-1">¥{{ "%.2f"|format(cash_balance) }}</div>
+<div class="text-gray-600 text-sm">现金余额</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-semibold text-gray-900">收支趋势</h3>
+<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
+<button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="trendMonthBtn">月度</button>
+<button class="px-3 py-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button" id="trendYearBtn">年度</button>
+</div>
+</div>
+<div id="trendChart" class="h-80"></div>
 </div>
 
-<div class="row">
-    <!-- 最近交易 -->
-    <div class="col-md-8 mb-4">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-list me-2"></i>最近交易
-                </h5>
-                {% if current_user.role != 'employee' %}
-                <a href="{{ url_for('add_transaction') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus me-1"></i>添加交易
-                </a>
-                {% endif %}
-            </div>
-            <div class="card-body">
-                {% if recent_transactions %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>日期</th>
-                                    <th>描述</th>
-                                    <th>分类</th>
-                                    <th>供应商</th>
-                                    <th class="text-end">金额</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for transaction in recent_transactions %}
-                                <tr>
-                                    <td>{{ transaction.date.strftime('%m-%d') }}</td>
-                                    <td>{{ transaction.description or '无描述' }}</td>
-                                    <td>
-                                        <span class="badge" style="background-color: {{ transaction.category.color }}">
-                                            {{ transaction.category.name }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% if transaction.supplier %}
-                                            <span class="text-muted">{{ transaction.supplier.name }}</span>
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="{% if transaction.type == 'income' %}text-success{% else %}text-danger{% endif %}">
-                                            {{ '+' if transaction.type == 'income' else '-' }}¥{{ "%.2f"|format(transaction.amount) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('transactions') }}" class="btn btn-outline-primary">查看全部</a>
-                    </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">暂无交易记录</p>
-                        {% if current_user.role != 'employee' %}
-                        <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i>添加第一笔交易
-                        </a>
-                        {% endif %}
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    
-    <!-- 统计信息 -->
-    <div class="col-md-4 mb-4">
-        <!-- 分类统计 -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>支出分类
-                </h6>
-            </div>
-            <div class="card-body">
-                {% if category_stats %}
-                    {% for category_name, total in category_stats %}
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="small">{{ category_name }}</span>
-                        <span class="text-danger small">¥{{ "%.2f"|format(total) }}</span>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center py-2">
-                        <i class="fas fa-chart-pie fa-2x text-muted mb-2"></i>
-                        <p class="text-muted small">暂无支出数据</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <!-- 供应商统计 -->
-        <div class="card">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-truck me-2"></i>供应商支出
-                </h6>
-            </div>
-            <div class="card-body">
-                {% if supplier_stats %}
-                    {% for supplier_name, total in supplier_stats %}
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="small">{{ supplier_name }}</span>
-                        <span class="text-danger small">¥{{ "%.2f"|format(total) }}</span>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center py-2">
-                        <i class="fas fa-truck fa-2x text-muted mb-2"></i>
-                        <p class="text-muted small">暂无供应商数据</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-semibold text-gray-900">收支构成</h3>
+<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
+<button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="pieIncomeBtn">收入</button>
+<button class="px-3 py-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button" id="pieExpenseBtn">支出</button>
+</div>
+</div>
+<div id="pieChart" class="h-80"></div>
+</div>
 </div>
 
-<!-- 快速操作 -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-bolt me-2"></i>快速操作
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    {% if current_user.role != 'employee' %}
-                    <div class="col-md-3 mb-2">
-                        <a href="{{ url_for('add_transaction') }}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-plus me-1"></i>添加交易
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <a href="{{ url_for('add_supplier') }}" class="btn btn-outline-success w-100">
-                            <i class="fas fa-truck me-1"></i>添加供应商
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <a href="{{ url_for('add_product') }}" class="btn btn-outline-info w-100">
-                            <i class="fas fa-box me-1"></i>添加商品
-                        </a>
-                    </div>
-                    {% endif %}
-                    <div class="col-md-3 mb-2">
-                        <a href="{{ url_for('statistics') }}" class="btn btn-outline-warning w-100">
-                            <i class="fas fa-chart-bar me-1"></i>查看统计
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- 交易记录表格 -->
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-semibold text-gray-900">最近交易记录</h3>
+<a href="{{ url_for('add_transaction') }}" class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors text-sm font-medium">添加收支</a>
 </div>
-{% endblock %} 
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead>
+<tr class="border-b border-gray-200">
+<th class="text-left py-3 px-4 font-medium text-gray-700">日期</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">类型</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">分类</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">交易对象</th>
+<th class="text-right py-3 px-4 font-medium text-gray-700">金额</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">支付方式</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">操作</th>
+</tr>
+</thead>
+<tbody>
+{% for transaction in recent_transactions %}
+<tr class="border-b border-gray-100 hover:bg-gray-50/50">
+<td class="py-3 px-4 text-gray-900">{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+<td class="py-3 px-4">
+{% if transaction.type == 'income' %}
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+{% else %}
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+{% endif %}
+</td>
+<td class="py-3 px-4 text-gray-700">{{ transaction.category.name if transaction.category else '-' }}</td>
+<td class="py-3 px-4 text-gray-700">{{ transaction.description or '-' }}</td>
+<td class="py-3 px-4 text-right font-medium {% if transaction.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+{% if transaction.type == 'income' %}+{% else %}-{% endif %}¥{{ "%.2f"|format(transaction.amount) }}
+</td>
+<td class="py-3 px-4 text-gray-700">{{ transaction.payment_method or '-' }}</td>
+<td class="py-3 px-4">
+<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-line"></i>
+</div>
+</button>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+<div class="text-sm text-gray-600">显示最近 {{ recent_transactions|length }} 条交易记录</div>
+<div class="flex items-center space-x-2">
+<a href="{{ url_for('transactions') }}" class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button">查看全部</a>
+</div>
+</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
+<script id="period-toggle-script">
+document.addEventListener('DOMContentLoaded', function() {
+const monthBtn = document.getElementById('monthBtn');
+const yearBtn = document.getElementById('yearBtn');
+
+// 数据定义
+const monthData = {
+    income: {{ month_income }},
+    expense: {{ month_expense }},
+    profit: {{ month_income - month_expense }}
+};
+
+const yearData = {
+    income: {{ year_income }},
+    expense: {{ year_expense }},
+    profit: {{ year_income - year_expense }}
+};
+
+function updateStatCards(data, period) {
+     // 更新收入卡片
+     const cards = document.querySelectorAll('.grid .bg-white\\/60');
+     const incomeCard = cards[0];
+     const incomeAmount = incomeCard.querySelector('.text-2xl');
+     const incomeLabel = incomeCard.querySelector('.text-gray-600');
+     incomeAmount.textContent = '¥' + data.income.toFixed(2);
+     incomeLabel.textContent = period + '收入总额';
+     
+     // 更新支出卡片
+     const expenseCard = cards[1];
+     const expenseAmount = expenseCard.querySelector('.text-2xl');
+     const expenseLabel = expenseCard.querySelector('.text-gray-600');
+     expenseAmount.textContent = '¥' + data.expense.toFixed(2);
+     expenseLabel.textContent = period + '支出总额';
+     
+     // 更新利润卡片
+     const profitCard = cards[2];
+     const profitAmount = profitCard.querySelector('.text-2xl');
+     const profitLabel = profitCard.querySelector('.text-gray-600');
+     profitAmount.textContent = '¥' + data.profit.toFixed(2);
+     profitLabel.textContent = period + '利润';
+ }
+
+function togglePeriod(activeBtn, inactiveBtn) {
+    activeBtn.classList.add('bg-primary', 'text-white');
+    activeBtn.classList.remove('text-gray-600');
+    inactiveBtn.classList.remove('bg-primary', 'text-white');
+    inactiveBtn.classList.add('text-gray-600');
+    
+    // 根据按钮更新数据
+    if (activeBtn.id === 'monthBtn') {
+        updateStatCards(monthData, '本月');
+        // 更新饼图数据为月度数据
+        window.currentPeriod = 'month';
+        if (window.updatePieChartForPeriod) {
+            window.updatePieChartForPeriod('month');
+        }
+    } else {
+        updateStatCards(yearData, '本年');
+        // 更新饼图数据为年度数据
+        window.currentPeriod = 'year';
+        if (window.updatePieChartForPeriod) {
+            window.updatePieChartForPeriod('year');
+        }
+    }
+}
+
+monthBtn.addEventListener('click', () => togglePeriod(monthBtn, yearBtn));
+yearBtn.addEventListener('click', () => togglePeriod(yearBtn, monthBtn));
+
+// 初始化为月度数据
+window.currentPeriod = 'month';
+});
+</script>
+
+<script id="trend-chart-script">
+document.addEventListener('DOMContentLoaded', function() {
+const trendChart = echarts.init(document.getElementById('trendChart'));
+const trendMonthBtn = document.getElementById('trendMonthBtn');
+const trendYearBtn = document.getElementById('trendYearBtn');
+
+const monthData = {
+xAxis: [{% for data in trend_data %}'{{ data.month }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+income: [{% for data in trend_data %}{{ data.income }}{% if not loop.last %}, {% endif %}{% endfor %}],
+expense: [{% for data in trend_data %}{{ data.expense }}{% if not loop.last %}, {% endif %}{% endfor %}]
+};
+
+const yearData = {
+xAxis: [{% for data in year_data %}'{{ data.year }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+income: [{% for data in year_data %}{{ data.income }}{% if not loop.last %}, {% endif %}{% endfor %}],
+expense: [{% for data in year_data %}{{ data.expense }}{% if not loop.last %}, {% endif %}{% endfor %}]
+};
+
+function updateTrendChart(data) {
+const option = {
+animation: false,
+grid: { top: 20, right: 20, bottom: 40, left: 60 },
+xAxis: {
+type: 'category',
+data: data.xAxis,
+axisLine: { lineStyle: { color: '#e5e7eb' } },
+axisLabel: { color: '#6b7280' }
+},
+yAxis: {
+type: 'value',
+axisLine: { show: false },
+axisTick: { show: false },
+axisLabel: { color: '#6b7280' },
+splitLine: { lineStyle: { color: '#f3f4f6' } }
+},
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.95)',
+borderColor: '#e5e7eb',
+textStyle: { color: '#1f2937' },
+formatter: function(params) {
+let result = params[0].name + '<br/>';
+params.forEach(function(item) {
+result += item.marker + item.seriesName + ': ¥' + item.value.toFixed(2) + '<br/>';
+});
+return result;
+}
+},
+series: [
+{
+name: '收入',
+type: 'line',
+data: data.income,
+smooth: true,
+symbol: 'none',
+lineStyle: { color: 'rgba(87, 181, 231, 1)', width: 3 },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [
+{ offset: 0, color: 'rgba(87, 181, 231, 0.1)' },
+{ offset: 1, color: 'rgba(87, 181, 231, 0.01)' }
+]
+}
+}
+},
+{
+name: '支出',
+type: 'line',
+data: data.expense,
+smooth: true,
+symbol: 'none',
+lineStyle: { color: 'rgba(252, 141, 98, 1)', width: 3 },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [
+{ offset: 0, color: 'rgba(252, 141, 98, 0.1)' },
+{ offset: 1, color: 'rgba(252, 141, 98, 0.01)' }
+]
+}
+}
+}
+]
+};
+trendChart.setOption(option);
+}
+
+function toggleTrendPeriod(activeBtn, inactiveBtn, data) {
+activeBtn.classList.add('bg-primary', 'text-white');
+activeBtn.classList.remove('text-gray-600');
+inactiveBtn.classList.remove('bg-primary', 'text-white');
+inactiveBtn.classList.add('text-gray-600');
+updateTrendChart(data);
+}
+
+trendMonthBtn.addEventListener('click', () => toggleTrendPeriod(trendMonthBtn, trendYearBtn, monthData));
+trendYearBtn.addEventListener('click', () => toggleTrendPeriod(trendYearBtn, trendMonthBtn, yearData));
+
+updateTrendChart(monthData);
+});
+</script>
+
+<script id="pie-chart-script">
+document.addEventListener('DOMContentLoaded', function() {
+const pieChart = echarts.init(document.getElementById('pieChart'));
+const pieIncomeBtn = document.getElementById('pieIncomeBtn');
+const pieExpenseBtn = document.getElementById('pieExpenseBtn');
+
+// 月度数据
+const monthIncomeData = [
+{% for stat in income_category_stats %}
+{ value: {{ stat.total }}, name: '{{ stat.name }}' }{% if not loop.last %},{% endif %}
+{% endfor %}
+{% if not income_category_stats %}
+{ value: 0, name: '暂无收入数据' }
+{% endif %}
+];
+
+const monthExpenseData = [
+{% for stat in expense_category_stats %}
+{ value: {{ stat.total }}, name: '{{ stat.name }}' }{% if not loop.last %},{% endif %}
+{% endfor %}
+{% if not expense_category_stats %}
+{ value: 0, name: '暂无支出数据' }
+{% endif %}
+];
+
+// 年度数据
+const yearIncomeData = [
+{% for stat in year_income_category_stats %}
+{ value: {{ stat.total }}, name: '{{ stat.name }}' }{% if not loop.last %},{% endif %}
+{% endfor %}
+{% if not year_income_category_stats %}
+{ value: 0, name: '暂无收入数据' }
+{% endif %}
+];
+
+const yearExpenseData = [
+{% for stat in year_expense_category_stats %}
+{ value: {{ stat.total }}, name: '{{ stat.name }}' }{% if not loop.last %},{% endif %}
+{% endfor %}
+{% if not year_expense_category_stats %}
+{ value: 0, name: '暂无支出数据' }
+{% endif %}
+];
+
+// 当前显示的数据类型
+let currentType = 'income';
+let currentPeriod = 'month';
+
+function updatePieChart(data) {
+const option = {
+animation: false,
+tooltip: {
+trigger: 'item',
+backgroundColor: 'rgba(255, 255, 255, 0.95)',
+borderColor: '#e5e7eb',
+textStyle: { color: '#1f2937' },
+formatter: function(params) {
+return params.seriesName + '<br/>' + params.name + ': ¥' + params.value.toFixed(2) + ' (' + params.percent.toFixed(1) + '%)';
+}
+},
+series: [
+{
+name: '金额分布',
+type: 'pie',
+radius: ['40%', '70%'],
+center: ['50%', '50%'],
+data: data,
+itemStyle: {
+borderRadius: 8,
+borderColor: '#fff',
+borderWidth: 2
+},
+label: {
+show: true,
+formatter: function(params) {
+return params.name + '\n¥' + params.value.toFixed(2);
+},
+color: '#1f2937'
+},
+labelLine: {
+show: true
+},
+color: ['rgba(87, 181, 231, 1)', 'rgba(141, 211, 199, 1)', 'rgba(251, 191, 114, 1)', 'rgba(252, 141, 98, 1)']
+}
+]
+};
+pieChart.setOption(option);
+}
+
+// 获取当前应显示的数据
+function getCurrentData(type, period) {
+    if (type === 'income') {
+        return period === 'month' ? monthIncomeData : yearIncomeData;
+    } else {
+        return period === 'month' ? monthExpenseData : yearExpenseData;
+    }
+}
+
+function togglePieType(activeBtn, inactiveBtn, type) {
+    activeBtn.classList.add('bg-primary', 'text-white');
+    activeBtn.classList.remove('text-gray-600');
+    inactiveBtn.classList.remove('bg-primary', 'text-white');
+    inactiveBtn.classList.add('text-gray-600');
+    
+    currentType = type;
+    const data = getCurrentData(currentType, currentPeriod);
+    updatePieChart(data);
+}
+
+// 全局函数，供期间切换调用
+window.updatePieChartForPeriod = function(period) {
+    currentPeriod = period;
+    const data = getCurrentData(currentType, currentPeriod);
+    updatePieChart(data);
+};
+
+pieIncomeBtn.addEventListener('click', () => togglePieType(pieIncomeBtn, pieExpenseBtn, 'income'));
+pieExpenseBtn.addEventListener('click', () => togglePieType(pieExpenseBtn, pieIncomeBtn, 'expense'));
+
+// 初始化显示收入数据
+const initialData = getCurrentData('income', 'month');
+updatePieChart(initialData);
+});
+</script>
+
+{% endblock %}
