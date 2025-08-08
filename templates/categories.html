@@ -13,12 +13,12 @@
 <div class="flex items-center justify-between mb-8">
     <div class="flex items-center space-x-4">
         {% if current_user.role != 'employee' %}
-        <a href="{{ url_for('add_category') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2">
+        <button id="addCategoryBtn" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2">
             <div class="w-4 h-4 flex items-center justify-center">
                 <i class="fas fa-plus"></i>
             </div>
             <span>添加新分类</span>
-        </a>
+        </button>
         {% endif %}
         <div class="relative">
             <select id="typeFilter" class="appearance-none bg-white/80 backdrop-blur-lg border border-white/20 rounded-lg px-4 py-3 pr-10 text-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
@@ -84,9 +84,13 @@
                     {% if current_user.role != 'employee' %}
                     <td class="px-6 py-4 text-center">
                         <div class="flex items-center justify-center space-x-2">
-                            <a href="{{ url_for('edit_category', id=category.id) }}" class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors">
+                            <button class="edit-btn w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors" 
+                                    data-id="{{ category.id }}" 
+                                    data-name="{{ category.name }}" 
+                                    data-type="{{ category.type }}" 
+                                    data-color="{{ category.color }}">
                                 <i class="fas fa-edit text-blue-600 text-sm"></i>
-                            </a>
+                            </button>
                             <a href="{{ url_for('delete_category', id=category.id) }}" class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center transition-colors" onclick="return confirm('确定要删除这个分类吗？')">
                                 <i class="fas fa-trash text-red-600 text-sm"></i>
                             </a>
@@ -144,12 +148,77 @@
 </div>
 {% endif %}
 
+<!-- 添加/编辑分类模态框 -->
+<div id="categoryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+    <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl border border-white/20">
+        <div class="flex items-center justify-between mb-6">
+            <h3 id="modalTitle" class="text-xl font-bold text-gray-900">添加新分类</h3>
+            <button id="closeModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+                <i class="fas fa-times text-gray-600"></i>
+            </button>
+        </div>
+        <form id="categoryForm" class="space-y-6">
+            <input type="hidden" id="categoryId" name="category_id" value="">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">分类名称</label>
+                <input type="text" id="categoryName" name="name" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-gray-900" placeholder="请输入分类名称" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">类型</label>
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="type" value="income" class="sr-only">
+                        <div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+                            <div class="radio-dot w-2 h-2 bg-indigo-600 rounded-full hidden"></div>
+                        </div>
+                        <span class="ml-2 text-gray-700">收入</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="type" value="expense" class="sr-only">
+                        <div class="radio-custom w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer">
+                            <div class="radio-dot w-2 h-2 bg-indigo-600 rounded-full hidden"></div>
+                        </div>
+                        <span class="ml-2 text-gray-700">支出</span>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">分类颜色</label>
+                <div class="flex items-center space-x-4">
+                    <input type="color" id="categoryColor" name="color" value="#667eea" class="w-12 h-12 border border-gray-200 rounded-lg cursor-pointer">
+                    <div class="flex space-x-2">
+                        <div class="color-preview w-8 h-8 bg-red-400 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#FF6B6B"></div>
+                        <div class="color-preview w-8 h-8 bg-teal-400 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#4ECDC4"></div>
+                        <div class="color-preview w-8 h-8 bg-blue-400 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#45B7D1"></div>
+                        <div class="color-preview w-8 h-8 bg-green-400 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#96CEB4"></div>
+                        <div class="color-preview w-8 h-8 bg-yellow-300 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#FFEAA7"></div>
+                        <div class="color-preview w-8 h-8 bg-purple-300 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-300" data-color="#DDA0DD"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex space-x-4 pt-4">
+                <button type="button" id="cancelBtn" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">取消</button>
+                <button type="submit" class="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-// 分类筛选功能
+// 分类筛选功能和模态窗口功能
 document.addEventListener('DOMContentLoaded', function() {
     const typeFilter = document.getElementById('typeFilter');
     const categoryRows = document.querySelectorAll('.category-row');
+    const categoryModal = document.getElementById('categoryModal');
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const closeModal = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const categoryForm = document.getElementById('categoryForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const categoryColor = document.getElementById('categoryColor');
+    const colorPreviews = document.querySelectorAll('.color-preview');
     
+    // 分类筛选功能
     typeFilter.addEventListener('change', function() {
         const selectedType = this.value;
         
@@ -160,6 +229,157 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 row.style.display = 'none';
             }
+        });
+    });
+    
+    // 模态窗口功能
+     if (addCategoryBtn) {
+         addCategoryBtn.addEventListener('click', function() {
+             modalTitle.textContent = '添加新分类';
+             categoryForm.reset();
+             document.getElementById('categoryId').value = '';
+             // 重置单选按钮状态
+             const radioLabels = document.querySelectorAll('input[name="type"]');
+             radioLabels.forEach(r => {
+                 const label = r.closest('label');
+                 const customRadio = label.querySelector('.radio-custom');
+                 const radioDot = customRadio.querySelector('.radio-dot');
+                 customRadio.classList.remove('border-indigo-600');
+                 radioDot.classList.add('hidden');
+                 r.checked = false;
+             });
+             categoryModal.classList.remove('hidden');
+         });
+     }
+     
+     // 编辑分类按钮点击事件
+     document.addEventListener('click', function(e) {
+         if (e.target.closest('.edit-btn')) {
+             const btn = e.target.closest('.edit-btn');
+             const id = btn.getAttribute('data-id');
+             const name = btn.getAttribute('data-name');
+             const type = btn.getAttribute('data-type');
+             const color = btn.getAttribute('data-color');
+             
+             // 设置为编辑模式
+             modalTitle.textContent = '编辑分类';
+             document.getElementById('categoryId').value = id;
+             document.getElementById('categoryName').value = name;
+             document.getElementById('categoryColor').value = color;
+             
+             // 设置类型单选按钮
+             const radioLabels = document.querySelectorAll('input[name="type"]');
+             radioLabels.forEach(r => {
+                 const label = r.closest('label');
+                 const customRadio = label.querySelector('.radio-custom');
+                 const radioDot = customRadio.querySelector('.radio-dot');
+                 
+                 if (r.value === type) {
+                     r.checked = true;
+                     customRadio.classList.add('border-indigo-600');
+                     radioDot.classList.remove('hidden');
+                 } else {
+                     r.checked = false;
+                     customRadio.classList.remove('border-indigo-600');
+                     radioDot.classList.add('hidden');
+                 }
+             });
+             
+             categoryModal.classList.remove('hidden');
+         }
+     });
+     
+     closeModal.addEventListener('click', function() {
+         categoryModal.classList.add('hidden');
+     });
+     
+     cancelBtn.addEventListener('click', function() {
+         categoryModal.classList.add('hidden');
+     });
+     
+     // 点击模态窗口外部关闭
+     categoryModal.addEventListener('click', function(e) {
+         if (e.target === categoryModal) {
+             categoryModal.classList.add('hidden');
+         }
+     });
+     
+     // 表单提交处理
+     categoryForm.addEventListener('submit', function(e) {
+         e.preventDefault();
+         
+         const formData = new FormData();
+         const categoryId = document.getElementById('categoryId').value;
+         formData.append('name', document.getElementById('categoryName').value);
+         formData.append('color', document.getElementById('categoryColor').value);
+         
+         const selectedType = document.querySelector('input[name="type"]:checked');
+         if (!selectedType) {
+             alert('请选择分类类型');
+             return;
+         }
+         formData.append('type', selectedType.value);
+         
+         // 根据是否有categoryId决定是添加还是编辑
+         let url, method;
+         if (categoryId) {
+             // 编辑模式
+             url = '{{ url_for("edit_category", id="PLACEHOLDER") }}'.replace('PLACEHOLDER', categoryId);
+             method = 'POST';
+         } else {
+             // 添加模式
+             url = '{{ url_for("add_category") }}';
+             method = 'POST';
+         }
+         
+         fetch(url, {
+              method: method,
+              body: formData
+          })
+          .then(response => {
+              if (response.ok) {
+                  categoryModal.classList.add('hidden');
+                  location.reload(); // 刷新页面以显示更新的分类
+              } else {
+                  alert(categoryId ? '编辑分类失败，请重试' : '添加分类失败，请重试');
+              }
+          })
+          .catch(error => {
+               console.error('Error:', error);
+               alert(categoryId ? '编辑分类失败，请重试' : '添加分类失败，请重试');
+           });
+       });
+     
+     // 颜色选择功能
+    colorPreviews.forEach(preview => {
+        preview.addEventListener('click', function() {
+            const color = this.dataset.color;
+            categoryColor.value = color;
+        });
+    });
+    
+    // 自定义单选按钮功能
+    const radioLabels = document.querySelectorAll('input[name="type"]');
+    radioLabels.forEach(radio => {
+        const label = radio.closest('label');
+        const customRadio = label.querySelector('.radio-custom');
+        const radioDot = customRadio.querySelector('.radio-dot');
+        
+        label.addEventListener('click', function() {
+            // 清除所有选中状态
+            radioLabels.forEach(r => {
+                const otherLabel = r.closest('label');
+                const otherCustom = otherLabel.querySelector('.radio-custom');
+                const otherDot = otherCustom.querySelector('.radio-dot');
+                otherCustom.classList.remove('border-indigo-600');
+                otherDot.classList.add('hidden');
+                r.checked = false;
+            });
+            
+            // 设置当前选中状态
+            customRadio.classList.add('border-indigo-600');
+            radioDot.classList.remove('hidden');
+            radio.checked = true;
         });
     });
 });

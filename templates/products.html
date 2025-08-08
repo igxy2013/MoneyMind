@@ -146,7 +146,7 @@ DEFAULT:'8px',
                                 <td class="px-6 py-4">
                                     <div class="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100">
                                         {% if product.image_path %}
-                                        <img src="{{ product.image_path }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center">
+                                        <img src="{{ '/static' + product.image_path if not product.image_path.startswith('/static') else product.image_path }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center">
                                         {% else %}
                                         <div class="w-full h-full flex items-center justify-center">
                                             <i class="ri-image-line text-2xl text-gray-400"></i>
@@ -274,164 +274,228 @@ DEFAULT:'8px',
 
 
 <!-- 新增/编辑商品模态框 -->
-<div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">新增商品</h3>
-                    <button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors" onclick="closeModal('productModal')">
-                        <i class="ri-close-line text-gray-600"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <form class="space-y-6">
-                    <!-- 基本信息 -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-4">基本信息</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">商品名称</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="请输入商品名称">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">商品编号</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="自动生成或手动输入">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">商品分类</label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="">请选择分类</option>
-                                    <option value="新鲜水果">新鲜水果</option>
-                                    <option value="干果坚果">干果坚果</option>
-                                    <option value="果汁饮品">果汁饮品</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">商品状态</label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <option value="在售">在售</option>
-                                    <option value="下架">下架</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 价格设置 -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-4">价格设置</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">售价</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
-                                    <input type="number" class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0.00" step="0.01">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">单位</label>
-                                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="如：kg、盒、瓶等">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 库存管理 -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-4">库存管理</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">当前库存</label>
-                                <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0" min="0">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">安全库存</label>
-                                <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0" min="0">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 商品图片 -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">商品图片</label>
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
-                            <i class="ri-image-line text-3xl text-gray-400 mb-2"></i>
-                            <p class="text-sm text-gray-500 mb-2">点击上传或拖拽图片到此处</p>
-                            <p class="text-xs text-gray-400">支持 JPG、PNG 格式，大小不超过 2MB</p>
-                            <input type="file" class="hidden" accept="image/*">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
-                <button class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" onclick="closeModal('productModal')">
-                    取消
-                </button>
-                <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
-                    保存
-                </button>
-            </div>
-        </div>
-    </div>
+<div id="productModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-4xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<h3 id="productModalTitle" class="text-2xl font-bold text-gray-900">新增商品</h3>
+<button id="closeProductModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors" onclick="closeModal('productModal')">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<form id="productForm" class="space-y-8">
+<!-- 基本信息 -->
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">基本信息</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品名称 <span class="text-red-500">*</span></label>
+<input type="text" id="productName" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品编号</label>
+<input type="text" id="productCode" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品分类 <span class="text-red-500">*</span></label>
+<select id="productCategory" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="">请选择分类</option>
+<option value="fresh-fruit">新鲜水果</option>
+<option value="dried-fruit">干果坚果</option>
+<option value="fruit-juice">果汁饮品</option>
+<option value="fruit-snack">果脯零食</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品状态</label>
+<select id="productStatus" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="active">在售</option>
+<option value="inactive">下架</option>
+<option value="draft">草稿</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">商品描述</label>
+<textarea id="productDescription" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none"></textarea>
+</div>
+</div>
+<!-- 价格设置 -->
+<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">价格设置</h4>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">售价 <span class="text-red-500">*</span></label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
+<input type="number" id="productPrice" required step="0.01" min="0" class="w-full pl-8 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">成本价</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">¥</span>
+<input type="number" id="productCost" step="0.01" min="0" class="w-full pl-8 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">计量单位</label>
+<select id="productUnit" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
+<option value="kg">千克(kg)</option>
+<option value="g">克(g)</option>
+<option value="个">个</option>
+<option value="盒">盒</option>
+<option value="瓶">瓶</option>
+<option value="袋">袋</option>
+</select>
+</div>
+</div>
+</div>
+<!-- 库存管理 -->
+<div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">库存管理</h4>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">当前库存</label>
+<input type="number" id="currentStock" min="0" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">最低库存预警</label>
+<input type="number" id="minStock" min="0" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">最高库存</label>
+<input type="number" id="maxStock" min="0" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+</div>
+</div>
+</div>
+<!-- 商品图片 -->
+<div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">商品图片</h4>
+<div id="imageUploadArea" class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-primary transition-colors cursor-pointer">
+<div id="imagePreview" class="hidden">
+<img id="previewImage" src="" alt="预览图片" class="w-32 h-32 object-cover rounded-2xl mx-auto mb-4">
+<button type="button" id="removeImage" class="px-4 py-2 bg-red-100 text-red-600 rounded-button hover:bg-red-200 transition-colors">
+<i class="ri-delete-bin-line mr-2"></i>移除图片
+</button>
+</div>
+<div id="uploadPlaceholder">
+<i class="ri-image-line text-4xl text-gray-400 mb-4"></i>
+<p class="text-lg text-gray-600 mb-2">点击上传或拖拽图片到此处</p>
+<p class="text-sm text-gray-400">支持 JPG、PNG 格式，大小不超过 2MB</p>
+</div>
+<input type="file" id="productImage" accept="image/*" class="hidden">
+</div>
+</div>
+<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+<button type="button" id="cancelProductBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors" onclick="closeModal('productModal')">取消</button>
+<button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存商品</button>
+</div>
+</form>
+</div>
 </div>
 
 <!-- 商品详情模态框 -->
-<div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">商品详情</h3>
-                    <button class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors" onclick="closeModal('detailModal')">
-                        <i class="ri-close-line text-gray-600"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <div class="w-full h-48 bg-gray-100 rounded-xl overflow-hidden mb-4">
-                            <div class="w-full h-full bg-gradient-to-br from-red-100 to-pink-100 flex items-center justify-center">
-                                <svg class="w-16 h-16 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-sm font-medium text-gray-500">商品名称</label>
-                            <p class="text-lg font-semibold text-gray-900">红富士苹果</p>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-500">商品编号</label>
-                            <p class="text-gray-900">FRT001</p>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-500">分类</label>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                新鲜水果
-                            </span>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-500">售价</label>
-                            <p class="text-lg font-semibold text-gray-900">¥ 12.80/kg</p>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-500">库存</label>
-                            <p class="text-green-600 font-semibold">580 kg</p>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-500">状态</label>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                在售
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div id="detailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-5xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-bold text-gray-900">商品详情</h3>
+<button id="closeDetailModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors" onclick="closeModal('detailModal')">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+</div>
+<div class="space-y-8">
+<!-- 商品信息 -->
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">商品信息</h4>
+<div class="flex items-start space-x-6">
+<div class="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-red-100 to-orange-100 flex-shrink-0">
+<img id="detailProductImage" src="" alt="商品图片" class="w-full h-full object-cover object-center hidden">
+<div id="detailImagePlaceholder" class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+<i class="ri-image-line text-4xl text-gray-400"></i>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div>
+<div class="text-sm text-gray-500 mb-1">商品名称</div>
+<div id="detailProductName" class="font-semibold text-gray-900">-</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">商品编号</div>
+<div id="detailProductCode" class="font-semibold text-gray-900">-</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">商品分类</div>
+<span id="detailProductCategory" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+未分类
+</span>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">售价</div>
+<div id="detailProductPrice" class="font-semibold text-gray-900">-</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">成本价</div>
+<div id="detailProductCost" class="font-semibold text-gray-900">-</div>
+</div>
+<div>
+<div class="text-sm text-gray-500 mb-1">商品状态</div>
+<span id="detailProductStatus" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+在售
+</span>
+</div>
+</div>
+</div>
+<div class="mt-4">
+<div class="text-sm text-gray-500 mb-1">商品描述</div>
+<div id="detailProductDescription" class="text-gray-900">-</div>
+</div>
+</div>
+<!-- 库存统计 -->
+<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">库存统计</h4>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="text-center">
+<div id="detailCurrentStock" class="text-2xl font-bold text-green-600 mb-1">-</div>
+<div class="text-sm text-gray-600">当前库存</div>
+</div>
+<div class="text-center">
+<div id="detailMinStock" class="text-2xl font-bold text-orange-600 mb-1">-</div>
+<div class="text-sm text-gray-600">最低库存</div>
+</div>
+<div class="text-center">
+<div id="detailMaxStock" class="text-2xl font-bold text-blue-600 mb-1">-</div>
+<div class="text-sm text-gray-600">最高库存</div>
+</div>
+<div class="text-center">
+<div id="detailStockStatus" class="text-2xl font-bold text-purple-600 mb-1">-</div>
+<div class="text-sm text-gray-600">库存状态</div>
+</div>
+</div>
+</div>
+<!-- 销售统计 -->
+<div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+<h4 class="text-lg font-semibold text-gray-900 mb-4">销售统计</h4>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="text-center">
+<div id="detailMonthlySales" class="text-2xl font-bold text-blue-600 mb-1">¥ 0</div>
+<div class="text-sm text-gray-600">本月销售额</div>
+</div>
+<div class="text-center">
+<div id="detailMonthlyQuantity" class="text-2xl font-bold text-green-600 mb-1">0</div>
+<div class="text-sm text-gray-600">本月销量</div>
+</div>
+<div class="text-center">
+<div id="detailOrderCount" class="text-2xl font-bold text-orange-600 mb-1">0</div>
+<div class="text-sm text-gray-600">订单数量</div>
+</div>
+<div class="text-center">
+<div id="detailAverageRating" class="text-2xl font-bold text-purple-600 mb-1">0</div>
+<div class="text-sm text-gray-600">平均评分</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 
 <!-- 库存管理模态框 -->
@@ -684,9 +748,10 @@ DEFAULT:'8px',
                         <label class="block text-sm font-medium text-gray-700 mb-2">商品分类 <span class="text-red-500">*</span></label>
                         <select id="addProductCategory" name="category_id" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
                             <option value="">请选择分类</option>
-                            {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.name }}</option>
-                            {% endfor %}
+                            <option value="fresh-fruit">新鲜水果</option>
+                            <option value="dried-fruit">干果坚果</option>
+                            <option value="fruit-juice">果汁饮品</option>
+                            <option value="fruit-snack">果脯零食</option>
                         </select>
                     </div>
                     <div>
@@ -782,9 +847,10 @@ DEFAULT:'8px',
                         <label class="block text-sm font-medium text-gray-700 mb-2">商品分类 <span class="text-red-500">*</span></label>
                         <select id="editProductCategory" name="category_id" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 pr-8">
                             <option value="">请选择分类</option>
-                            {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.name }}</option>
-                            {% endfor %}
+                            <option value="fresh-fruit">新鲜水果</option>
+                            <option value="dried-fruit">干果坚果</option>
+                            <option value="fruit-juice">果汁饮品</option>
+                            <option value="fruit-snack">果脯零食</option>
                         </select>
                     </div>
                     <div>
@@ -1021,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const imagePreview = document.getElementById('editImagePreview');
                 const previewImage = document.getElementById('editPreviewImage');
                 if (product.image_path) {
-                    previewImage.src = product.image_path;
+                    previewImage.src = `/static${product.image_path}`;
                     imagePreview.classList.remove('hidden');
                 } else {
                     imagePreview.classList.add('hidden');
@@ -1251,8 +1317,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('detailProductCode').textContent = product.code || '-';
                 document.getElementById('detailProductCategory').textContent = product.category || '未分类';
                 document.getElementById('detailProductPrice').textContent = product.price ? `¥${product.price}` : '-';
-                document.getElementById('detailProductCost').textContent = product.cost ? `¥${product.cost}` : '-';
-                document.getElementById('detailProductDescription').textContent = product.description || '暂无描述';
+                
+                // 显示库存信息
+                const stockElement = document.getElementById('detailProductStock');
+                if (product.stock !== undefined && product.stock !== null) {
+                    stockElement.textContent = `${product.stock} 件`;
+                    if (product.stock <= 0) {
+                        stockElement.className = 'font-semibold text-red-600';
+                    } else if (product.min_stock && product.stock <= product.min_stock) {
+                        stockElement.className = 'font-semibold text-yellow-600';
+                    } else {
+                        stockElement.className = 'font-semibold text-green-600';
+                    }
+                } else {
+                    stockElement.textContent = '-';
+                    stockElement.className = 'font-semibold text-gray-600';
+                }
                 
                 // 设置商品状态
                 const statusElement = document.getElementById('detailProductStatus');
@@ -1261,22 +1341,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusElement.textContent = statusText;
                 statusElement.className = `inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusClass}`;
                 
-                // 填充库存信息
-                document.getElementById('detailCurrentStock').textContent = product.stock || 0;
-                document.getElementById('detailMinStock').textContent = product.min_stock || 0;
-                document.getElementById('detailMaxStock').textContent = product.max_stock || '-';
+                // 显示商品图片
+                const imageElement = document.getElementById('detailProductImage');
+                const placeholderElement = document.getElementById('detailImagePlaceholder');
                 
-                // 设置库存状态
-                const stockStatusElement = document.getElementById('detailStockStatus');
-                if (product.stock <= 0) {
-                    stockStatusElement.textContent = '缺货';
-                } else if (product.stock <= product.min_stock) {
-                    stockStatusElement.textContent = '库存不足';
+                if (product.image_path) {
+                    imageElement.src = `/static${product.image_path}`;
+                    imageElement.classList.remove('hidden');
+                    placeholderElement.classList.add('hidden');
                 } else {
-                    stockStatusElement.textContent = '正常';
+                    imageElement.classList.add('hidden');
+                    placeholderElement.classList.remove('hidden');
                 }
                 
-                productDetailModal.classList.remove('hidden');
+                document.getElementById('detailModal').classList.remove('hidden');
             })
             .catch(error => {
                 console.error('获取商品详情失败:', error);
