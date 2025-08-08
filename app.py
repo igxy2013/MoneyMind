@@ -935,7 +935,10 @@ def edit_product(id):
         # 更新基本信息
         product.name = request.form['name']
         product.category = request.form['category']
+        product.supplier_id = int(request.form['supplier']) if request.form['supplier'] else None
+        product.cost_price = float(request.form['cost_price']) if request.form['cost_price'] else None
         product.selling_price = float(request.form['selling_price']) if request.form['selling_price'] else None
+        product.unit = request.form['unit']
         product.stock = int(request.form['stock']) if request.form['stock'] else 0
         product.description = request.form['description']
         product.is_active = 'is_active' in request.form
@@ -962,8 +965,13 @@ def edit_product(id):
                 file.save(file_path)
                 product.image_path = f'/uploads/products/{unique_filename}'
         
-        db.session.commit()
-        return jsonify({'success': True, 'message': '商品更新成功！'})
+        try:
+            db.session.commit()
+            flash('商品信息更新成功！', 'success')
+            return redirect(url_for('products'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'更新失败：{str(e)}', 'error')
     
     suppliers = Supplier.query.filter_by(is_active=True).all()
     return render_template('edit_product.html', product=product, suppliers=suppliers)

@@ -1,81 +1,122 @@
 {% extends "base.html" %}
 
-{% block title %}编辑商品 - 七彩果坊{% endblock %}
+{% block title %}编辑商品{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h2 class="mb-3">
-            <i class="fas fa-edit me-2"></i>编辑商品
-        </h2>
+<div class="max-w-4xl mx-auto">
+    <!-- 页面标题 -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">编辑商品</h1>
+                <p class="text-gray-600">修改商品信息，包括基本信息、价格设置和图片管理</p>
+            </div>
+            <a href="{{ url_for('products') }}" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors flex items-center space-x-2">
+                <div class="w-4 h-4 flex items-center justify-center">
+                    <i class="ri-arrow-left-line"></i>
+                </div>
+                <span>返回列表</span>
+            </a>
+        </div>
     </div>
-</div>
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card">
-            <div class="card-body p-4">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">商品名称 *</label>
-                        <input type="text" class="form-control" id="name" name="name" 
-                               value="{{ product.name }}" placeholder="请输入商品名称" required>
+    <!-- 编辑表单 -->
+    <div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 overflow-hidden">
+        <form method="POST" enctype="multipart/form-data" class="p-8 space-y-8">
+            <!-- 商品图片 -->
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">商品图片</h4>
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl p-8 hover:border-primary transition-colors cursor-pointer" id="imageUploadArea">
+                    <i class="ri-image-line text-3xl text-gray-400 mb-2"></i>
+                    <p class="text-sm text-gray-500 mb-2">点击上传或拖拽图片到此处</p>
+                    <p class="text-xs text-gray-400">支持 JPG、PNG、GIF 格式，最大 5MB</p>
+                    <input type="file" id="productImage" name="image" accept="image/*" class="hidden">
+                </div>
+                <!-- 图片预览区域 -->
+                <div id="imagePreview" class="mt-4 {% if not product.image_path %}hidden{% endif %}">
+                    <div class="text-sm text-gray-600 mb-2">图片预览：</div>
+                    <div id="imagePreviewContainer" class="relative inline-block">
+                        <img id="previewImage" src="{{ product.image_path or '' }}" alt="商品图片预览" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                        <button type="button" id="removeImage" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
+                            <i class="ri-close-line text-xs"></i>
+                        </button>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="category" class="form-label">商品分类</label>
-                                <select class="form-select" id="category" name="category">
-                                    <option value="">请选择分类</option>
-                                    <option value="生鲜" {% if product.category == '生鲜' %}selected{% endif %}>生鲜</option>
-                                    <option value="蔬菜" {% if product.category == '蔬菜' %}selected{% endif %}>蔬菜</option>
-                                    <option value="水果" {% if product.category == '水果' %}selected{% endif %}>水果</option>
-                                    <option value="肉类" {% if product.category == '肉类' %}selected{% endif %}>肉类</option>
-                                    <option value="海鲜" {% if product.category == '海鲜' %}selected{% endif %}>海鲜</option>
-                                    <option value="粮油" {% if product.category == '粮油' %}selected{% endif %}>粮油</option>
-                                    <option value="调味品" {% if product.category == '调味品' %}selected{% endif %}>调味品</option>
-                                    <option value="零食" {% if product.category == '零食' %}selected{% endif %}>零食</option>
-                                    <option value="饮料" {% if product.category == '饮料' %}selected{% endif %}>饮料</option>
-                                    <option value="其他" {% if product.category == '其他' %}selected{% endif %}>其他</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="supplier" class="form-label">供应商</label>
-                                <select class="form-select" id="supplier" name="supplier">
-                                    <option value="">请选择供应商</option>
-                                    {% for supplier in suppliers %}
-                                    <option value="{{ supplier.id }}" {% if product.supplier_id == supplier.id %}selected{% endif %}>
-                                        {{ supplier.name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
+                </div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">基本信息</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">商品名称 *</label>
+                        <input type="text" id="name" name="name" value="{{ product.name }}" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900" placeholder="请输入商品名称">
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="cost_price" class="form-label">成本价 (元)</label>
-                                <input type="number" step="0.01" class="form-control" id="cost_price" name="cost_price" 
-                                       value="{{ product.cost_price or '' }}" placeholder="0.00">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="selling_price" class="form-label">销售价 (元)</label>
-                                <input type="number" step="0.01" class="form-control" id="selling_price" name="selling_price" 
-                                       value="{{ product.selling_price or '' }}" placeholder="0.00">
-                            </div>
-                        </div>
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">商品分类</label>
+                        <select id="category" name="category" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+                            <option value="">请选择分类</option>
+                            <option value="生鲜" {% if product.category == '生鲜' %}selected{% endif %}>生鲜</option>
+                            <option value="蔬菜" {% if product.category == '蔬菜' %}selected{% endif %}>蔬菜</option>
+                            <option value="水果" {% if product.category == '水果' %}selected{% endif %}>水果</option>
+                            <option value="肉类" {% if product.category == '肉类' %}selected{% endif %}>肉类</option>
+                            <option value="海鲜" {% if product.category == '海鲜' %}selected{% endif %}>海鲜</option>
+                            <option value="粮油" {% if product.category == '粮油' %}selected{% endif %}>粮油</option>
+                            <option value="调味品" {% if product.category == '调味品' %}selected{% endif %}>调味品</option>
+                            <option value="零食" {% if product.category == '零食' %}selected{% endif %}>零食</option>
+                            <option value="饮料" {% if product.category == '饮料' %}selected{% endif %}>饮料</option>
+                            <option value="其他" {% if product.category == '其他' %}selected{% endif %}>其他</option>
+                        </select>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="unit" class="form-label">计量单位</label>
-                        <select class="form-select" id="unit" name="unit">
+                    <div>
+                        <label for="supplier" class="block text-sm font-medium text-gray-700 mb-2">供应商</label>
+                        <select id="supplier" name="supplier" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
+                            <option value="">请选择供应商</option>
+                            {% for supplier in suppliers %}
+                            <option value="{{ supplier.id }}" {% if product.supplier_id == supplier.id %}selected{% endif %}>
+                                {{ supplier.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="unit" class="block text-sm font-medium text-gray-700 mb-2">计量单位</label>
+                        <select id="unit" name="unit" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900">
                             <option value="">请选择单位</option>
                             <option value="斤" {% if product.unit == '斤' %}selected{% endif %}>斤</option>
                             <option value="公斤" {% if product.unit == '公斤' %}selected{% endif %}>公斤</option>
@@ -89,29 +130,123 @@
                             <option value="其他" {% if product.unit == '其他' %}selected{% endif %}>其他</option>
                         </select>
                     </div>
-                    
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
-                                   {% if product.is_active %}checked{% endif %}>
-                            <label class="form-check-label" for="is_active">
-                                启用商品
-                            </label>
-                        </div>
-                        <small class="form-text text-muted">取消勾选将停用该商品</small>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i>保存修改
-                        </button>
-                        <a href="{{ url_for('products') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-1"></i>返回
-                        </a>
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
+
+            <!-- 价格和库存 -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">价格和库存</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="cost_price" class="block text-sm font-medium text-gray-700 mb-2">成本价 (元)</label>
+                        <input type="number" step="0.01" id="cost_price" name="cost_price" value="{{ product.cost_price or '' }}" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label for="selling_price" class="block text-sm font-medium text-gray-700 mb-2">销售价 (元)</label>
+                        <input type="number" step="0.01" id="selling_price" name="selling_price" value="{{ product.selling_price or '' }}" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">库存数量</label>
+                        <input type="number" id="stock" name="stock" value="{{ product.stock or 0 }}" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900" placeholder="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 商品描述 -->
+            <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">商品描述</h4>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">详细描述</label>
+                    <textarea id="description" name="description" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none" placeholder="请输入商品详细描述...">{{ product.description or '' }}</textarea>
+                </div>
+                <div class="mt-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="is_active" name="is_active" {% if product.is_active %}checked{% endif %} class="w-4 h-4 text-primary rounded">
+                        <span class="ml-2 text-sm text-gray-700">商品上架</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <a href="{{ url_for('products') }}" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors">取消</a>
+                <button type="submit" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors">保存修改</button>
+            </div>
+        </form>
     </div>
 </div>
-{% endblock %} 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageUploadArea = document.getElementById('imageUploadArea');
+    const productImage = document.getElementById('productImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+    const removeImage = document.getElementById('removeImage');
+
+    // 图片上传区域点击事件
+    imageUploadArea.addEventListener('click', function() {
+        productImage.click();
+    });
+
+    // 图片文件选择处理
+    productImage.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // 验证文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件');
+                return;
+            }
+            
+            // 验证文件大小 (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('图片大小不能超过5MB');
+                return;
+            }
+            
+            // 预览图片
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 移除图片
+    removeImage.addEventListener('click', function() {
+        productImage.value = '';
+        imagePreview.classList.add('hidden');
+    });
+
+    // 拖拽上传功能
+    imageUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        imageUploadArea.classList.add('border-primary');
+    });
+
+    imageUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        imageUploadArea.classList.remove('border-primary');
+    });
+
+    imageUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        imageUploadArea.classList.remove('border-primary');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                productImage.files = files;
+                productImage.dispatchEvent(new Event('change'));
+            } else {
+                alert('请选择图片文件');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
