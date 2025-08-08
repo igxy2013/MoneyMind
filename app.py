@@ -910,6 +910,30 @@ def add_product():
             suppliers = Supplier.query.filter_by(is_active=True).all()
             return render_template('add_product.html', suppliers=suppliers)
         
+        # 处理图片上传
+        image_path = None
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename != '' and allowed_file(file.filename):
+                # 创建商品图片上传目录
+                product_upload_folder = 'static/uploads/products'
+                os.makedirs(product_upload_folder, exist_ok=True)
+                
+                # 生成唯一文件名
+                filename = secure_filename(file.filename)
+                unique_filename = f"{uuid.uuid4().hex}_{filename}"
+                file_path = os.path.join(product_upload_folder, unique_filename)
+                
+                try:
+                    file.save(file_path)
+                    image_path = file_path
+                except Exception as e:
+                    if is_ajax:
+                        return jsonify({'success': False, 'message': f'图片上传失败: {str(e)}'}), 500
+                    flash(f'图片上传失败: {str(e)}', 'error')
+                    suppliers = Supplier.query.filter_by(is_active=True).all()
+                    return render_template('add_product.html', suppliers=suppliers)
+        
         product = Product(
             name=name,
             category=category_id,  # 使用category_id而不是category
@@ -918,6 +942,7 @@ def add_product():
             selling_price=selling_price,
             unit=unit,
             description=description,
+            image_path=image_path,
             is_active=is_active
         )
         db.session.add(product)
