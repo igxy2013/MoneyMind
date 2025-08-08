@@ -1,133 +1,130 @@
 {% extends "base.html" %}
 
-{% block title %}添加应收款 - 七彩果坊{% endblock %}
+{% block title %}添加应收款 - MoneyMind{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h2 class="mb-3">
-            <i class="fas fa-plus me-2"></i>添加应收款
-        </h2>
-    </div>
+<div class="max-w-4xl mx-auto">
+<div class="mb-8">
+<div class="flex items-center justify-between mb-6">
+<div>
+<div class="flex items-center space-x-3 mb-2">
+<a href="{{ url_for('receivables') }}" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-left-line text-gray-600"></i>
+</div>
+</a>
+<h1 class="text-3xl font-bold text-gray-900">添加应收款</h1>
+</div>
+<p class="text-gray-600">录入新的应收款记录，完善客户账款管理</p>
+</div>
 </div>
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-edit me-2"></i>应收款信息
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="title" class="form-label">客户名称 <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="title" name="title" required 
-                               placeholder="例如：华润万家超市">
-                        <div class="form-text">请输入客户名称</div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="contact_person" class="form-label">联系人</label>
-                                <input type="text" class="form-control" id="contact_person" name="contact_person" 
-                                       placeholder="例如：李经理">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="contact_phone" class="form-label">联系电话</label>
-                                <input type="tel" class="form-control" id="contact_phone" name="contact_phone" 
-                                       placeholder="例如：138-0001-2345">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="contact_address" class="form-label">联系地址</label>
-                        <input type="text" class="form-control" id="contact_address" name="contact_address" 
-                               placeholder="例如：深圳市南山区科技园南区">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="amount" class="form-label">应收金额 <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text">¥</span>
-                            <input type="number" class="form-control" id="amount" name="amount" 
-                                   step="0.01" min="0" required placeholder="0.00">
-                        </div>
-                        <div class="form-text">请输入应收款的金额</div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="invoice_date" class="form-label">开票日期 <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="invoice_date" name="invoice_date" required>
-                                <div class="form-text">请选择开票日期</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="payment_terms" class="form-label">账期天数</label>
-                                <input type="number" class="form-control" id="payment_terms" name="payment_terms" 
-                                       min="0" placeholder="30" value="30">
-                                <div class="form-text">账期天数，默认30天</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">备注</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3" 
-                                  placeholder="添加一些备注信息"></textarea>
-                        <div class="form-text">可选，添加一些额外的备注信息</div>
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>保存应收款
-                        </button>
-                        <a href="{{ url_for('receivables') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>返回列表
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>填写说明
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <h6><i class="fas fa-tag me-1"></i>标题</h6>
-                    <p class="text-muted small">建议使用简洁明了的标题，如"房屋押金-张三"、"服务费-公司A"等</p>
-                </div>
-                
-                <div class="mb-3">
-                    <h6><i class="fas fa-money-bill me-1"></i>金额</h6>
-                    <p class="text-muted small">请输入准确的应收金额，支持小数点后两位</p>
-                </div>
-                
-                <div class="mb-3">
-                    <h6><i class="fas fa-calendar me-1"></i>到期日期</h6>
-                    <p class="text-muted small">设置到期日期有助于提醒和跟踪应收款状态</p>
-                </div>
-                
-                <div class="mb-3">
-                    <h6><i class="fas fa-sticky-note me-1"></i>备注</h6>
-                    <p class="text-muted small">可以添加联系人、联系方式、相关说明等额外信息</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-8">
+<form method="POST" id="receivableForm" class="space-y-8">
+<div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
+<h3 class="text-lg font-semibold text-gray-900 mb-6">基本信息</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="md:col-span-2">
+<label class="block text-sm font-medium text-gray-700 mb-2">客户名称 <span class="text-red-500">*</span></label>
+<input type="text" id="title" name="title" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm" placeholder="例如：华润万家超市">
 </div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">应收金额 <span class="text-red-500">*</span></label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">¥</span>
+<input type="number" id="amount" name="amount" required step="0.01" min="0" class="w-full pl-8 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm" placeholder="请输入金额">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">账期天数</label>
+<input type="number" id="payment_terms" name="payment_terms" min="0" value="30" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm" placeholder="30">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">开票日期 <span class="text-red-500">*</span></label>
+<input type="date" id="invoice_date" name="invoice_date" required class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm">
+</div>
+</div>
+</div>
+
+<div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6">
+<h3 class="text-lg font-semibold text-gray-900 mb-6">联系信息</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">联系人</label>
+<input type="text" id="contact_person" name="contact_person" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm" placeholder="例如：李经理">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">联系电话</label>
+<input type="tel" id="contact_phone" name="contact_phone" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm" placeholder="例如：138-0001-2345">
+</div>
+<div class="md:col-span-2">
+<label class="block text-sm font-medium text-gray-700 mb-2">联系地址</label>
+<input type="text" id="contact_address" name="contact_address" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm" placeholder="例如：深圳市南山区科技园南区">
+</div>
+<div class="md:col-span-2">
+<label class="block text-sm font-medium text-gray-700 mb-2">备注说明</label>
+<textarea id="notes" name="notes" rows="4" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 text-sm resize-none" placeholder="请输入相关备注信息，如交易详情、用途说明等..."></textarea>
+</div>
+</div>
+</div>
+
+<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+<a href="{{ url_for('receivables') }}" class="px-8 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors font-medium">取消</a>
+<button type="submit" class="px-8 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors font-medium flex items-center space-x-2">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-save-line"></i>
+</div>
+<span>保存应收款</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</main>
+</div>
+</body>
+
+<script>
+// 表单验证
+document.getElementById('receivableForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const title = formData.get('title');
+    const amount = parseFloat(formData.get('amount'));
+    const invoiceDate = formData.get('invoice_date');
+    
+    if (!title || title.trim() === '') {
+        alert('请输入客户名称');
+        return;
+    }
+    
+    if (!amount || amount <= 0) {
+        alert('请输入有效的应收金额');
+        return;
+    }
+    
+    if (!invoiceDate) {
+        alert('请选择开票日期');
+        return;
+    }
+    
+    // 如果验证通过，提交表单
+    this.submit();
+});
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 设置默认开票日期为今天
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('invoice_date').value = today;
+});
+</script>
 {% endblock %}

@@ -17,7 +17,7 @@
 <h1 class="text-3xl font-bold text-gray-900 mb-2">应收款管理</h1>
 <p class="text-gray-600">管理客户应收账款，跟踪逾期情况，记录催收进度和收款状态</p>
 </div>
-<a href="{{ url_for('add_receivable') }}" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
+<a href="{{ url_for('add_receivable') }}" id="addReceivableBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
 <div class="w-4 h-4 flex items-center justify-center">
 <i class="ri-add-line"></i>
 </div>
@@ -278,8 +278,8 @@
 </div>
 
 <!-- 新增/编辑应收款模态框 -->
-<div id="receivableModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
-<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-4xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto">
+<div id="receivableModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+<div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 w-full max-w-4xl mx-4 shadow-2xl border border-white/20 max-h-[90vh] overflow-y-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 <div class="flex items-center justify-between mb-6">
 <h3 id="receivableModalTitle" class="text-2xl font-bold text-gray-900">新增应收款</h3>
 <button id="closeReceivableModal" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
@@ -611,332 +611,333 @@
 </div>
 
 <script>
-// 模态框控制
-const receivableModal = document.getElementById('receivableModal');
-const closeReceivableModal = document.getElementById('closeReceivableModal');
-const receivableDetailModal = document.getElementById('receivableDetailModal');
-const closeDetailModal = document.getElementById('closeDetailModal');
-const paymentModal = document.getElementById('paymentModal');
-const closePaymentModal = document.getElementById('closePaymentModal');
-const collectionModal = document.getElementById('collectionModal');
-const closeCollectionModal = document.getElementById('closeCollectionModal');
+// 等待DOM加载完成
+document.addEventListener('DOMContentLoaded', function() {
+    // 模态框控制
+    const receivableModal = document.getElementById('receivableModal');
+    const closeReceivableModal = document.getElementById('closeReceivableModal');
+    const receivableDetailModal = document.getElementById('receivableDetailModal');
+    const closeDetailModal = document.getElementById('closeDetailModal');
+    const paymentModal = document.getElementById('paymentModal');
+    const closePaymentModal = document.getElementById('closePaymentModal');
+    const collectionModal = document.getElementById('collectionModal');
+    const closeCollectionModal = document.getElementById('closeCollectionModal');
 
-// 新增应收款模态框
-const addReceivableBtn = document.querySelector('a[href*="add_receivable"]');
-if (addReceivableBtn) {
-    addReceivableBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        receivableModal.classList.remove('hidden');
-        // 生成新的应收款单号
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const random = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
-        document.getElementById('receivableNumber').value = `AR${year}${month}${day}${random}`;
-    });
-}
+    // 新增应收款模态框
+    const addReceivableBtn = document.getElementById('addReceivableBtn');
+    if (addReceivableBtn) {
+        addReceivableBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('按钮被点击'); // 调试信息
+            receivableModal.classList.remove('hidden');
+            receivableModal.style.display = 'flex';
+            receivableModal.style.alignItems = 'center';
+            receivableModal.style.justifyContent = 'center';
+            // 生成新的应收款单号
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const random = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+            const receivableNumberInput = document.getElementById('receivableNumber');
+            if (receivableNumberInput) {
+                receivableNumberInput.value = `AR${year}${month}${day}${random}`;
+            }
+        });
+    } else {
+        console.log('未找到新增应收款按钮');
+    }
 
-if (closeReceivableModal) {
-    closeReceivableModal.addEventListener('click', () => {
-        receivableModal.classList.add('hidden');
-    });
-}
-
-// 取消按钮
-const cancelReceivableBtn = document.getElementById('cancelReceivableBtn');
-if (cancelReceivableBtn) {
-    cancelReceivableBtn.addEventListener('click', () => {
-        receivableModal.classList.add('hidden');
-    });
-}
-
-// 保存应收款按钮
-const saveReceivableBtn = document.getElementById('saveReceivableBtn');
-if (saveReceivableBtn) {
-    saveReceivableBtn.addEventListener('click', () => {
-        const receivableForm = document.getElementById('receivableForm');
-        if (receivableForm.checkValidity()) {
-            receivableForm.submit();
-        } else {
-            receivableForm.reportValidity();
-        }
-    });
-}
-
-// 点击模态框外部关闭
-if (receivableModal) {
-    receivableModal.addEventListener('click', (e) => {
-        if (e.target === receivableModal) {
+    if (closeReceivableModal) {
+        closeReceivableModal.addEventListener('click', () => {
             receivableModal.classList.add('hidden');
-        }
-    });
-}
+            receivableModal.style.display = 'none';
+        });
+    }
 
-// 应收款详情模态框
-document.querySelectorAll('.view-detail-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        receivableDetailModal.classList.remove('hidden');
-    });
-});
+    // 取消按钮
+    const cancelReceivableBtn = document.getElementById('cancelReceivableBtn');
+    if (cancelReceivableBtn) {
+        cancelReceivableBtn.addEventListener('click', () => {
+            receivableModal.classList.add('hidden');
+            receivableModal.style.display = 'none';
+        });
+    }
 
-if (closeDetailModal) {
-    closeDetailModal.addEventListener('click', () => {
-        receivableDetailModal.classList.add('hidden');
-    });
-}
-
-// 收款登记模态框
-let currentReceivableId = null;
-document.querySelectorAll('.payment-record-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        currentReceivableId = btn.getAttribute('data-id');
-        paymentModal.classList.remove('hidden');
-        // 设置表单action
-        const paymentForm = document.getElementById('paymentForm');
-        paymentForm.action = `/receivables/${currentReceivableId}/receive`;
-        // 设置默认收款日期为今天
-        const dateInput = paymentForm.querySelector('input[name="received_date"]');
-        dateInput.value = new Date().toISOString().split('T')[0];
-    });
-});
-
-// 确认收款按钮
-const confirmPaymentBtn = document.querySelector('#paymentModal button[type="button"]:last-child');
-if (confirmPaymentBtn) {
-    confirmPaymentBtn.addEventListener('click', () => {
-        const paymentForm = document.getElementById('paymentForm');
-        if (paymentForm.checkValidity()) {
-            paymentForm.submit();
-        } else {
-            paymentForm.reportValidity();
-        }
-    });
-}
-
-if (closePaymentModal) {
-    closePaymentModal.addEventListener('click', () => {
-        paymentModal.classList.add('hidden');
-    });
-}
-
-// 催收记录模态框
-document.querySelectorAll('.collection-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        collectionModal.classList.remove('hidden');
-    });
-});
-
-if (closeCollectionModal) {
-    closeCollectionModal.addEventListener('click', () => {
-        collectionModal.classList.add('hidden');
-    });
-}
-
-// 点击模态框背景关闭
-[receivableDetailModal, paymentModal, collectionModal].forEach(modal => {
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.add('hidden');
+    // 点击模态框外部关闭
+    if (receivableModal) {
+        receivableModal.addEventListener('click', (e) => {
+            if (e.target === receivableModal) {
+                receivableModal.classList.add('hidden');
+                receivableModal.style.display = 'none';
             }
         });
     }
-});
 
-// receivableModal的外部点击关闭已在上面单独处理
+    // 应收款详情模态框
+    document.querySelectorAll('.view-detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            receivableDetailModal.classList.remove('hidden');
+        });
+    });
 
-// ESC键关闭模态框
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        [receivableModal, receivableDetailModal, paymentModal, collectionModal].forEach(modal => {
-            if (modal) {
-                modal.classList.add('hidden');
+    if (closeDetailModal) {
+        closeDetailModal.addEventListener('click', () => {
+            receivableDetailModal.classList.add('hidden');
+        });
+    }
+
+    // 收款登记模态框
+    let currentReceivableId = null;
+    document.querySelectorAll('.payment-record-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentReceivableId = btn.getAttribute('data-id');
+            paymentModal.classList.remove('hidden');
+            // 设置表单action
+            const paymentForm = document.getElementById('paymentForm');
+            paymentForm.action = `/receivables/${currentReceivableId}/receive`;
+            // 设置默认收款日期为今天
+            const dateInput = paymentForm.querySelector('input[name="received_date"]');
+            dateInput.value = new Date().toISOString().split('T')[0];
+        });
+    });
+
+    // 确认收款按钮
+    const confirmPaymentBtn = document.querySelector('#paymentModal button[type="button"]:last-child');
+    if (confirmPaymentBtn) {
+        confirmPaymentBtn.addEventListener('click', () => {
+            const paymentForm = document.getElementById('paymentForm');
+            if (paymentForm.checkValidity()) {
+                paymentForm.submit();
+            } else {
+                paymentForm.reportValidity();
             }
         });
     }
-});
 
-// 筛选功能
-const statusFilter = document.getElementById('statusFilter');
-const customerFilter = document.getElementById('customerFilter');
-const searchInput = document.getElementById('searchInput');
-const startDate = document.getElementById('startDate');
-const endDate = document.getElementById('endDate');
-const receivableRows = document.querySelectorAll('.receivable-row');
+    if (closePaymentModal) {
+        closePaymentModal.addEventListener('click', () => {
+            paymentModal.classList.add('hidden');
+        });
+    }
 
-// 筛选函数
-function filterReceivables() {
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const statusValue = statusFilter ? statusFilter.value : '';
-    const customerValue = customerFilter ? customerFilter.value : '';
-    const startDateValue = startDate ? startDate.value : '';
-    const endDateValue = endDate ? endDate.value : '';
-    
-    let visibleCount = 0;
-    
-    receivableRows.forEach(row => {
-        const receivableNumber = row.querySelector('td:nth-child(2) .font-semibold').textContent.toLowerCase();
-        const customerName = row.querySelector('td:nth-child(3) .font-semibold').textContent.toLowerCase();
-        const contactInfo = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-        const statusElement = row.querySelector('td:nth-child(8) span');
-        const statusText = statusElement ? statusElement.textContent.trim() : '';
-        
-        // 搜索匹配
-        const matchesSearch = !searchTerm || 
-            receivableNumber.includes(searchTerm) || 
-            customerName.includes(searchTerm) || 
-            contactInfo.includes(searchTerm);
-        
-        // 状态匹配
-        let matchesStatus = !statusValue;
-        if (statusValue) {
-            switch (statusValue) {
-                case 'unpaid':
-                    matchesStatus = statusText.includes('未收');
-                    break;
-                case 'partial':
-                    matchesStatus = statusText.includes('部分');
-                    break;
-                case 'paid':
-                    matchesStatus = statusText.includes('已收');
-                    break;
-                case 'overdue':
-                    matchesStatus = statusText.includes('逾期');
-                    break;
-            }
-        }
-        
-        // 客户匹配（基于客户名称）
-        let matchesCustomer = !customerValue;
-        if (customerValue) {
-            switch (customerValue) {
-                case 'customer1':
-                    matchesCustomer = customerName.includes('华润万家');
-                    break;
-                case 'customer2':
-                    matchesCustomer = customerName.includes('永辉');
-                    break;
-                case 'customer3':
-                    matchesCustomer = customerName.includes('家乐福');
-                    break;
-                case 'customer4':
-                    matchesCustomer = customerName.includes('沃尔玛');
-                    break;
-            }
-        }
-        
-        // 日期范围匹配（基于开票日期）
-        let matchesDateRange = true;
-        const dateElement = row.querySelector('td:nth-child(2) .text-sm');
-        if (dateElement && (startDateValue || endDateValue)) {
-            const dateText = dateElement.textContent.trim();
-            if (dateText && dateText !== '未设置') {
-                const rowDate = new Date(dateText);
-                if (startDateValue) {
-                    const startDateObj = new Date(startDateValue);
-                    if (rowDate < startDateObj) {
-                        matchesDateRange = false;
-                    }
+    // 催收记录模态框
+    document.querySelectorAll('.collection-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            collectionModal.classList.remove('hidden');
+        });
+    });
+
+    if (closeCollectionModal) {
+        closeCollectionModal.addEventListener('click', () => {
+            collectionModal.classList.add('hidden');
+        });
+    }
+
+    // 点击模态框背景关闭
+    [receivableDetailModal, paymentModal, collectionModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
                 }
-                if (endDateValue && matchesDateRange) {
-                    const endDateObj = new Date(endDateValue);
-                    if (rowDate > endDateObj) {
-                        matchesDateRange = false;
-                    }
+            });
+        }
+    });
+
+    // receivableModal的外部点击关闭已在上面单独处理
+
+    // ESC键关闭模态框
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            [receivableModal, receivableDetailModal, paymentModal, collectionModal].forEach(modal => {
+                if (modal) {
+                    modal.classList.add('hidden');
                 }
-            } else if (startDateValue || endDateValue) {
-                matchesDateRange = false;
-            }
+            });
         }
+    });
+
+    // 筛选功能
+    const statusFilter = document.getElementById('statusFilter');
+    const customerFilter = document.getElementById('customerFilter');
+    const searchInput = document.getElementById('searchInput');
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    const receivableRows = document.querySelectorAll('.receivable-row');
+
+    // 筛选函数
+    function filterReceivables() {
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const statusValue = statusFilter ? statusFilter.value : '';
+        const customerValue = customerFilter ? customerFilter.value : '';
+        const startDateValue = startDate ? startDate.value : '';
+        const endDateValue = endDate ? endDate.value : '';
         
-        // 显示或隐藏行
-        if (matchesSearch && matchesStatus && matchesCustomer && matchesDateRange) {
-            row.style.display = '';
-            visibleCount++;
-        } else {
-            row.style.display = 'none';
-        }
-    });
-    
-    // 更新记录数显示
-    const recordCountElement = document.querySelector('.text-sm.text-gray-700 .font-semibold');
-    if (recordCountElement) {
-        recordCountElement.textContent = visibleCount;
-    }
-}
-
-// 绑定事件监听器
-if (statusFilter) {
-    statusFilter.addEventListener('change', filterReceivables);
-}
-
-if (customerFilter) {
-    customerFilter.addEventListener('change', filterReceivables);
-}
-
-if (searchInput) {
-    searchInput.addEventListener('input', filterReceivables);
-}
-
-if (startDate) {
-    startDate.addEventListener('change', filterReceivables);
-}
-
-if (endDate) {
-    endDate.addEventListener('change', filterReceivables);
-}
-
-// 重置筛选
-function resetFilters() {
-    if (searchInput) searchInput.value = '';
-    if (statusFilter) statusFilter.value = '';
-    if (customerFilter) customerFilter.value = '';
-    if (startDate) startDate.value = '';
-    if (endDate) endDate.value = '';
-    filterReceivables();
-}
-
-// 重置筛选按钮功能
-const resetFilterBtn = document.getElementById('resetFilterBtn');
-if (resetFilterBtn) {
-    resetFilterBtn.addEventListener('click', resetFilters);
-}
-
-// 高级筛选按钮功能
-const advancedFilterBtn = document.getElementById('advancedFilterBtn');
-if (advancedFilterBtn) {
-    advancedFilterBtn.addEventListener('click', () => {
-        // 可以在这里添加高级筛选模态框
-        alert('高级筛选功能开发中...');
-    });
-}
-
-// 全选功能
-const selectAllCheckbox = document.getElementById('selectAll');
-const rowCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#selectAll)');
-
-if (selectAllCheckbox) {
-    selectAllCheckbox.addEventListener('change', () => {
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
+        let visibleCount = 0;
+        
+        receivableRows.forEach(row => {
+            const receivableNumber = row.querySelector('td:nth-child(2) .font-semibold').textContent.toLowerCase();
+            const customerName = row.querySelector('td:nth-child(3) .font-semibold').textContent.toLowerCase();
+            const contactInfo = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            const statusElement = row.querySelector('td:nth-child(8) span');
+            const statusText = statusElement ? statusElement.textContent.trim() : '';
+            
+            // 搜索匹配
+            const matchesSearch = !searchTerm || 
+                receivableNumber.includes(searchTerm) || 
+                customerName.includes(searchTerm) || 
+                contactInfo.includes(searchTerm);
+            
+            // 状态匹配
+            let matchesStatus = !statusValue;
+            if (statusValue) {
+                switch (statusValue) {
+                    case 'unpaid':
+                        matchesStatus = statusText.includes('未收');
+                        break;
+                    case 'partial':
+                        matchesStatus = statusText.includes('部分');
+                        break;
+                    case 'paid':
+                        matchesStatus = statusText.includes('已收');
+                        break;
+                    case 'overdue':
+                        matchesStatus = statusText.includes('逾期');
+                        break;
+                }
+            }
+            
+            // 客户匹配（基于客户名称）
+            let matchesCustomer = !customerValue;
+            if (customerValue) {
+                switch (customerValue) {
+                    case 'customer1':
+                        matchesCustomer = customerName.includes('华润万家');
+                        break;
+                    case 'customer2':
+                        matchesCustomer = customerName.includes('永辉');
+                        break;
+                    case 'customer3':
+                        matchesCustomer = customerName.includes('家乐福');
+                        break;
+                    case 'customer4':
+                        matchesCustomer = customerName.includes('沃尔玛');
+                        break;
+                }
+            }
+            
+            // 日期范围匹配（基于开票日期）
+            let matchesDateRange = true;
+            const dateElement = row.querySelector('td:nth-child(2) .text-sm');
+            if (dateElement && (startDateValue || endDateValue)) {
+                const dateText = dateElement.textContent.trim();
+                if (dateText && dateText !== '未设置') {
+                    const rowDate = new Date(dateText);
+                    if (startDateValue) {
+                        const startDateObj = new Date(startDateValue);
+                        if (rowDate < startDateObj) {
+                            matchesDateRange = false;
+                        }
+                    }
+                    if (endDateValue && matchesDateRange) {
+                        const endDateObj = new Date(endDateValue);
+                        if (rowDate > endDateObj) {
+                            matchesDateRange = false;
+                        }
+                    }
+                } else if (startDateValue || endDateValue) {
+                    matchesDateRange = false;
+                }
+            }
+            
+            // 显示或隐藏行
+            if (matchesSearch && matchesStatus && matchesCustomer && matchesDateRange) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
         });
-    });
-}
-
-// 批量操作
-const batchActionBtn = document.getElementById('batchActionBtn');
-if (batchActionBtn) {
-    batchActionBtn.addEventListener('click', () => {
-        const selectedRows = Array.from(rowCheckboxes).filter(cb => cb.checked);
-        if (selectedRows.length === 0) {
-            alert('请先选择要操作的应收款记录');
-            return;
+        
+        // 更新记录数显示
+        const recordCountElement = document.querySelector('.text-sm.text-gray-700 .font-semibold');
+        if (recordCountElement) {
+            recordCountElement.textContent = visibleCount;
         }
-        // 这里可以添加批量操作逻辑
-        console.log('批量操作:', selectedRows.length + '条记录');
-    });
-}
+    }
+
+    // 绑定事件监听器
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterReceivables);
+    }
+
+    if (customerFilter) {
+        customerFilter.addEventListener('change', filterReceivables);
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterReceivables);
+    }
+
+    if (startDate) {
+        startDate.addEventListener('change', filterReceivables);
+    }
+
+    if (endDate) {
+        endDate.addEventListener('change', filterReceivables);
+    }
+
+    // 重置筛选
+    function resetFilters() {
+        if (searchInput) searchInput.value = '';
+        if (statusFilter) statusFilter.value = '';
+        if (customerFilter) customerFilter.value = '';
+        if (startDate) startDate.value = '';
+        if (endDate) endDate.value = '';
+        filterReceivables();
+    }
+
+    // 重置筛选按钮功能
+    const resetFilterBtn = document.getElementById('resetFilterBtn');
+    if (resetFilterBtn) {
+        resetFilterBtn.addEventListener('click', resetFilters);
+    }
+
+    // 高级筛选按钮功能
+    const advancedFilterBtn = document.getElementById('advancedFilterBtn');
+    if (advancedFilterBtn) {
+        advancedFilterBtn.addEventListener('click', () => {
+            // 可以在这里添加高级筛选模态框
+            alert('高级筛选功能开发中...');
+        });
+    }
+
+    // 全选功能
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const rowCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#selectAll)');
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', () => {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+    }
+
+    // 批量操作
+    const batchActionBtn = document.getElementById('batchActionBtn');
+    if (batchActionBtn) {
+        batchActionBtn.addEventListener('click', () => {
+            const selectedRows = Array.from(rowCheckboxes).filter(cb => cb.checked);
+            if (selectedRows.length === 0) {
+                alert('请先选择要操作的应收款记录');
+                return;
+            }
+            // 这里可以添加批量操作逻辑
+            console.log('批量操作:', selectedRows.length + '条记录');
+        });
+    }
 </script>
 
 {% endblock %}
