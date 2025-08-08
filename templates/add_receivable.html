@@ -22,10 +22,33 @@
             <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="title" class="form-label">应收款标题 <span class="text-danger">*</span></label>
+                        <label for="title" class="form-label">客户名称 <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="title" name="title" required 
-                               placeholder="例如：房屋押金-张三">
-                        <div class="form-text">请输入应收款的标题，便于识别和管理</div>
+                               placeholder="例如：华润万家超市">
+                        <div class="form-text">请输入客户名称</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contact_person" class="form-label">联系人</label>
+                                <input type="text" class="form-control" id="contact_person" name="contact_person" 
+                                       placeholder="例如：李经理">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contact_phone" class="form-label">联系电话</label>
+                                <input type="tel" class="form-control" id="contact_phone" name="contact_phone" 
+                                       placeholder="例如：138-0001-2345">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="contact_address" class="form-label">联系地址</label>
+                        <input type="text" class="form-control" id="contact_address" name="contact_address" 
+                               placeholder="例如：深圳市南山区科技园南区">
                     </div>
                     
                     <div class="mb-3">
@@ -38,16 +61,28 @@
                         <div class="form-text">请输入应收款的金额</div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="due_date" class="form-label">到期日期</label>
-                        <input type="date" class="form-control" id="due_date" name="due_date">
-                        <div class="form-text">可选，设置应收款的到期日期</div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="invoice_date" class="form-label">开票日期 <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="invoice_date" name="invoice_date" required>
+                                <div class="form-text">请选择开票日期</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="payment_terms" class="form-label">账期天数</label>
+                                <input type="number" class="form-control" id="payment_terms" name="payment_terms" 
+                                       min="0" placeholder="30" value="30">
+                                <div class="form-text">账期天数，默认30天</div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="notes" class="form-label">备注</label>
                         <textarea class="form-control" id="notes" name="notes" rows="3" 
-                                  placeholder="添加一些备注信息，如联系人、联系方式等"></textarea>
+                                  placeholder="添加一些备注信息"></textarea>
                         <div class="form-text">可选，添加一些额外的备注信息</div>
                     </div>
                     
@@ -95,4 +130,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

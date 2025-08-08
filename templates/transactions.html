@@ -30,46 +30,48 @@
 
 <!-- 筛选区域 -->
 <div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">日期范围</label>
-            <div class="flex items-center space-x-2">
-                <input type="date" class="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
-                <span class="text-gray-400">至</span>
-                <input type="date" class="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+    <form id="filterForm" method="GET">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">日期范围</label>
+                <div class="flex items-center space-x-2">
+                    <input type="date" id="startDate" name="start_date" value="{{ filter_params.start_date or '' }}" class="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+                    <span class="text-gray-400">至</span>
+                    <input type="date" id="endDate" name="end_date" value="{{ filter_params.end_date or '' }}" class="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">交易类型</label>
+                <select id="typeFilter" name="type" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+                    <option value="">全部类型</option>
+                    <option value="income" {{ 'selected' if filter_params.type == 'income' else '' }}>收入</option>
+                    <option value="expense" {{ 'selected' if filter_params.type == 'expense' else '' }}>支出</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">分类</label>
+                <select id="categoryFilter" name="category_id" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+                    <option value="">全部分类</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {{ 'selected' if filter_params.category_id == category.id|string else '' }}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">交易类型</label>
-            <select class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
-                <option value="">全部类型</option>
-                <option value="income">收入</option>
-                <option value="expense">支出</option>
-            </select>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <button type="submit" id="filterBtn" class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors text-sm font-medium">
+                    筛选
+                </button>
+                <button type="button" id="resetBtn" class="px-4 py-2 text-gray-600 hover:text-primary transition-colors text-sm">
+                    重置
+                </button>
+            </div>
+            <div class="text-sm text-gray-600">
+                共找到 <span class="font-medium text-primary">{{ transactions.total }}</span> 条记录
+            </div>
         </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">分类</label>
-            <select class="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
-                <option value="">全部分类</option>
-                {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-    <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-            <button class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors text-sm font-medium">
-                筛选
-            </button>
-            <button class="px-4 py-2 text-gray-600 hover:text-primary transition-colors text-sm">
-                重置
-            </button>
-        </div>
-        <div class="text-sm text-gray-600">
-            共找到 <span class="font-medium text-primary">{{ transactions.total }}</span> 条记录
-        </div>
-    </div>
+    </form>
 </div>
 
 <div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
@@ -139,7 +141,7 @@
                 <div class="text-sm text-gray-600">显示 {{ (transactions.page - 1) * transactions.per_page + 1 }}-{{ transactions.page * transactions.per_page if transactions.page * transactions.per_page < transactions.total else transactions.total }} 条，共 {{ transactions.total }} 条记录</div>
                 <div class="flex items-center space-x-2">
                     {% if transactions.has_prev %}
-                        <a href="{{ url_for('transactions', page=transactions.prev_num) }}" 
+                        <a href="{{ url_for('transactions', page=transactions.prev_num, start_date=filter_params.start_date, end_date=filter_params.end_date, type=filter_params.type, category_id=filter_params.category_id) }}" 
                            class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors">
                             上一页
                         </a>
@@ -147,7 +149,7 @@
                     
                     {% for page_num in transactions.iter_pages() %}
                         {% if page_num %}
-                            <a href="{{ url_for('transactions', page=page_num) }}" 
+                            <a href="{{ url_for('transactions', page=page_num, start_date=filter_params.start_date, end_date=filter_params.end_date, type=filter_params.type, category_id=filter_params.category_id) }}" 
                                class="px-3 py-2 text-sm {% if page_num == transactions.page %}bg-primary text-white rounded-xl{% else %}text-gray-600 hover:text-primary transition-colors{% endif %}">
                                 {{ page_num }}
                             </a>
@@ -157,7 +159,7 @@
                     {% endfor %}
                     
                     {% if transactions.has_next %}
-                        <a href="{{ url_for('transactions', page=transactions.next_num) }}" 
+                        <a href="{{ url_for('transactions', page=transactions.next_num, start_date=filter_params.start_date, end_date=filter_params.end_date, type=filter_params.type, category_id=filter_params.category_id) }}" 
                            class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors">
                             下一页
                         </a>
@@ -184,10 +186,32 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 导出功能
+    // 筛选功能
+    const filterForm = document.getElementById('filterForm');
+    const resetBtn = document.getElementById('resetBtn');
     const exportBtn = document.getElementById('exportBtn');
+    
+    // 重置筛选
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            // 清空所有筛选字段
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('categoryFilter').value = '';
+            
+            // 重新加载页面（不带筛选参数）
+            window.location.href = window.location.pathname;
+        });
+    }
+    
+    // 导出功能
     if (exportBtn) {
         exportBtn.addEventListener('click', function() {
+            // 获取当前筛选参数
+            const params = new URLSearchParams(window.location.search);
+            params.set('export', 'true');
+            
             // 这里可以添加导出功能的实现
             alert('导出功能开发中...');
         });

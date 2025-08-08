@@ -121,15 +121,47 @@ class Product(db.Model):
 
 class Receivable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, received
-    due_date = db.Column(db.Date)
+    receivable_number = db.Column(db.String(50), unique=True, nullable=False)  # 应收款单号
+    title = db.Column(db.String(200), nullable=False)  # 应收款标题/客户名称
+    amount = db.Column(db.Float, nullable=False)  # 应收金额
+    received_amount = db.Column(db.Float, default=0.0)  # 已收金额
+    status = db.Column(db.String(20), default='pending')  # pending, partial, received
+    invoice_date = db.Column(db.Date)  # 开票日期
+    due_date = db.Column(db.Date)  # 到期日期
+    payment_terms = db.Column(db.Integer, default=30)  # 账期天数
+    contact_person = db.Column(db.String(100))  # 联系人
+    contact_phone = db.Column(db.String(20))  # 联系电话
+    contact_address = db.Column(db.String(500))  # 联系地址
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     received_at = db.Column(db.DateTime)
     notes = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='receivables')
+    
+    @property
+    def remaining_amount(self):
+        """计算剩余未收金额"""
+        return self.amount - self.received_amount
+    
+    @property
+    def overdue_days(self):
+        """计算逾期天数"""
+        if not self.due_date or self.status == 'received':
+            return 0
+        today = datetime.now().date()
+        if today > self.due_date:
+            return (today - self.due_date).days
+        return 0
+    
+    @property
+    def days_until_due(self):
+        """计算距离到期的天数"""
+        if not self.due_date or self.status == 'received':
+            return None
+        today = datetime.now().date()
+        if today <= self.due_date:
+            return (self.due_date - today).days
+        return 0
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -373,12 +405,67 @@ def dashboard():
 @login_required
 def transactions():
     page = request.args.get('page', 1, type=int)
-    transactions = Transaction.query.order_by(Transaction.date.desc()).paginate(
+    
+    # 获取筛选参数
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    transaction_type = request.args.get('type')
+    category_id = request.args.get('category_id')
+    
+    # 构建查询
+    query = Transaction.query
+    
+    # 日期范围筛选
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(Transaction.date >= start_date_obj)
+        except ValueError:
+            pass
+    
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+            # 包含结束日期的整天
+            end_date_obj = end_date_obj.replace(hour=23, minute=59, second=59)
+            query = query.filter(Transaction.date <= end_date_obj)
+        except ValueError:
+            pass
+    
+    # 交易类型筛选
+    if transaction_type and transaction_type in ['income', 'expense']:
+        query = query.filter(Transaction.type == transaction_type)
+    
+    # 分类筛选
+    if category_id:
+        try:
+            category_id_int = int(category_id)
+            query = query.filter(Transaction.category_id == category_id_int)
+        except ValueError:
+            pass
+    
+    # 排序和分页
+    transactions = query.order_by(Transaction.date.desc()).paginate(
         page=page, per_page=20, error_out=False)
+    
     categories = Category.query.all()
     suppliers = Supplier.query.filter_by(is_active=True).all()
     products = Product.query.filter_by(is_active=True).all()
-    return render_template('transactions.html', transactions=transactions, categories=categories, suppliers=suppliers, products=products)
+    
+    # 传递当前筛选参数到模板
+    filter_params = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'type': transaction_type,
+        'category_id': category_id
+    }
+    
+    return render_template('transactions.html', 
+                         transactions=transactions, 
+                         categories=categories, 
+                         suppliers=suppliers, 
+                         products=products,
+                         filter_params=filter_params)
 
 @app.route('/add_transaction', methods=['GET', 'POST'])
 @edit_required
@@ -1382,8 +1469,12 @@ def receivables():
     
     # 计算统计数据
     total_amount = sum(r.amount for r in receivables_list)
-    received_amount = sum(r.amount for r in receivables_list if r.status == 'received')
+    received_amount = sum(r.received_amount for r in receivables_list)
     pending_amount = total_amount - received_amount
+    
+    # 计算逾期金额
+    overdue_amount = sum(r.remaining_amount for r in receivables_list if r.overdue_days > 0)
+    
     total_count = len(receivables_list)
     
     return render_template('receivables.html', 
@@ -1391,6 +1482,7 @@ def receivables():
                          total_amount=total_amount,
                          received_amount=received_amount,
                          pending_amount=pending_amount,
+                         overdue_amount=overdue_amount,
                          total_count=total_count)
 
 @app.route('/receivables/add', methods=['GET', 'POST'])
@@ -1399,20 +1491,49 @@ def add_receivable():
     if request.method == 'POST':
         title = request.form['title']
         amount = float(request.form['amount'])
+        invoice_date_str = request.form.get('invoice_date')
         due_date_str = request.form.get('due_date')
+        payment_terms = int(request.form.get('payment_terms', 30))
+        contact_person = request.form.get('contact_person', '')
+        contact_phone = request.form.get('contact_phone', '')
+        contact_address = request.form.get('contact_address', '')
         notes = request.form.get('notes', '')
         
+        # 生成应收款单号
+        today = datetime.now()
+        receivable_number = f"AR{today.strftime('%Y%m%d')}{str(Receivable.query.count() + 1).zfill(3)}"
+        
+        # 处理日期
+        invoice_date = None
         due_date = None
+        
+        if invoice_date_str:
+            try:
+                invoice_date = datetime.strptime(invoice_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+        
         if due_date_str:
             try:
                 due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
             except ValueError:
-                pass
+                # 如果没有指定到期日期但有开票日期，则根据账期计算
+                if invoice_date:
+                    due_date = invoice_date + timedelta(days=payment_terms)
+        elif invoice_date:
+            # 如果只有开票日期，根据账期计算到期日期
+            due_date = invoice_date + timedelta(days=payment_terms)
         
         receivable = Receivable(
+            receivable_number=receivable_number,
             title=title,
             amount=amount,
+            invoice_date=invoice_date,
             due_date=due_date,
+            payment_terms=payment_terms,
+            contact_person=contact_person,
+            contact_phone=contact_phone,
+            contact_address=contact_address,
             notes=notes,
             user_id=current_user.id
         )
@@ -1424,11 +1545,38 @@ def add_receivable():
     
     return render_template('add_receivable.html')
 
-@app.route('/receivables/<int:id>/receive')
+@app.route('/receivables/<int:id>/receive', methods=['POST'])
 @edit_required
 def receive_receivable(id):
     receivable = Receivable.query.get_or_404(id)
     if receivable:
+        received_amount = float(request.form.get('received_amount', 0))
+        if received_amount > 0:
+            receivable.received_amount += received_amount
+            
+            # 更新状态
+            if receivable.received_amount >= receivable.amount:
+                receivable.status = 'received'
+                receivable.received_at = datetime.utcnow()
+            else:
+                receivable.status = 'partial'
+            
+            db.session.commit()
+            flash(f'收款记录已更新，收款金额：¥{received_amount:.2f}', 'success')
+        else:
+            flash('收款金额必须大于0', 'error')
+    else:
+        flash('应收款不存在', 'error')
+    
+    return redirect(url_for('receivables'))
+
+@app.route('/receivables/<int:id>/mark_received')
+@edit_required
+def mark_received(id):
+    """快速标记为已收款"""
+    receivable = Receivable.query.get_or_404(id)
+    if receivable:
+        receivable.received_amount = receivable.amount
         receivable.status = 'received'
         receivable.received_at = datetime.utcnow()
         db.session.commit()
