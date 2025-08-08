@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
          let url, method;
          if (categoryId) {
              // 编辑模式
-             url = '{{ url_for("edit_category", id="PLACEHOLDER") }}'.replace('PLACEHOLDER', categoryId);
+             url = '/edit_category/' + categoryId;
              method = 'POST';
          } else {
              // 添加模式

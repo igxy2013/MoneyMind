@@ -421,12 +421,9 @@ def add_transaction():
         flash('交易记录添加成功！', 'success')
         return redirect(url_for('transactions'))
     
-    # 根据URL参数或默认值决定显示哪种类型的分类
+    # 获取所有分类，让前端JavaScript根据类型过滤
     transaction_type = request.args.get('type', 'expense')
-    if transaction_type == 'expense':
-        categories = Category.query.filter_by(type='expense').all()
-    else:
-        categories = Category.query.filter_by(type='income').all()
+    categories = Category.query.all()
     
     suppliers = Supplier.query.filter_by(is_active=True).all()
     products = Product.query.filter_by(is_active=True).all()
@@ -894,7 +891,7 @@ def add_product():
         is_ajax = 'X-Requested-With' in request.headers and request.headers['X-Requested-With'] == 'XMLHttpRequest'
         
         name = request.form['name']
-        category_id = request.form.get('category_id')
+        category = request.form.get('category')
         supplier_id = int(request.form['supplier']) if request.form.get('supplier') else None
         cost_price = float(request.form['cost_price']) if request.form.get('cost_price') else None
         selling_price = float(request.form['selling_price']) if request.form.get('selling_price') else None
@@ -926,7 +923,7 @@ def add_product():
                 
                 try:
                     file.save(file_path)
-                    image_path = file_path
+                    image_path = f"uploads/products/{unique_filename}"
                 except Exception as e:
                     if is_ajax:
                         return jsonify({'success': False, 'message': f'图片上传失败: {str(e)}'}), 500
@@ -936,7 +933,7 @@ def add_product():
         
         product = Product(
             name=name,
-            category=category_id,  # 使用category_id而不是category
+            category=category,
             supplier_id=supplier_id,
             cost_price=cost_price,
             selling_price=selling_price,
@@ -949,7 +946,7 @@ def add_product():
         db.session.commit()
         
         if is_ajax:
-            return jsonify({'success': True, 'message': '商品添加成功！'})
+            return jsonify({'success': True})
         
         flash('商品添加成功！', 'success')
         return redirect(url_for('products'))
@@ -964,46 +961,58 @@ def edit_product(id):
     product = Product.query.get_or_404(id)
     
     if request.method == 'POST':
-        # 更新基本信息
-        product.name = request.form['name']
-        product.category = request.form['category']
-        product.supplier_id = int(request.form['supplier']) if request.form['supplier'] else None
-        product.cost_price = float(request.form['cost_price']) if request.form['cost_price'] else None
-        product.selling_price = float(request.form['selling_price']) if request.form['selling_price'] else None
-        product.unit = request.form['unit']
-        product.stock = int(request.form['stock']) if request.form['stock'] else 0
-        product.description = request.form['description']
-        product.is_active = 'is_active' in request.form
-        
-        # 处理图片上传
-        if 'image' in request.files:
-            file = request.files['image']
-            if file and file.filename != '' and allowed_file(file.filename):
-                # 删除旧图片
-                if product.image_path:
-                    old_image_path = os.path.join('static', product.image_path.lstrip('/'))
-                    if os.path.exists(old_image_path):
-                        os.remove(old_image_path)
-                
-                # 保存新图片
-                filename = secure_filename(file.filename)
-                unique_filename = f"{uuid.uuid4()}_{filename}"
-                
-                # 确保商品图片目录存在
-                product_upload_folder = 'static/uploads/products'
-                os.makedirs(product_upload_folder, exist_ok=True)
-                
-                file_path = os.path.join(product_upload_folder, unique_filename)
-                file.save(file_path)
-                product.image_path = f'/uploads/products/{unique_filename}'
-        
         try:
+            # 更新基本信息
+            product.name = request.form['name']
+            product.category = request.form['category']
+            product.supplier_id = int(request.form['supplier']) if request.form.get('supplier') else None
+            product.cost_price = float(request.form['cost_price']) if request.form['cost_price'] else None
+            product.selling_price = float(request.form['selling_price']) if request.form['selling_price'] else None
+            product.unit = request.form['unit']
+            product.stock = int(request.form['stock']) if request.form['stock'] else 0
+            product.description = request.form['description']
+            product.is_active = request.form.get('is_active') == '1'
+            
+            # 处理图片上传
+            if 'image' in request.files:
+                file = request.files['image']
+                if file and file.filename != '' and allowed_file(file.filename):
+                    # 删除旧图片
+                    if product.image_path:
+                        old_image_path = os.path.join('static', product.image_path.lstrip('/'))
+                        if os.path.exists(old_image_path):
+                            os.remove(old_image_path)
+                    
+                    # 保存新图片
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{uuid.uuid4()}_{filename}"
+                    
+                    # 确保商品图片目录存在
+                    product_upload_folder = 'static/uploads/products'
+                    os.makedirs(product_upload_folder, exist_ok=True)
+                    
+                    file_path = os.path.join(product_upload_folder, unique_filename)
+                    file.save(file_path)
+                    product.image_path = f'uploads/products/{unique_filename}'
+            
             db.session.commit()
-            flash('商品信息更新成功！', 'success')
-            return redirect(url_for('products'))
+            
+            # 检查是否为AJAX请求
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': True})
+            else:
+                flash('商品信息更新成功！', 'success')
+                return redirect(url_for('products'))
+                
         except Exception as e:
             db.session.rollback()
-            flash(f'更新失败：{str(e)}', 'error')
+            error_message = f'更新失败：{str(e)}'
+            
+            # 检查是否为AJAX请求
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': error_message})
+            else:
+                flash(error_message, 'error')
     
     suppliers = Supplier.query.filter_by(is_active=True).all()
     return render_template('edit_product.html', product=product, suppliers=suppliers)
@@ -1013,15 +1022,29 @@ def edit_product(id):
 def delete_product(id):
     product = Product.query.get_or_404(id)
     
-    # 检查是否有关联的交易
-    if product.transactions:
-        flash('无法删除：该商品下有关联的交易记录', 'error')
+    # 检查是否为AJAX请求
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # 检查是否有关联的交易
+        if product.transactions:
+            return jsonify({'success': False, 'message': '无法删除：该商品下有关联的交易记录'})
+        else:
+            try:
+                db.session.delete(product)
+                db.session.commit()
+                return jsonify({'success': True, 'message': '商品删除成功！'})
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({'success': False, 'message': f'删除失败：{str(e)}'})
     else:
-        db.session.delete(product)
-        db.session.commit()
-        flash('商品删除成功！', 'success')
-    
-    return redirect(url_for('products'))
+        # 非AJAX请求，保持原有逻辑
+        if product.transactions:
+            flash('无法删除：该商品下有关联的交易记录', 'error')
+        else:
+            db.session.delete(product)
+            db.session.commit()
+            flash('商品删除成功！', 'success')
+        
+        return redirect(url_for('products'))
 
 @app.route('/users')
 @admin_required
