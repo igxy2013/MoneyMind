@@ -168,6 +168,7 @@ class Transaction(db.Model):
     amount = db.Column(db.Float, nullable=False)
     type = db.Column(db.String(10), nullable=False)
     description = db.Column(db.String(200))
+    supplier_description = db.Column(db.String(200))  # 供应商/描述字段
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -175,6 +176,7 @@ class Transaction(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     quantity = db.Column(db.Float)
     unit_price = db.Column(db.Float)
+
     category = db.relationship('Category', backref='transactions')
     supplier = db.relationship('Supplier', backref='transactions')
     product = db.relationship('Product', backref='transactions')
@@ -474,11 +476,12 @@ def add_transaction():
         amount = float(request.form['amount'])
         transaction_type = request.form['type']
         description = request.form['description']
+        supplier_description = request.form.get('supplier_description', '')
         category_id = int(request.form['category'])
         date = datetime.strptime(request.form['date'], '%Y-%m-%d')
         
-        supplier_id = request.form.get('supplier') or None
-        product_id = request.form.get('product') or None
+        supplier_id = request.form.get('supplier_id') or None
+        product_id = request.form.get('product_id') or None
         quantity = request.form.get('quantity') or None
         unit_price = request.form.get('unit_price') or None
         
@@ -495,13 +498,15 @@ def add_transaction():
             amount=amount,
             type=transaction_type,
             description=description,
+            supplier_description=supplier_description,
             category_id=category_id,
             user_id=current_user.id,
             date=date,
             supplier_id=supplier_id,
             product_id=product_id,
             quantity=quantity,
-            unit_price=unit_price
+            unit_price=unit_price,
+
         )
         db.session.add(transaction)
         db.session.commit()
@@ -526,27 +531,12 @@ def edit_transaction(id):
         transaction.amount = float(request.form['amount'])
         transaction.type = request.form['type']
         transaction.description = request.form['description']
-        transaction.category_id = int(request.form['category'])
+        transaction.supplier_description = request.form.get('supplier_description', '')
+        transaction.category_id = int(request.form['category_id'])
         transaction.date = datetime.strptime(request.form['date'], '%Y-%m-%d')
         
-        supplier_id = request.form.get('supplier') or None
-        product_id = request.form.get('product') or None
-        quantity = request.form.get('quantity') or None
-        unit_price = request.form.get('unit_price') or None
-        
-        if supplier_id:
-            supplier_id = int(supplier_id)
-        if product_id:
-            product_id = int(product_id)
-        if quantity:
-            quantity = float(quantity)
-        if unit_price:
-            unit_price = float(unit_price)
-        
-        transaction.supplier_id = supplier_id
-        transaction.product_id = product_id
-        transaction.quantity = quantity
-        transaction.unit_price = unit_price
+
+
         
         db.session.commit()
         flash('交易记录更新成功！', 'success')
@@ -557,7 +547,7 @@ def edit_transaction(id):
     products = Product.query.filter_by(is_active=True).all()
     return render_template('edit_transaction.html', transaction=transaction, categories=categories, suppliers=suppliers, products=products)
 
-@app.route('/delete_transaction/<int:id>')
+@app.route('/delete_transaction/<int:id>', methods=['GET', 'POST'])
 @edit_required
 def delete_transaction(id):
     transaction = Transaction.query.get_or_404(id)

@@ -12,6 +12,7 @@
     <meta name="author" content="七彩果坊">
     <meta name="theme-color" content="#6366F1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="七彩果坊">
     <meta name="msapplication-TileColor" content="#6366F1">
@@ -34,6 +35,7 @@
     <link href="{{ url_for('static', filename='css/all.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/mobile.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css" rel="stylesheet">
     
     <!-- Tailwind CSS 配置 -->
     <script>
@@ -115,14 +117,6 @@
                         <span class="font-medium">收支记录</span>
                     </a>
                     
-                    {% if current_user.role != 'employee' %}
-                    <a href="{{ url_for('add_transaction') }}" class="flex items-center space-x-3 px-4 py-3 {% if request.endpoint == 'add_transaction' %}bg-gradient-to-r from-primary/10 to-purple-100 text-primary{% else %}text-gray-600 hover:bg-gray-50{% endif %} rounded-xl transition-colors">
-                        <div class="w-5 h-5 flex items-center justify-center">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
-                        <span class="font-medium">添加收支</span>
-                    </a>
-                    {% endif %}
                     
                     <a href="{{ url_for('suppliers') }}" class="flex items-center space-x-3 px-4 py-3 {% if request.endpoint == 'suppliers' %}bg-gradient-to-r from-primary/10 to-purple-100 text-primary{% else %}text-gray-600 hover:bg-gray-50{% endif %} rounded-xl transition-colors">
                         <div class="w-5 h-5 flex items-center justify-center">

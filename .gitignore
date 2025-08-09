@@ -28,3 +28,4 @@ ENV/
 # 临时文件
 *.tmp
 *.temp
+__pycache__/app.cpython-312.pyc
