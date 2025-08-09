@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto receivables-container">
 <div class="mb-8">
 <div class="flex items-center justify-between mb-6">
 <div>
@@ -938,6 +938,43 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('批量操作:', selectedRows.length + '条记录');
         });
     }
+    
+    // 移动端布局强制函数
+    function forceMobileLayout() {
+        if (window.innerWidth <= 768) {
+            // 强制应收款总览卡片为2列布局
+            const gridElements = document.querySelectorAll('.grid[class*="grid-cols-1"][class*="md:grid-cols-4"]');
+            gridElements.forEach(function(element) {
+                element.style.display = 'grid';
+                element.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                element.style.gap = '0.75rem';
+            });
+            
+            // 强制页面标题区域为垂直布局
+            const titleAreas = document.querySelectorAll('.flex.items-center.justify-between.mb-6');
+            titleAreas.forEach(function(element) {
+                element.style.flexDirection = 'column';
+                element.style.alignItems = 'flex-start';
+                element.style.gap = '1rem';
+            });
+            
+            // 强制按钮组为垂直布局
+            const buttonGroups = document.querySelectorAll('.flex.items-center.space-x-4');
+            buttonGroups.forEach(function(element) {
+                element.style.flexDirection = 'column';
+                element.style.gap = '0.5rem';
+                element.style.width = '100%';
+            });
+        }
+    }
+    
+    // 窗口大小变化时重新应用移动端布局
+    window.addEventListener('resize', function() {
+        setTimeout(forceMobileLayout, 100);
+    });
+    
+    // 页面加载完成后执行
+    setTimeout(forceMobileLayout, 500);
 </script>
 
 {% endblock %}

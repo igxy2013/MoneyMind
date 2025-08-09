@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto suppliers-container">
 <!-- 页面标题和操作栏 -->
 <div class="mb-8">
     <div class="flex items-center justify-between mb-6">
@@ -35,14 +35,14 @@
                     </div>
                     <input type="text" id="searchInput" placeholder="搜索供应商名称、联系人或电话..." class="w-full pl-10 pr-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
                 </div>
-            </div>
-            <div class="flex items-center space-x-4">
                 <select id="statusFilter" class="px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm pr-8">
                     <option value="">全部状态</option>
                     <option value="active">合作中</option>
                     <option value="inactive">已暂停</option>
                     <option value="terminated">已终止</option>
                 </select>
+            </div>
+            <div class="flex items-center space-x-4">
                 <button id="advancedFilterBtn" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap hover:bg-gray-200 transition-colors flex items-center space-x-2">
                     <div class="w-4 h-4 flex items-center justify-center">
                         <i class="ri-filter-line"></i>
@@ -1019,6 +1019,42 @@ document.addEventListener('DOMContentLoaded', function() {
         
         addNewImages(files);
     }
+    
+    // 移动端布局强制函数
+    function forceMobileLayout() {
+        if (window.innerWidth <= 768) {
+            // 强制搜索筛选栏为垂直布局
+            const searchAreas = document.querySelectorAll('.flex.flex-wrap.items-center.gap-4');
+            searchAreas.forEach(function(element) {
+                element.style.flexDirection = 'column';
+                element.style.alignItems = 'stretch';
+                element.style.gap = '1rem';
+            });
+            
+            // 强制按钮组为垂直布局
+            const buttonGroups = document.querySelectorAll('.flex.items-center.space-x-4');
+            buttonGroups.forEach(function(element) {
+                element.style.flexDirection = 'column';
+                element.style.gap = '0.5rem';
+                element.style.width = '100%';
+            });
+            
+            // 强制搜索框宽度
+            const searchInputs = document.querySelectorAll('.flex-1.min-w-64');
+            searchInputs.forEach(function(element) {
+                element.style.minWidth = 'auto';
+                element.style.width = '100%';
+            });
+        }
+    }
+    
+    // 窗口大小变化时重新应用移动端布局
+    window.addEventListener('resize', function() {
+        setTimeout(forceMobileLayout, 100);
+    });
+    
+    // 页面加载完成后执行
+    setTimeout(forceMobileLayout, 500);
 });
 </script>
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block title %}分类管理 - 七彩果坊{% endblock %}
 
 {% block content %}
+<div class="categories-container">
 <!-- 页面标题 -->
 <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">分类管理</h1>
@@ -12,8 +13,9 @@
 <!-- 操作区域 -->
 <div class="flex items-center justify-between mb-8">
     <div class="flex items-center space-x-4">
+        <!-- 移动端悬浮按钮将替代这个按钮，所以添加d-none-mobile类在移动端隐藏 -->
         {% if current_user.role != 'employee' %}
-        <button id="addCategoryBtn" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2">
+        <button id="addCategoryBtn" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2 d-none-mobile">
             <div class="w-4 h-4 flex items-center justify-center">
                 <i class="fas fa-plus"></i>
             </div>
@@ -147,6 +149,15 @@
     </div>
 </div>
 {% endif %}
+</div>
+
+<!-- 悬浮添加按钮 (移动端显示) -->
+{% if current_user.role != 'employee' %}
+<a href="#" id="fabAddCategoryBtn" class="fab-button fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 group d-block-mobile">
+    <i class="fas fa-plus text-xl group-hover:rotate-90 transition-transform duration-300"></i>
+    <span class="sr-only">添加新分类</span>
+</a>
+{% endif %}
 
 <!-- 添加/编辑分类模态框 -->
 <div id="categoryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">
@@ -207,10 +218,23 @@
 <script>
 // 分类筛选功能和模态窗口功能
 document.addEventListener('DOMContentLoaded', function() {
+    // 重置单选按钮状态的函数
+    function resetRadioButtons() {
+        const radioLabels = document.querySelectorAll('input[name="type"]');
+        radioLabels.forEach(r => {
+            const label = r.closest('label');
+            const customRadio = label.querySelector('.radio-custom');
+            const radioDot = customRadio.querySelector('.radio-dot');
+            customRadio.classList.remove('border-indigo-600');
+            radioDot.classList.add('hidden');
+            r.checked = false;
+        });
+    }
     const typeFilter = document.getElementById('typeFilter');
     const categoryRows = document.querySelectorAll('.category-row');
     const categoryModal = document.getElementById('categoryModal');
     const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const fabAddCategoryBtn = document.getElementById('fabAddCategoryBtn');
     const closeModal = document.getElementById('closeModal');
     const cancelBtn = document.getElementById('cancelBtn');
     const categoryForm = document.getElementById('categoryForm');
@@ -233,22 +257,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // 模态窗口功能
-     if (addCategoryBtn) {
-         addCategoryBtn.addEventListener('click', function() {
-             modalTitle.textContent = '添加新分类';
-             categoryForm.reset();
-             document.getElementById('categoryId').value = '';
-             // 重置单选按钮状态
-             const radioLabels = document.querySelectorAll('input[name="type"]');
-             radioLabels.forEach(r => {
-                 const label = r.closest('label');
-                 const customRadio = label.querySelector('.radio-custom');
-                 const radioDot = customRadio.querySelector('.radio-dot');
-                 customRadio.classList.remove('border-indigo-600');
-                 radioDot.classList.add('hidden');
-                 r.checked = false;
-             });
-             categoryModal.classList.remove('hidden');
+     // 桌面端添加按钮点击事件
+       if (addCategoryBtn) {
+           addCategoryBtn.addEventListener('click', function() {
+               modalTitle.textContent = '添加新分类';
+               categoryForm.reset();
+               document.getElementById('categoryId').value = '';
+               // 重置单选按钮状态
+               resetRadioButtons();
+               categoryModal.classList.remove('hidden');
+           });
+       }
+       
+       // 移动端悬浮添加按钮点击事件
+       if (fabAddCategoryBtn) {
+           fabAddCategoryBtn.addEventListener('click', function(e) {
+               e.preventDefault();
+               modalTitle.textContent = '添加新分类';
+               categoryForm.reset();
+               document.getElementById('categoryId').value = '';
+               // 重置单选按钮状态
+                resetRadioButtons();
+                categoryModal.classList.remove('hidden');
          });
      }
      

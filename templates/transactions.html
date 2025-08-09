@@ -3,6 +3,7 @@
 {% block title %}收支记录 - 七彩果坊{% endblock %}
 
 {% block content %}
+<div class="container mx-auto px-6 py-8 transactions-container">
 
 <!-- 页面标题 -->
 <div class="flex items-center justify-between mb-8">
@@ -217,6 +218,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // 移动端布局强制函数
+    function forceMobileLayout() {
+        if (window.innerWidth <= 768) {
+            // 强制页面标题区域为垂直布局
+            const titleAreas = document.querySelectorAll('.flex.items-center.justify-between.mb-8');
+            titleAreas.forEach(function(element) {
+                element.style.flexDirection = 'column';
+                element.style.alignItems = 'flex-start';
+                element.style.gap = '1rem';
+            });
+            
+            // 强制筛选区域为单列布局
+            const gridElements = document.querySelectorAll('.grid[class*="grid-cols-1"][class*="md:grid-cols-3"]');
+            gridElements.forEach(function(element) {
+                element.style.gridTemplateColumns = '1fr';
+                element.style.gap = '1rem';
+            });
+            
+            // 强制按钮组为垂直布局
+            const buttonGroups = document.querySelectorAll('.flex.items-center.space-x-4');
+            buttonGroups.forEach(function(element) {
+                element.style.flexDirection = 'column';
+                element.style.gap = '0.5rem';
+                element.style.width = '100%';
+            });
+        }
+    }
+    
     // 移动端表格优化
     if (window.innerWidth < 768) {
         const tableRows = document.querySelectorAll('tbody tr');
@@ -236,7 +265,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+        
+        // 执行移动端布局强制
+        forceMobileLayout();
     }
+    
+    // 窗口大小变化时重新应用移动端布局
+    window.addEventListener('resize', function() {
+        setTimeout(forceMobileLayout, 100);
+    });
+    
+    // 页面加载完成后执行
+    setTimeout(forceMobileLayout, 500);
 });
 </script>
+</div>
 {% endblock %}

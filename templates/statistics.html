@@ -3,6 +3,7 @@
 {% block title %}财务分析 - 七彩果坊{% endblock %}
 
 {% block content %}
+<div class="container mx-auto px-6 py-8 statistics-container">
 
 <!-- 页面标题 -->
 <div class="mb-8">
@@ -564,13 +565,124 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     cashflowChart.setOption(cashflowOption);
 
+    // 移动端优化函数
+    function optimizeForMobile() {
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile) {
+            // 优化趋势图表
+            const mobileTrendOption = {
+                grid: { left: 10, right: 10, top: 60, bottom: 30, containLabel: true },
+                legend: {
+                    orient: 'horizontal',
+                    bottom: 0,
+                    itemWidth: 15,
+                    itemHeight: 10,
+                    textStyle: { fontSize: 10 }
+                },
+                xAxis: {
+                    axisLabel: { fontSize: 10, rotate: 45 }
+                },
+                yAxis: {
+                    axisLabel: { fontSize: 10 }
+                },
+                tooltip: {
+                    textStyle: { fontSize: 12 }
+                }
+            };
+            trendChart.setOption(mobileTrendOption);
+            
+            // 优化健康度仪表盘
+            const mobileHealthOption = {
+                series: [{
+                    center: ['50%', '55%'],
+                    radius: '80%',
+                    detail: {
+                        fontSize: 20,
+                        offsetCenter: [0, '0%']
+                    },
+                    title: {
+                        fontSize: 12
+                    }
+                }]
+            };
+            healthChart.setOption(mobileHealthOption);
+            
+            // 优化分类饼图
+            const mobileCategoryOption = {
+                series: [
+                    {
+                        radius: ['20%', '35%'],
+                        label: { fontSize: 10 },
+                        labelLine: { length: 10, length2: 5 }
+                    },
+                    {
+                        radius: ['45%', '60%'],
+                        label: { fontSize: 10 },
+                        labelLine: { length: 10, length2: 5 }
+                    }
+                ],
+                tooltip: {
+                    textStyle: { fontSize: 12 }
+                }
+            };
+            categoryChart.setOption(mobileCategoryOption);
+            
+            // 优化现金流图表
+            const mobileCashflowOption = {
+                grid: { left: 10, right: 10, top: 20, bottom: 30, containLabel: true },
+                xAxis: {
+                    axisLabel: { fontSize: 9, rotate: 30 }
+                },
+                yAxis: {
+                    axisLabel: { fontSize: 10 }
+                },
+                tooltip: {
+                    textStyle: { fontSize: 12 }
+                }
+            };
+            cashflowChart.setOption(mobileCashflowOption);
+        }
+    }
+    
     // 响应式调整
     window.addEventListener('resize', function() {
         trendChart.resize();
         healthChart.resize();
         categoryChart.resize();
         cashflowChart.resize();
+        
+        // 延迟执行移动端优化，确保resize完成
+        setTimeout(function() {
+            optimizeForMobile();
+            forceMobileLayout();
+        }, 100);
     });
+    
+    // 初始化时执行移动端优化
+    setTimeout(function() {
+        optimizeForMobile();
+        forceMobileLayout();
+    }, 500);
+    
+    // 强制移动端布局函数
+    function forceMobileLayout() {
+        if (window.innerWidth <= 768) {
+            const gridElements = document.querySelectorAll('.grid[class*="grid-cols-1"][class*="md:grid-cols-4"]');
+            gridElements.forEach(function(element) {
+                element.style.display = 'grid';
+                element.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                element.style.gap = '0.75rem';
+            });
+            
+            // 也处理所有包含grid-cols-1的元素
+            const allGrids = document.querySelectorAll('.grid[class*="grid-cols-1"]');
+            allGrids.forEach(function(element) {
+                element.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                element.style.gap = '0.5rem';
+            });
+        }
+    }
 });
 </script>
 {% endblock %}

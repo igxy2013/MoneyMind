@@ -33,6 +33,7 @@
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <link href="{{ url_for('static', filename='css/all.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/mobile.css') }}" rel="stylesheet">
     
     <!-- Tailwind CSS 配置 -->
     <script>
@@ -75,20 +76,23 @@
                 </div>
                 
                 <!-- 用户信息 -->
-                <div class="mb-8 p-4 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl">
-                    <div class="flex items-center space-x-3 mb-2">
-                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                            <i class="fas fa-user text-primary"></i>
+                <div class="mb-6 p-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-primary text-xs"></i>
                         </div>
                         <div>
-                            <div class="font-medium text-gray-900">{{ current_user.username }}</div>
-                            <div class="text-xs text-gray-600">
+                            <div class="font-medium text-gray-900 flex items-center space-x-2">
+                                <span>{{ current_user.username }}</span>
                                 {% if current_user.role == 'admin' %}
-                                    <i class="fas fa-crown text-yellow-500"></i> 管理员
+                                    <i class="fas fa-crown text-yellow-500"></i>
+                                    <span class="text-xs text-gray-600">管理员</span>
                                 {% elif current_user.role == 'manager' %}
-                                    <i class="fas fa-user-tie text-blue-500"></i> 经理
+                                    <i class="fas fa-user-tie text-blue-500"></i>
+                                    <span class="text-xs text-gray-600">经理</span>
                                 {% else %}
-                                    <i class="fas fa-user text-gray-500"></i> 员工
+                                    <i class="fas fa-user text-gray-500"></i>
+                                    <span class="text-xs text-gray-600">员工</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -186,7 +190,7 @@
         </nav>
 
         <!-- 移动端导航按钮 -->
-        <button class="md:hidden fixed top-4 left-4 w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center" id="mobileNavToggle" style="z-index: 1060;">
+        <button class="md:hidden fixed bottom-4 left-4 w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center" id="mobileNavToggle" style="z-index: 1060;">
             <i class="fas fa-bars text-gray-600"></i>
         </button>
 
