@@ -1,43 +1,8 @@
 // 移动端优化脚本
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 移动端导航功能
-    const mobileNavToggle = document.getElementById('mobileNavToggle');
-    const sidebar = document.getElementById('sidebar');
-    const mobileNavOverlay = document.getElementById('mobileNavOverlay');
-    
-    if (mobileNavToggle && sidebar && mobileNavOverlay) {
-        // 切换侧边栏
-        mobileNavToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('show');
-            mobileNavOverlay.classList.toggle('show');
-        });
-        
-        // 点击遮罩层关闭侧边栏
-        mobileNavOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('show');
-            mobileNavOverlay.classList.remove('show');
-        });
-        
-        // 点击导航链接后关闭侧边栏
-        const navLinks = sidebar.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-                mobileNavOverlay.classList.remove('show');
-            });
-        });
-        
-        // 监听屏幕旋转
-        window.addEventListener('orientationchange', function() {
-            setTimeout(function() {
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('show');
-                    mobileNavOverlay.classList.remove('show');
-                }
-            }, 100);
-        });
-    }
+    // 移动端导航功能现在完全由base.html中的脚本处理
+    // 这里只保留其他移动端优化功能
     
     // 移动端表单优化
     const formInputs = document.querySelectorAll('input, select, textarea');
@@ -268,4 +233,4 @@ const MobileUtils = {
 };
 
 // 导出工具函数
-window.MobileUtils = MobileUtils; 
+window.MobileUtils = MobileUtils;

@@ -186,12 +186,12 @@
         </nav>
 
         <!-- 移动端导航按钮 -->
-        <button class="md:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center" id="mobileNavToggle">
+        <button class="md:hidden fixed top-4 left-4 w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center" id="mobileNavToggle" style="z-index: 1060;">
             <i class="fas fa-bars text-gray-600"></i>
         </button>
 
         <!-- 移动端遮罩层 -->
-        <div class="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden" id="mobileNavOverlay"></div>
+        <div class="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm hidden" id="mobileNavOverlay" style="z-index: 1030;"></div>
         
         <!-- 主内容区 -->
         <main class="flex-1 ml-0 md:ml-64 min-h-screen">
@@ -226,25 +226,98 @@
     
     <!-- 移动端导航脚本 -->
     <script>
-        const mobileNav = document.querySelector('nav');
-        const mobileNavToggle = document.getElementById('mobileNavToggle');
-        const mobileNavOverlay = document.getElementById('mobileNavOverlay');
-        
-        function toggleMobileNav() {
-            if (mobileNav && mobileNavOverlay) {
-                mobileNav.classList.toggle('hidden');
-                mobileNavOverlay.classList.toggle('hidden');
-                document.body.classList.toggle('overflow-hidden');
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNav = document.querySelector('nav');
+            const mobileNavToggle = document.getElementById('mobileNavToggle');
+            const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+            
+            // 初始化移动端导航栏状态
+            function initMobileNav() {
+                if (mobileNav) {
+                    if (window.innerWidth < 768) {
+                        mobileNav.classList.add('hidden');
+                        mobileNav.classList.remove('block', 'md:block');
+                    } else {
+                        mobileNav.classList.remove('hidden', 'block');
+                        mobileNav.classList.add('md:block');
+                    }
+                }
+                if (mobileNavOverlay) {
+                    mobileNavOverlay.classList.add('hidden');
+                }
             }
-        }
-        
-        if (mobileNavToggle) {
-            mobileNavToggle.addEventListener('click', toggleMobileNav);
-        }
-        
-        if (mobileNavOverlay) {
-            mobileNavOverlay.addEventListener('click', toggleMobileNav);
-        }
+            
+            // 页面加载时初始化
+            initMobileNav();
+            
+            function toggleMobileNav() {
+                if (mobileNav && mobileNavOverlay) {
+                    // 检查当前状态
+                    const isHidden = mobileNav.classList.contains('hidden');
+                    
+                    if (isHidden) {
+                        // 显示导航栏
+                        mobileNav.classList.remove('hidden', 'md:block');
+                        mobileNav.classList.add('block');
+                        mobileNavOverlay.classList.remove('hidden');
+                        document.body.classList.add('overflow-hidden');
+                    } else {
+                        // 隐藏导航栏
+                        mobileNav.classList.remove('block');
+                        mobileNav.classList.add('hidden');
+                        if (window.innerWidth >= 768) {
+                            mobileNav.classList.add('md:block');
+                        }
+                        mobileNavOverlay.classList.add('hidden');
+                        document.body.classList.remove('overflow-hidden');
+                    }
+                }
+            }
+            
+            if (mobileNavToggle) {
+                mobileNavToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileNav();
+                });
+            }
+            
+            if (mobileNavOverlay) {
+                mobileNavOverlay.addEventListener('click', toggleMobileNav);
+            }
+            
+            // 点击导航链接后自动关闭移动端导航栏
+            if (mobileNav) {
+                const navLinks = mobileNav.querySelectorAll('a[href]:not([href="#"])');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // 只有在移动端且导航栏显示时才关闭
+                        if (window.innerWidth < 768 && mobileNav.classList.contains('block')) {
+                            setTimeout(() => {
+                                toggleMobileNav();
+                            }, 100); // 稍微延迟以确保链接导航正常进行
+                        }
+                    });
+                });
+            }
+            
+            // 监听窗口大小变化，确保在桌面端正确显示
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    if (mobileNav) {
+                        mobileNav.classList.remove('block', 'hidden');
+                        mobileNav.classList.add('md:block');
+                    }
+                    if (mobileNavOverlay) {
+                        mobileNavOverlay.classList.add('hidden');
+                    }
+                    document.body.classList.remove('overflow-hidden');
+                } else {
+                    if (mobileNav && !mobileNav.classList.contains('block')) {
+                        mobileNav.classList.add('hidden');
+                    }
+                }
+            });
+        });
     </script>
     
     {% block scripts %}{% endblock %}

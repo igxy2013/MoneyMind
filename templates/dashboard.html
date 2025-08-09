@@ -20,7 +20,7 @@
 <div class="flex items-center space-x-4">
 <div class="flex items-center bg-white/60 backdrop-blur-lg rounded-xl border border-white/20 px-1 py-1">
 <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="monthBtn">本月</button>
-<button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button" id="yearBtn">本年</button>
+<button class="px-4 py-2 text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="yearBtn">本年</button>
 </div>
 <a href="{{ url_for('add_transaction') }}" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors font-medium flex items-center space-x-2">
 <div class="w-4 h-4 flex items-center justify-center">
@@ -101,7 +101,7 @@
 <h3 class="text-lg font-semibold text-gray-900">收支趋势</h3>
 <div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
 <button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="trendMonthBtn">月度</button>
-<button class="px-3 py-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button" id="trendYearBtn">年度</button>
+<button class="px-3 py-1 text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="trendYearBtn">年度</button>
 </div>
 </div>
 <div id="trendChart" class="h-80"></div>
@@ -110,9 +110,9 @@
 <div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
 <div class="flex items-center justify-between mb-6">
 <h3 class="text-lg font-semibold text-gray-900">收支构成</h3>
-<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
+<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1 ">
 <button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="pieIncomeBtn">收入</button>
-<button class="px-3 py-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button" id="pieExpenseBtn">支出</button>
+<button class="px-3 py-1 text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="pieExpenseBtn">支出</button>
 </div>
 </div>
 <div id="pieChart" class="h-80"></div>
