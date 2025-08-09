@@ -1,6 +1,39 @@
 {% extends "base.html" %}
 
 {% block extra_head %}
+<style>
+/* 统一占位符（placeholder）样式：字体大小与颜色一致 */
+#username::placeholder,
+#password::placeholder {
+  font-size: 1rem !important; /* 与正文一致 */
+  line-height: 1.5 !important;
+  color: #9ca3af !important; /* 与 Tailwind text-gray-400 接近的占位颜色 */
+  opacity: 1 !important; /* 某些浏览器默认较淡，统一为可读 */
+}
+/* iOS/WebKit 兼容写法 */
+#username::-webkit-input-placeholder,
+#password::-webkit-input-placeholder {
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+/* 移动端强制对齐与一致尺寸（修正通用样式覆盖）*/
+@media (max-width: 768px) {
+  #username,
+  #password {
+    text-align: left !important;
+    height: auto !important;
+    line-height: 1.5 !important;
+    padding-top: 0.75rem !important;  /* 等同于 py-3 */
+    padding-bottom: 0.75rem !important; /* 等同于 py-3 */
+    padding-left: 1rem !important; /* 等同于 px-4 */
+  }
+  #password {
+    padding-right: 3rem !important; /* 等同于 pr-12，为右侧图标预留 */
+  }
+}
+</style>
 {% endblock %}
 
 {% block auth_content %}
