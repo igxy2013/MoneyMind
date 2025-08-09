@@ -15,7 +15,7 @@
     <div class="flex items-center space-x-4">
         <!-- 移动端悬浮按钮将替代这个按钮，所以添加d-none-mobile类在移动端隐藏 -->
         {% if current_user.role != 'employee' %}
-        <button id="addCategoryBtn" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2 d-none-mobile">
+        <button id="addCategoryBtn" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors flex items-center space-x-2">
             <div class="w-4 h-4 flex items-center justify-center">
                 <i class="fas fa-plus"></i>
             </div>
@@ -150,14 +150,6 @@
 </div>
 {% endif %}
 </div>
-
-<!-- 悬浮添加按钮 (移动端显示) -->
-{% if current_user.role != 'employee' %}
-<a href="#" id="fabAddCategoryBtn" class="fab-button fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 group d-block-mobile">
-    <i class="fas fa-plus text-xl group-hover:rotate-90 transition-transform duration-300"></i>
-    <span class="sr-only">添加新分类</span>
-</a>
-{% endif %}
 
 <!-- 添加/编辑分类模态框 -->
 <div id="categoryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center">

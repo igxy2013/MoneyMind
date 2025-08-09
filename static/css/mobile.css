@@ -362,6 +362,56 @@
          grid-template-columns: 1fr !important;
          gap: 1rem !important;
      }
+     
+     /* 收支记录页面筛选按钮区域优化 */
+     .transactions-container .flex.items-center.justify-between {
+         flex-direction: row !important;
+         align-items: center !important;
+         justify-content: space-between !important;
+         flex-wrap: wrap !important;
+         gap: 0.75rem !important;
+     }
+     
+     .transactions-container .flex.items-center.space-x-4 {
+         display: flex !important;
+         flex-direction: row !important;
+         align-items: center !important;
+         gap: 0.75rem !important;
+         flex-shrink: 0 !important;
+     }
+     
+     .transactions-container #filterBtn,
+     .transactions-container #resetBtn {
+         white-space: nowrap !important;
+         flex-shrink: 0 !important;
+         min-width: 5rem !important;
+         padding: 0.5rem 1.25rem !important;
+     }
+     
+     /* 筛选表单元素高度统一 */
+     .transactions-container input[type="date"],
+     .transactions-container select {
+         height: 2.5rem !important;
+         min-height: 2.5rem !important;
+         max-height: 2.5rem !important;
+         line-height: 1.5 !important;
+         padding: 0.5rem 1rem !important;
+         box-sizing: border-box !important;
+         border: 1px solid #e5e7eb !important;
+         vertical-align: top !important;
+         -webkit-appearance: none !important;
+         -moz-appearance: none !important;
+         appearance: none !important;
+     }
+     
+     /* 确保下拉菜单箭头不影响高度 */
+     .transactions-container select {
+         background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>') !important;
+         background-repeat: no-repeat !important;
+         background-position: right 0.75rem center !important;
+         background-size: 0.75rem !important;
+         padding-right: 2.5rem !important;
+     }
     
     /* 表格容器优化 */
     .overflow-x-auto {
