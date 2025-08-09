@@ -633,10 +633,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 删除供应商
+    let currentDeleteSupplierId = null;
     document.querySelectorAll('.delete-supplier-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            const supplierId = this.getAttribute('data-id');
+            currentDeleteSupplierId = this.getAttribute('data-id');
             deleteModal.classList.remove('hidden');
         });
     });
@@ -723,9 +724,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (confirmDeleteBtn) {
-        confirmDeleteBtn.addEventListener('click', function() {
-            // 这里执行删除操作
+        confirmDeleteBtn.addEventListener('click', async function() {
+            if (!currentDeleteSupplierId) {
+                alert('删除失败：未找到供应商ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/delete_supplier/${currentDeleteSupplierId}`, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    // 删除成功，刷新页面
+                    window.location.reload();
+                } else {
+                    const text = await response.text();
+                    alert('删除失败：' + text);
+                }
+            } catch (error) {
+                console.error('删除供应商时出错:', error);
+                alert('删除失败：网络错误');
+            }
+            
             deleteModal.classList.add('hidden');
+            currentDeleteSupplierId = null;
         });
     }
 

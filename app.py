@@ -752,9 +752,11 @@ def delete_supplier(id):
     else:
         # 删除供应商图片
         for image in supplier.images:
-            image_path = os.path.join('static', image.image_path)
-            if os.path.exists(image_path):
-                os.remove(image_path)
+            # image.image_path 已经包含了 static/uploads/suppliers/ 前缀
+            if os.path.exists(image.image_path):
+                os.remove(image.image_path)
+            # 同时删除数据库中的图片记录
+            db.session.delete(image)
         
         db.session.delete(supplier)
         db.session.commit()
@@ -914,34 +916,46 @@ def api_upload_supplier_image(id):
     """上传供应商图片"""
     supplier = Supplier.query.get_or_404(id)
     
-    if 'image' not in request.files:
+    # 支持单个文件上传（image字段）和多个文件上传（images字段）
+    files = []
+    if 'images' in request.files:
+        files = request.files.getlist('images')
+    elif 'image' in request.files:
+        files = [request.files['image']]
+    
+    if not files:
         return jsonify({'error': '没有选择文件'}), 400
     
-    file = request.files['image']
-    if file.filename == '':
-        return jsonify({'error': '没有选择文件'}), 400
+    uploaded_images = []
     
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        unique_filename = f"{uuid.uuid4().hex}_{filename}"
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-        file.save(file_path)
-        
-        image_path = f"static/uploads/suppliers/{unique_filename}"
-        supplier_image = SupplierImage(supplier_id=supplier.id, image_path=image_path)
-        db.session.add(supplier_image)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'image': {
+    for file in files:
+        if file.filename == '':
+            continue
+            
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            file.save(file_path)
+            
+            image_path = f"static/uploads/suppliers/{unique_filename}"
+            supplier_image = SupplierImage(supplier_id=supplier.id, image_path=image_path)
+            db.session.add(supplier_image)
+            db.session.commit()
+            
+            uploaded_images.append({
                 'id': supplier_image.id,
                 'path': supplier_image.image_path,
                 'upload_time': supplier_image.upload_time.strftime('%Y-%m-%d %H:%M:%S')
-            }
-        })
+            })
     
-    return jsonify({'error': '不支持的文件格式'}), 400
+    if uploaded_images:
+        return jsonify({
+            'success': True,
+            'images': uploaded_images
+        })
+    else:
+        return jsonify({'error': '没有有效的图片文件或不支持的文件格式'}), 400
 
 @app.route('/api/supplier/<int:supplier_id>/images/<int:image_id>', methods=['DELETE'])
 @edit_required
