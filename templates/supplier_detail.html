@@ -162,7 +162,7 @@ function displaySupplierImages(images) {
     if (images.length === 1) {
         // 单张图片，居中显示
         const image = images[0];
-        const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+        const imagePath = image.path.startsWith('/') ? image.path : `/${image.path}`;
         imagesHtml = `
             <div class="text-center">
                 <img src="${imagePath}" alt="供应商场地照片" 
@@ -176,7 +176,7 @@ function displaySupplierImages(images) {
         // 多张图片，网格显示
         imagesHtml = '<div class="row">';
         images.forEach(image => {
-            const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+            const imagePath = image.path.startsWith('/') ? image.path : `/${image.path}`;
             imagesHtml += `
                 <div class="col-md-6 col-lg-4 mb-3">
                     <div class="position-relative">

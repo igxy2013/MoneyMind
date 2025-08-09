@@ -53,9 +53,9 @@ login_manager.login_view = 'login'
 @login_manager.unauthorized_handler
 def unauthorized():
     # 检查是否是 AJAX 请求
-    if request.headers.get('Accept') == 'application/json':
-        return jsonify({'error': '请先登录才能访问此页面'}), 401
-    flash('请先登录才能访问此页面', 'error')
+    # if request.headers.get('Accept') == 'application/json':
+    #     # return jsonify({'error': '请先登录才能访问此页面'}), 401
+    # # flash('请先登录才能访问此页面', 'error')
     return redirect(url_for('login'))
 
 # 数据模型
@@ -682,7 +682,7 @@ def add_supplier():
                     
                     supplier_image = SupplierImage(
                         supplier_id=supplier.id,
-                        image_path=f"uploads/suppliers/{unique_filename}"
+                        image_path=f"static/uploads/suppliers/{unique_filename}"
                     )
                     db.session.add(supplier_image)
         
@@ -731,7 +731,7 @@ def edit_supplier(id):
                     
                     supplier_image = SupplierImage(
                         supplier_id=supplier.id,
-                        image_path=f"uploads/suppliers/{unique_filename}"
+                        image_path=f"static/uploads/suppliers/{unique_filename}"
                     )
                     db.session.add(supplier_image)
         
@@ -927,7 +927,7 @@ def api_upload_supplier_image(id):
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
         file.save(file_path)
         
-        image_path = f"uploads/suppliers/{unique_filename}"
+        image_path = f"static/uploads/suppliers/{unique_filename}"
         supplier_image = SupplierImage(supplier_id=supplier.id, image_path=image_path)
         db.session.add(supplier_image)
         db.session.commit()

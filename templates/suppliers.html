@@ -431,6 +431,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // 加载供应商数据到模态框
     async function loadSupplierData(supplierId) {
         try {
+            // 重置新图片选择（保持已有图片显示）
+            resetNewImageSelection();
+            
             const response = await fetch(`/api/supplier/${supplierId}`);
             if (response.ok) {
                 const supplier = await response.json();
@@ -587,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
         images.forEach(image => {
             const imageContainer = document.createElement('div');
             imageContainer.className = 'relative group cursor-pointer';
-            const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+            const imagePath = image.path.startsWith('/') ? image.path : `/${image.path}`;
             imageContainer.innerHTML = `
                 <img src="${imagePath}" alt="供应商场地图片" class="w-full h-32 object-cover rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
                 <div class="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-2 py-1 rounded">
@@ -820,7 +823,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 清除当前供应商ID
         window.currentSupplierId = null;
         
-        // 重置图片相关
+        // 重置图片相关（仅用于新增模式）
         resetImageUpload();
     }
     
@@ -930,7 +933,7 @@ document.addEventListener('DOMContentLoaded', function() {
          images.forEach(image => {
              const imageContainer = document.createElement('div');
              imageContainer.className = 'relative group';
-             const imagePath = image.path.startsWith('/') ? image.path : `/static/${image.path}`;
+             const imagePath = image.path.startsWith('/') ? image.path : `/${image.path}`;
              imageContainer.innerHTML = `
                  <img src="${imagePath}" alt="供应商图片" class="w-full h-24 object-cover rounded-lg border border-gray-200">
                  <button type="button" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeExistingImage('${image.id}', this)">
@@ -981,6 +984,15 @@ document.addEventListener('DOMContentLoaded', function() {
         existingImages.classList.add('hidden');
         imagePreviewList.innerHTML = '';
         existingImagesList.innerHTML = '';
+    }
+    
+    // 重置新图片选择（用于编辑模式）
+    function resetNewImageSelection() {
+        supplierImages.value = '';
+        newSelectedFiles = [];
+        imagePreview.classList.add('hidden');
+        imagePreviewList.innerHTML = '';
+        // 注意：不隐藏existingImages，保持已有图片显示
     }
     
     // 拖拽上传功能
