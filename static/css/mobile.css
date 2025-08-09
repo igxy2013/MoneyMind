@@ -1592,17 +1592,43 @@
         padding: 0.375rem 0.75rem !important;
     }
     
-    /* 导出按钮组优化 - 排除导航菜单 */
-    .flex.items-center.space-x-3:not(nav .flex.items-center.space-x-3):not(.nav-item) {
+    /* 导出按钮组优化 - 排除导航菜单和仪表板按钮组 */
+    .flex.items-center.space-x-3:not(nav .flex.items-center.space-x-3):not(.nav-item):not(.bg-gray-100) {
         flex-direction: column !important;
         space-x: 0 !important;
         gap: 0.5rem !important;
         align-items: stretch !important;
     }
     
-    .flex.items-center.space-x-3:not(nav .flex.items-center.space-x-3):not(.nav-item) button {
+    .flex.items-center.space-x-3:not(nav .flex.items-center.space-x-3):not(.nav-item):not(.bg-gray-100) button {
         width: 100% !important;
         justify-content: center !important;
+    }
+    
+    /* 确保仪表板按钮组保持水平布局 */
+    .flex.items-center.bg-gray-100.rounded-xl {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* 仪表板图表容器按钮组强制水平布局并调整样式 */
+    .chart-container .flex.items-center.bg-gray-100.rounded-xl,
+    .charts-grid .flex.items-center.bg-gray-100.rounded-xl {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        display: flex !important;
+        width: fit-content !important;
+        margin-left: auto !important;
+        padding: 0.25rem !important;
+    }
+    
+    .chart-container .flex.items-center.bg-gray-100.rounded-xl button,
+    .charts-grid .flex.items-center.bg-gray-100.rounded-xl button {
+        flex: none !important;
+        width: auto !important;
+        min-width: auto !important;
     }
     
     /* 收支记录页面标题区域优化 */
@@ -2436,12 +2462,39 @@
       }
       
       /* 移动端按钮悬停效果禁用 */
-      .period-btn:hover {
+      .period-btn:hover:not(.bg-primary) {
           background-color: inherit !important;
       }
       
       .period-btn.bg-primary:hover {
-          background-color: var(--primary-color) !important;
+          background-color: var(--primary) !important;
+      }
+      
+      /* 移动端按钮点击状态优化 */
+      .period-btn:active,
+      .period-btn:focus {
+          outline: none !important;
+      }
+      
+      .period-btn.bg-primary:active,
+      .period-btn.bg-primary:focus {
+          background-color: var(--primary) !important;
+          color: white !important;
+      }
+      
+      /* 强制确保选中按钮的样式 */
+      .period-btn.bg-primary {
+          background-color: var(--primary) !important;
+          color: white !important;
+          -webkit-tap-highlight-color: transparent !important;
+      }
+      
+      /* 移动端触摸反馈优化 */
+      .period-btn {
+          -webkit-tap-highlight-color: transparent !important;
+          -webkit-touch-callout: none !important;
+          -webkit-user-select: none !important;
+          user-select: none !important;
       }
      
      /* 仪表板移动端优化 */
