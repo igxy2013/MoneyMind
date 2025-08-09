@@ -11,7 +11,7 @@
 <div class="container mx-auto px-6 py-8 products-container">
 <!-- 页面标题和操作栏 -->
 <div class="mb-8">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between mb-8">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 mb-2">商品管理</h1>
             <p class="text-gray-600">管理商品信息，包括商品分类、库存状态、价格设置等核心数据</p>
@@ -241,6 +241,30 @@
         </div>
         
         <form id="productForm" class="space-y-8">
+            <!-- 隐藏字段标记图片删除状态 -->
+            <input type="hidden" id="removeImageFlag" name="remove_image" value="0">
+            
+            <!-- 商品图片 -->
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">商品图片</h4>
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl p-8 hover:border-primary transition-colors cursor-pointer" id="imageUploadArea">
+                    <i class="fas fa-image text-3xl text-gray-400 mb-2"></i>
+                    <p class="text-sm text-gray-500 mb-2">点击上传或拖拽图片到此处</p>
+                    <p class="text-xs text-gray-400">支持 JPG、PNG、GIF 格式，最大 5MB</p>
+                    <input type="file" id="productImage" name="image" accept="image/*" class="hidden">
+                </div>
+                <!-- 图片预览区域 -->
+                <div id="imagePreview" class="mt-4 hidden">
+                    <div class="text-sm text-gray-600 mb-2">图片预览：</div>
+                    <div id="imagePreviewContainer" class="relative inline-block">
+                        <img id="previewImage" src="" alt="商品图片预览" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                        <button type="button" id="removeImage" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 基本信息 -->
             <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
                 <h4 class="text-lg font-semibold text-gray-900 mb-4">基本信息</h4>
@@ -277,40 +301,7 @@
                     <textarea id="productDescription" rows="3" class="w-full px-4 py-3 bg-white/80 border border-gray-200 rounded-button focus:outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 resize-none"></textarea>
                 </div>
                 
-                <!-- 商品图片上传 -->
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">商品图片</label>
-                    <div class="flex items-start space-x-4">
-                        <!-- 图片预览区域 -->
-                        <div id="imagePreview" class="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border-2 border-dashed border-gray-300">
-                            <div id="previewPlaceholder" class="text-center">
-                                <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
-                                <div class="text-xs text-gray-500">暂无图片</div>
-                            </div>
-                            <img id="previewImage" src="" alt="商品预览" class="w-full h-full object-cover hidden">
-                        </div>
-                        
-                        <!-- 上传控制区域 -->
-                        <div class="flex-1">
-                            <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-primary/50 transition-colors cursor-pointer" id="uploadArea">
-                                <input type="file" id="productImage" name="image" accept="image/*" class="hidden">
-                                <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-3"></i>
-                                <div class="text-sm text-gray-600 mb-2">点击上传商品图片</div>
-                                <div class="text-xs text-gray-500">支持 JPG、PNG、GIF 格式，文件大小不超过 5MB</div>
-                            </div>
-                            
-                            <!-- 图片操作按钮 -->
-                            <div class="flex items-center space-x-2 mt-3">
-                                <button type="button" id="changeImageBtn" class="px-3 py-2 text-xs bg-blue-100 text-blue-700 rounded-button hover:bg-blue-200 transition-colors hidden">
-                                    <i class="fas fa-exchange-alt mr-1"></i>更换图片
-                                </button>
-                                <button type="button" id="removeImageBtn" class="px-3 py-2 text-xs bg-red-100 text-red-700 rounded-button hover:bg-red-200 transition-colors hidden">
-                                    <i class="fas fa-trash mr-1"></i>删除图片
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- 商品图片已在上方单独区域设置 -->
             </div>
             
             <!-- 价格设置 -->
@@ -564,6 +555,21 @@ document.addEventListener('DOMContentLoaded', function() {
         productModal.classList.remove('hidden');
     });
     
+    // 图片处理相关变量定义
+    const imageUploadArea = document.getElementById('imageUploadArea');
+    const productImage = document.getElementById('productImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+    const removeImage = document.getElementById('removeImage');
+    
+    // 重置图片预览函数
+    function resetImagePreview() {
+        imagePreview.classList.add('hidden');
+        previewImage.src = '';
+        productImage.value = '';
+        document.getElementById('removeImageFlag').value = '0';
+    }
+    
     // 编辑商品
     document.querySelectorAll('.edit-product-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -588,9 +594,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     // 设置编辑模式
                     productForm.setAttribute('data-edit-id', productId);
                     
-                    // 如果有图片，显示预览
+                    // 处理商品图片
                     if (data.image_path) {
-                        showImagePreview('/static/' + data.image_path.replace(/^\//, ''));
+                        previewImage.src = `/static/${data.image_path}`;
+                        imagePreview.classList.remove('hidden');
+                        document.getElementById('removeImageFlag').value = '0';
                     } else {
                         resetImagePreview();
                     }
@@ -608,9 +616,105 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.view-detail-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
+            const productId = this.getAttribute('data-product-id');
+            loadProductDetail(productId);
             productDetailModal.classList.remove('hidden');
         });
     });
+    
+    // 加载商品详情数据
+    async function loadProductDetail(productId) {
+        try {
+            const response = await fetch(`/api/product/${productId}`);
+            if (response.ok) {
+                const product = await response.json();
+                
+                // 更新商品图片
+                const productImage = document.querySelector('#productDetailModal .w-32.h-32 img');
+                if (product.image_path) {
+                    productImage.src = `/static/${product.image_path.replace(/^\//, '')}`;
+                    productImage.alt = product.name;
+                } else {
+                    productImage.src = '{{ url_for("static", filename="logo.png") }}';
+                    productImage.alt = '商品图片';
+                }
+                
+                // 更新商品信息
+                const infoGrid = document.querySelector('#productDetailModal .grid');
+                const categoryMap = {
+                    'fresh-fruit': '新鲜水果',
+                    'dried-fruit': '干果坚果',
+                    'fruit-juice': '果汁饮品',
+                    'fruit-snack': '果脯零食'
+                };
+                
+                infoGrid.innerHTML = `
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">商品名称</div>
+                        <div class="font-semibold text-gray-900">${product.name || '-'}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">商品编号</div>
+                        <div class="font-semibold text-gray-900">${product.code || '-'}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">商品分类</div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            ${categoryMap[product.category] || product.category || '未分类'}
+                        </span>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">售价</div>
+                        <div class="font-semibold text-gray-900">${product.selling_price ? '¥ ' + product.selling_price.toFixed(2) + '/' + (product.unit || '件') : '未设置'}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">成本价</div>
+                        <div class="font-semibold text-gray-900">${product.cost_price ? '¥ ' + product.cost_price.toFixed(2) + '/' + (product.unit || '件') : '未设置'}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">商品状态</div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${product.is_active ? '在售' : '下架'}
+                        </span>
+                    </div>
+                `;
+                
+                // 更新商品描述
+                const descriptionDiv = document.querySelector('#productDetailModal .mt-4 .text-gray-900');
+                descriptionDiv.textContent = product.description || '暂无描述';
+                
+                // 更新库存统计
+                const stockGrid = document.querySelector('#productDetailModal .bg-gradient-to-r.from-green-50 .grid');
+                const stockStatus = product.stock > 50 ? '充足' : product.stock > 10 ? '不足' : '告急';
+                const stockColor = product.stock > 50 ? 'green' : product.stock > 10 ? 'orange' : 'red';
+                
+                stockGrid.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-${stockColor}-600 mb-1">${product.stock || 0} ${product.unit || '件'}</div>
+                        <div class="text-sm text-gray-600">当前库存</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-orange-600 mb-1">${product.min_stock || 10} ${product.unit || '件'}</div>
+                        <div class="text-sm text-gray-600">最低库存</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600 mb-1">${product.max_stock || 1000} ${product.unit || '件'}</div>
+                        <div class="text-sm text-gray-600">最高库存</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-${stockColor}-600 mb-1">${stockStatus}</div>
+                        <div class="text-sm text-gray-600">库存状态</div>
+                    </div>
+                `;
+                
+            } else {
+                alert('获取商品详情失败');
+            }
+        } catch (error) {
+            console.error('获取商品详情时出错:', error);
+            alert('获取商品详情时出错，请重试');
+        }
+    }
     
     // 库存管理
     document.querySelectorAll('.stock-manage-btn').forEach(btn => {
@@ -710,6 +814,10 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('image', imageFile);
         }
         
+        // 添加图片删除标记
+        const removeImageFlag = document.getElementById('removeImageFlag').value;
+        formData.append('remove_image', removeImageFlag);
+        
         // 显示加载状态
         const submitBtn = productForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
@@ -756,6 +864,52 @@ document.addEventListener('DOMContentLoaded', function() {
         // 这里添加库存操作逻辑
         stockModal.classList.add('hidden');
     });
+    
+    // 图片处理功能
+    
+    // 图片上传区域点击事件
+    imageUploadArea.addEventListener('click', function() {
+        productImage.click();
+    });
+    
+    // 图片文件选择处理
+    productImage.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // 验证文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件');
+                return;
+            }
+            
+            // 验证文件大小 (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('图片大小不能超过5MB');
+                return;
+            }
+            
+            // 预览图片
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+                // 重置删除标记
+                document.getElementById('removeImageFlag').value = '0';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // 移除图片按钮
+    removeImage.addEventListener('click', function() {
+        imagePreview.classList.add('hidden');
+        previewImage.src = '';
+        productImage.value = '';
+        // 设置删除标记
+        document.getElementById('removeImageFlag').value = '1';
+    });
+    
+    // 重置图片预览函数已在前面定义
     
     // 全选功能
     selectAll.addEventListener('change', function() {
@@ -829,104 +983,32 @@ document.addEventListener('DOMContentLoaded', function() {
     categoryFilter.addEventListener('change', filterProducts);
     stockFilter.addEventListener('change', filterProducts);
     
-    // 图片上传功能
-    const uploadArea = document.getElementById('uploadArea');
-    const productImageInput = document.getElementById('productImage');
-    const imagePreview = document.getElementById('imagePreview');
-    const previewImage = document.getElementById('previewImage');
-    const previewPlaceholder = document.getElementById('previewPlaceholder');
-    const changeImageBtn = document.getElementById('changeImageBtn');
-    const removeImageBtn = document.getElementById('removeImageBtn');
+    // 第二个图片上传区域相关的JavaScript代码已删除，因为对应的HTML元素已被移除
     
-    // 点击上传区域触发文件选择
-    uploadArea.addEventListener('click', () => {
-        productImageInput.click();
-    });
-    
-    // 更换图片按钮
-    changeImageBtn.addEventListener('click', () => {
-        productImageInput.click();
-    });
-    
-    // 删除图片按钮
-    removeImageBtn.addEventListener('click', () => {
-        resetImagePreview();
-    });
-    
-    // 文件选择处理
-    productImageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // 验证文件类型
-            if (!file.type.startsWith('image/')) {
-                alert('请选择图片文件！');
-                return;
-            }
-            
-            // 验证文件大小（5MB）
-            if (file.size > 5 * 1024 * 1024) {
-                alert('图片文件大小不能超过5MB！');
-                return;
-            }
-            
-            // 预览图片
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                showImagePreview(e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    // 显示图片预览
-    function showImagePreview(src) {
-        previewImage.src = src;
-        previewImage.classList.remove('hidden');
-        previewPlaceholder.classList.add('hidden');
-        changeImageBtn.classList.remove('hidden');
-        removeImageBtn.classList.remove('hidden');
-        imagePreview.classList.remove('border-dashed');
-        imagePreview.classList.add('border-solid');
-    }
-    
-    // 重置图片预览
-    function resetImagePreview() {
-        previewImage.src = '';
-        previewImage.classList.add('hidden');
-        previewPlaceholder.classList.remove('hidden');
-        changeImageBtn.classList.add('hidden');
-        removeImageBtn.classList.add('hidden');
-        imagePreview.classList.add('border-dashed');
-        imagePreview.classList.remove('border-solid');
-        productImageInput.value = '';
-    }
-    
-    // 拖拽上传功能
-    uploadArea.addEventListener('dragover', function(e) {
+    // 为第一个图片上传区域添加拖拽上传功能
+    imageUploadArea.addEventListener('dragover', function(e) {
         e.preventDefault();
-        uploadArea.classList.add('border-primary');
+        imageUploadArea.classList.add('border-primary');
     });
     
-    uploadArea.addEventListener('dragleave', function(e) {
+    imageUploadArea.addEventListener('dragleave', function(e) {
         e.preventDefault();
-        uploadArea.classList.remove('border-primary');
+        imageUploadArea.classList.remove('border-primary');
     });
     
-    uploadArea.addEventListener('drop', function(e) {
+    imageUploadArea.addEventListener('drop', function(e) {
         e.preventDefault();
-        uploadArea.classList.remove('border-primary');
+        imageUploadArea.classList.remove('border-primary');
         
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             const file = files[0];
             if (file.type.startsWith('image/')) {
                 if (file.size <= 5 * 1024 * 1024) {
-                    productImageInput.files = files;
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        showImagePreview(e.target.result);
-                    };
-                    reader.readAsDataURL(file);
+                    productImage.files = files;
+                    // 触发change事件来处理图片预览
+                    const event = new Event('change', { bubbles: true });
+                    productImage.dispatchEvent(event);
                 } else {
                     alert('图片文件大小不能超过5MB！');
                 }

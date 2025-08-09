@@ -1074,12 +1074,28 @@ def edit_product(id):
             product.description = request.form['description']
             product.is_active = request.form.get('is_active') == '1'
             
+            # 检查是否需要删除图片
+            remove_image = request.form.get('remove_image') == '1'
+            print(f"Debug: remove_image = {remove_image}, product.image_path = {product.image_path}")
+            if remove_image and product.image_path:
+                # 删除旧图片文件
+                old_image_path = os.path.join('static', product.image_path.lstrip('/'))
+                print(f"Debug: 尝试删除图片文件: {old_image_path}")
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+                    print(f"Debug: 成功删除图片文件: {old_image_path}")
+                else:
+                    print(f"Debug: 图片文件不存在: {old_image_path}")
+                # 清空数据库中的图片路径
+                product.image_path = None
+                print(f"Debug: 已清空数据库中的图片路径")
+            
             # 处理图片上传
             if 'image' in request.files:
                 file = request.files['image']
                 if file and file.filename != '' and allowed_file(file.filename):
-                    # 删除旧图片
-                    if product.image_path:
+                    # 删除旧图片（如果存在且未被上面的删除逻辑处理）
+                    if product.image_path and not remove_image:
                         old_image_path = os.path.join('static', product.image_path.lstrip('/'))
                         if os.path.exists(old_image_path):
                             os.remove(old_image_path)
