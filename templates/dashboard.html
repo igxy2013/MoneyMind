@@ -4,34 +4,153 @@
 
 {% block extra_head %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/mobile.css') }}" rel="stylesheet">
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
+
+/* 移动端仪表板优化 */
+@media (max-width: 768px) {
+    /* 头部区域优化 */
+    .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .dashboard-header .flex {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    /* 按钮组优化 */
+    .button-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        width: 100%;
+    }
+    
+    .button-group > div {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .button-group .bg-white\/60 {
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+    }
+    
+    .button-group a {
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        justify-content: center;
+    }
+    
+    /* 统计卡片优化 */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-card .text-2xl {
+        font-size: 1.5rem;
+    }
+    
+    /* 图表区域优化 */
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .chart-container {
+        padding: 1rem;
+    }
+    
+    .chart-container h3 {
+        font-size: 1rem;
+    }
+    
+    /* 表格优化 */
+    .table-container {
+        padding: 1rem;
+    }
+    
+    .mobile-table {
+        display: block;
+    }
+    
+    .desktop-table {
+        display: none;
+    }
+    
+    .transaction-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .transaction-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .transaction-amount {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .transaction-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-table {
+        display: none;
+    }
+    
+    .desktop-table {
+        display: block;
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="max-w-7xl mx-auto">
-<div class="flex items-center justify-between mb-8">
+<div class="max-w-7xl mx-auto px-2 sm:px-4">
+<div class="dashboard-header mb-6 sm:mb-8">
+<div class="flex items-start justify-between mb-2">
 <div>
-<h1 class="text-3xl font-bold text-gray-900 mb-2">仪表板</h1>
-<p class="text-gray-600">经营数据概览与分析</p>
+<h1 class="text-2xl sm:text-3xl font-bold text-gray-900 text-left">仪表板</h1>
+<p class="text-gray-600 text-sm sm:text-base mt-1">经营数据概览与分析</p>
+
 </div>
-<div class="flex items-center space-x-4">
-<div class="flex items-center bg-white/60 backdrop-blur-lg rounded-xl border border-white/20 px-1 py-1">
-<button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="monthBtn">本月</button>
-<button class="px-4 py-2 text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="yearBtn">本年</button>
-</div>
-<a href="{{ url_for('add_transaction') }}" class="px-6 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors font-medium flex items-center space-x-2">
-<div class="w-4 h-4 flex items-center justify-center">
-<i class="ri-add-line"></i>
-</div>
-<span>添加收支</span>
-</a>
+<div class="button-group flex items-center justify-end ml-auto bg-gray-100 rounded-xl">
+<button class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="monthBtn">本月</button>
+<button class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="yearBtn">本年</button>
 </div>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+</div>
+</div>
+<div class="stats-grid grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+<div class="stat-card bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
 <div class="flex items-center justify-between mb-4">
 <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
 <div class="w-6 h-6 flex items-center justify-center">
@@ -47,7 +166,7 @@
 <div class="text-gray-600 text-sm">本月收入总额</div>
 </div>
 
-<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="stat-card bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
 <div class="flex items-center justify-between mb-4">
 <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
 <div class="w-6 h-6 flex items-center justify-center">
@@ -63,7 +182,7 @@
 <div class="text-gray-600 text-sm">本月支出总额</div>
 </div>
 
-<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="stat-card bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
 <div class="flex items-center justify-between mb-4">
 <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
 <div class="w-6 h-6 flex items-center justify-center">
@@ -79,7 +198,7 @@
 <div class="text-gray-600 text-sm">本月利润</div>
 </div>
 
-<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
+<div class="stat-card bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
 <div class="flex items-center justify-between mb-4">
 <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
 <div class="w-6 h-6 flex items-center justify-center">
@@ -95,37 +214,39 @@
 <div class="text-gray-600 text-sm">现金余额</div>
 </div>
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
-<div class="flex items-center justify-between mb-6">
-<h3 class="text-lg font-semibold text-gray-900">收支趋势</h3>
+<div class="charts-grid grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
+<div class="chart-container bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
+<div class="flex items-center justify-between mb-4 sm:mb-6">
+<h3 class="text-base sm:text-lg font-semibold text-gray-900">收支趋势</h3>
 <div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
-<button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="trendMonthBtn">月度</button>
-<button class="px-3 py-1 text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="trendYearBtn">年度</button>
+<button class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="trendMonthBtn">月度</button>
+<button class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="trendYearBtn">年度</button>
 </div>
 </div>
-<div id="trendChart" class="h-80"></div>
+<div id="trendChart" class="h-64 sm:h-80"></div>
 </div>
 
-<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6">
-<div class="flex items-center justify-between mb-6">
-<h3 class="text-lg font-semibold text-gray-900">收支构成</h3>
-<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1 ">
-<button class="px-3 py-1 text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="pieIncomeBtn">收入</button>
-<button class="px-3 py-1 text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="pieExpenseBtn">支出</button>
+<div class="chart-container bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
+<div class="flex items-center justify-between mb-4 sm:mb-6">
+<h3 class="text-base sm:text-lg font-semibold text-gray-900">收支构成</h3>
+<div class="flex items-center bg-gray-100 rounded-xl px-1 py-1">
+<button class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-white bg-primary rounded-button transition-colors whitespace-nowrap" id="pieIncomeBtn">收入</button>
+<button class="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-gray-600  transition-colors whitespace-nowrap rounded-button" id="pieExpenseBtn">支出</button>
 </div>
 </div>
-<div id="pieChart" class="h-80"></div>
+<div id="pieChart" class="h-64 sm:h-80"></div>
 </div>
 </div>
 
 <!-- 交易记录表格 -->
-<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
-<div class="flex items-center justify-between mb-6">
-<h3 class="text-lg font-semibold text-gray-900">最近交易记录</h3>
-<a href="{{ url_for('add_transaction') }}" class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors text-sm font-medium">添加收支</a>
+<div class="table-container bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6 mb-6 sm:mb-8">
+<div class="flex items-center justify-between mb-4 sm:mb-6">
+<h3 class="text-base sm:text-lg font-semibold text-gray-900">最近交易记录</h3>
+<a href="{{ url_for('add_transaction') }}" class="px-3 sm:px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors text-xs sm:text-sm font-medium">添加收支</a>
 </div>
-<div class="overflow-x-auto">
+
+<!-- 桌面端表格 -->
+<div class="desktop-table overflow-x-auto">
 <table class="w-full">
 <thead>
 <tr class="border-b border-gray-200">
@@ -167,10 +288,46 @@
 </tbody>
 </table>
 </div>
-<div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-<div class="text-sm text-gray-600">显示最近 {{ recent_transactions|length }} 条交易记录</div>
+
+<!-- 移动端卡片布局 -->
+<div class="mobile-table">
+{% for transaction in recent_transactions %}
+<div class="transaction-card">
+<div class="transaction-header">
 <div class="flex items-center space-x-2">
-<a href="{{ url_for('transactions') }}" class="px-3 py-2 text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button">查看全部</a>
+{% if transaction.type == 'income' %}
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">收入</span>
+{% else %}
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">支出</span>
+{% endif %}
+<span class="text-sm text-gray-600">{{ transaction.date.strftime('%m-%d') }}</span>
+</div>
+<div class="transaction-amount {% if transaction.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+{% if transaction.type == 'income' %}+{% else %}-{% endif %}¥{{ "%.2f"|format(transaction.amount) }}
+</div>
+</div>
+<div class="transaction-details">
+<div>
+<span class="text-gray-500">分类:</span>
+<span>{{ transaction.category.name if transaction.category else '-' }}</span>
+</div>
+<div>
+<span class="text-gray-500">支付:</span>
+<span>{{ transaction.payment_method or '-' }}</span>
+</div>
+<div class="col-span-2">
+<span class="text-gray-500">备注:</span>
+<span>{{ transaction.description or '-' }}</span>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+
+<div class="flex items-center justify-between mt-4 sm:mt-6 pt-4 border-t border-gray-200">
+<div class="text-xs sm:text-sm text-gray-600">显示最近 {{ recent_transactions|length }} 条交易记录</div>
+<div class="flex items-center space-x-2">
+<a href="{{ url_for('transactions') }}" class="px-3 py-2 text-xs sm:text-sm text-gray-600 hover:text-primary transition-colors whitespace-nowrap rounded-button">查看全部</a>
 </div>
 </div>
 </div>
@@ -352,6 +509,13 @@ trendMonthBtn.addEventListener('click', () => toggleTrendPeriod(trendMonthBtn, t
 trendYearBtn.addEventListener('click', () => toggleTrendPeriod(trendYearBtn, trendMonthBtn, yearData));
 
 updateTrendChart(monthData);
+
+// 响应式图表调整
+window.addEventListener('resize', function() {
+    if (trendChart) {
+        trendChart.resize();
+    }
+});
 });
 </script>
 
@@ -477,7 +641,20 @@ pieExpenseBtn.addEventListener('click', () => togglePieType(pieExpenseBtn, pieIn
 // 初始化显示收入数据
 const initialData = getCurrentData('income', 'month');
 updatePieChart(initialData);
+
+// 响应式图表调整
+window.addEventListener('resize', function() {
+    if (pieChart) {
+        pieChart.resize();
+    }
+});
 });
 </script>
+
+<!-- 悬浮添加按钮 -->
+<a href="{{ url_for('add_transaction') }}" class="fab-button fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 group">
+    <i class="ri-add-line text-xl group-hover:rotate-90 transition-transform duration-300"></i>
+    <span class="sr-only">添加收支</span>
+</a>
 
 {% endblock %}
