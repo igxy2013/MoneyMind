@@ -29,3 +29,4 @@ ENV/
 *.tmp
 *.temp
 __pycache__/app.cpython-312.pyc
+__pycache__/app.cpython-312.pyc
