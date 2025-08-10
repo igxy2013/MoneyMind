@@ -3,7 +3,7 @@
 {% block title %}收支记录 - 七彩果坊经营管理系统{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-6 py-8 transactions-container">
+<div class="container mx-auto px-6 py-8 transactions-container{% if current_user.role == 'employee' %} employee-role{% endif %}">
 
 <!-- 页面标题 -->
 <div class="flex items-center justify-between mb-8">
@@ -101,11 +101,6 @@
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-gray-200">
-                            {% if current_user.role != 'employee' %}
-                            <th class="text-left py-3 px-4 font-medium text-gray-700">
-                                <input type="checkbox" id="selectAll" class="rounded text-primary focus:ring-primary/20">
-                            </th>
-                            {% endif %}
                             <th class="text-left py-3 px-4 font-medium text-gray-700">交易日期</th>
                             <th class="text-left py-3 px-4 font-medium text-gray-700">交易类型</th>
                             <th class="text-left py-3 px-4 font-medium text-gray-700">分类</th>
@@ -120,11 +115,6 @@
                     <tbody>
                         {% for transaction in transactions.items %}
                         <tr class="border-b border-gray-100 hover:bg-gray-50/50">
-                            {% if current_user.role != 'employee' %}
-                            <td class="py-3 px-4">
-                                <input type="checkbox" class="transaction-checkbox rounded text-primary focus:ring-primary/20" data-id="{{ transaction.id }}">
-                            </td>
-                            {% endif %}
                             <td class="py-3 px-4 text-gray-900">{{ transaction.date.strftime('%Y-%m-%d') }}</td>
                             <td class="py-3 px-4">
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {% if transaction.type == 'income' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
@@ -165,14 +155,9 @@
                 </table>
             </div>
             
-            <!-- 分页和批量操作 -->
+            <!-- 分页 -->
             <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
                 <div class="flex items-center space-x-4">
-                    {% if current_user.role != 'employee' %}
-                    <div class="text-sm text-gray-600" id="selectedCount">已选择 0 项</div>
-                    <button class="text-sm text-red-600 hover:text-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed" 
-                            id="batchDeleteBtn" disabled onclick="batchDeleteTransactions()">批量删除</button>
-                    {% endif %}
                     {% if transactions.pages > 1 %}
                     <div class="text-sm text-gray-600">显示 {{ (transactions.page - 1) * transactions.per_page + 1 }}-{{ transactions.page * transactions.per_page if transactions.page * transactions.per_page < transactions.total else transactions.total }} 条，共 {{ transactions.total }} 条记录</div>
                     {% endif %}

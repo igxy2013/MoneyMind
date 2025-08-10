@@ -475,6 +475,301 @@
          appearance: none !important;
      }
      
+     /* 编辑收支记录页面表单元素高度统一 */
+     .w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl {
+         height: 48px !important;
+         min-height: 48px !important;
+         padding: 12px 16px !important;
+         box-sizing: border-box !important;
+         display: flex !important;
+         align-items: center !important;
+     }
+     
+     /* 编辑页面日期输入框特殊处理 - 更高优先级 */
+     form input[type="date"].w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl,
+     div input[type="date"].w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl,
+     input[type="date"].w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl {
+         height: 48px !important;
+         min-height: 48px !important;
+         padding: 12px 16px !important;
+         line-height: 1.5 !important;
+         width: 100% !important;
+         max-width: 250px !important;
+         box-sizing: border-box !important;
+         flex-shrink: 1 !important;
+     }
+     
+     /* 网格布局中的日期输入框宽度调整 - 更高优先级 */
+     .grid div input[type="date"].w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl,
+     .grid input[type="date"].w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl {
+         width: 100% !important;
+         max-width: 250px !important;
+         min-width: 0 !important;
+         flex: 1 !important;
+     }
+     
+     /* 强制日期输入框宽度 - 最高优先级 */
+     #date {
+         max-width: 250px !important;
+         width: 100% !important;
+     }
+     
+     /* 移动端响应式调整 */
+     @media (max-width: 768px) {
+         input[type="date"] {
+             max-width: 200px !important;
+         }
+         #date {
+             max-width: 200px !important;
+         }
+     }
+     
+     /* 金额输入框特殊处理 - 带左侧图标 */
+     input[type="number"].w-full.pl-8.pr-4.py-3.bg-white.border.border-gray-200.rounded-xl {
+         height: 48px !important;
+         min-height: 48px !important;
+         padding: 12px 32px 12px 32px !important;
+         line-height: 1.5 !important;
+         width: 100% !important;
+         max-width: 100% !important;
+         box-sizing: border-box !important;
+     }
+     
+     /* 确保所有表单输入框宽度一致 */
+     .w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl,
+     select.w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl,
+     input.w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl,
+     input.w-full.pl-8.pr-4.py-3.bg-white.border.border-gray-200.rounded-xl,
+     textarea.w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl {
+         width: 100% !important;
+         max-width: 100% !important;
+         min-width: 0 !important;
+         box-sizing: border-box !important;
+         height: 48px !important;
+         min-height: 48px !important;
+     }
+     
+     /* textarea特殊处理 - 允许多行 */
+     textarea.w-full.px-4.py-3.bg-white.border.border-gray-200.rounded-xl {
+         height: auto !important;
+         min-height: 96px !important;
+     }
+     
+     /* 网格布局中的表单元素宽度统一 */
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div {
+         width: 100% !important;
+         max-width: 100% !important;
+     }
+     
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div > input,
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div > select,
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div > textarea,
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div > .relative > input,
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div > .relative > select {
+         width: 100% !important;
+         max-width: 100% !important;
+         box-sizing: border-box !important;
+         height: 48px !important;
+         min-height: 48px !important;
+     }
+     
+     /* textarea在网格中的特殊处理 */
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div > textarea,
+     .grid.grid-cols-1.md\:grid-cols-2.gap-8 > div > .relative > textarea {
+         height: auto !important;
+         min-height: 96px !important;
+     }
+     
+     /* 添加收支页面表单布局优化 - 与编辑页面保持一致 */
+     #addRecordForm .grid.grid-cols-1.md\:grid-cols-2.gap-8 {
+         grid-template-columns: 1fr !important;
+         gap: 1.5rem !important;
+     }
+     
+     /* 添加收支页面表单元素统一样式 */
+     #addRecordForm input[type="date"] {
+         width: 100% !important;
+         max-width: 200px !important;
+         height: 48px !important;
+         min-height: 48px !important;
+         padding: 12px 16px !important;
+         box-sizing: border-box !important;
+         border: 1px solid #e5e7eb !important;
+         border-radius: 0.75rem !important;
+         background-color: white !important;
+         font-size: 14px !important;
+     }
+     
+     #addRecordForm input[type="number"],
+     #addRecordForm select,
+     #addRecordForm textarea {
+         width: 100% !important;
+         max-width: 100% !important;
+         height: 48px !important;
+         min-height: 48px !important;
+         padding: 12px 16px !important;
+         box-sizing: border-box !important;
+         border: 1px solid #e5e7eb !important;
+         border-radius: 0.75rem !important;
+         background-color: white !important;
+         font-size: 14px !important;
+     }
+     
+     /* 添加收支页面日期输入框特殊处理 - 确保与其他输入框一致 */
+    #addRecordForm #date {
+        width: 100% !important;
+        max-width: 320px !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        padding: 12px 16px !important;
+        box-sizing: border-box !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 0.75rem !important;
+        background-color: white !important;
+        font-size: 14px !important;
+    }
+     
+     /* 添加收支页面金额输入框特殊处理 */
+     #addRecordForm input[type="number"].pl-8 {
+         padding-left: 32px !important;
+         padding-right: 16px !important;
+     }
+     
+     /* 添加收支页面textarea特殊处理 */
+     #addRecordForm textarea {
+         height: auto !important;
+         min-height: 96px !important;
+         resize: none !important;
+     }
+     
+     /* 添加收支页面单选框容器优化 */
+     #addRecordForm .flex.space-x-4 {
+         display: flex !important;
+         flex-direction: row !important;
+         align-items: left !important;
+     }
+     
+     /* 添加收支页面单选框标签优化 */
+     #addRecordForm .flex.items-center.space-x-3.cursor-pointer {
+         display: flex !important;
+         flex-direction: row !important;
+         align-items: left !important;
+         cursor: pointer !important;
+     }
+     
+     /* 移动端响应式调整 - 添加收支页面 */
+     @media (max-width: 768px) {
+         #addRecordForm .grid.grid-cols-1.md\:grid-cols-2.gap-8 {
+             gap: 1rem !important;
+         }
+     }
+     
+     /* 编辑收支页面表单布局优化 - 与添加页面保持一致 */
+     #editRecordForm .grid.grid-cols-1.md\:grid-cols-2.gap-8 {
+         grid-template-columns: 1fr !important;
+         gap: 1.5rem !important;
+     }
+     
+     /* 编辑收支页面表单元素统一样式 */
+     #editRecordForm input[type="date"],
+     #editRecordForm input[type="number"],
+     #editRecordForm select,
+     #editRecordForm textarea {
+         width: 100% !important;
+         max-width: 100% !important;
+         height: 48px !important;
+         min-height: 48px !important;
+         padding: 12px 16px !important;
+         box-sizing: border-box !important;
+         border: 1px solid #e5e7eb !important;
+         border-radius: 0.75rem !important;
+         background-color: white !important;
+         font-size: 14px !important;
+     }
+     
+     /* 编辑收支页面日期输入框特殊处理 - 确保与其他输入框一致 */
+     #editRecordForm #date {
+         width: 100% !important;
+         max-width: 320px !important;
+         height: 48px !important;
+         min-height: 48px !important;
+         padding: 12px 16px !important;
+         box-sizing: border-box !important;
+         border: 1px solid #e5e7eb !important;
+         border-radius: 0.75rem !important;
+         background-color: white !important;
+         font-size: 14px !important;
+     }
+     
+     /* 编辑收支页面金额输入框特殊处理 */
+     #editRecordForm input[type="number"].pl-8 {
+         padding-left: 32px !important;
+         padding-right: 16px !important;
+     }
+     
+     /* 编辑收支页面textarea特殊处理 */
+     #editRecordForm textarea {
+         height: auto !important;
+         min-height: 96px !important;
+         resize: none !important;
+     }
+     
+     /* 编辑收支页面单选框容器优化 */
+     #editRecordForm .flex.space-x-4 {
+         display: flex !important;
+         flex-direction: row !important;
+         gap: 8px !important;
+         align-items: center !important;
+     }
+     
+     /* 编辑收支页面单选框标签优化 */
+     #editRecordForm .flex.items-center.space-x-3.cursor-pointer {
+         display: flex !important;
+         flex-direction: row !important;
+         align-items: center !important;
+         gap: 6px !important;
+         cursor: pointer !important;
+     }
+     
+     /* 移动端响应式调整 - 编辑收支页面 */
+     @media (max-width: 768px) {
+         #editRecordForm .grid.grid-cols-1.md\:grid-cols-2.gap-8 {
+             gap: 1rem !important;
+         }
+     }
+     
+     /* 编辑页面单选框容器优化 */
+     .flex.space-x-4 {
+         display: flex !important;
+         flex-direction: row !important;
+         gap: 8px !important;
+         align-items: center !important;
+     }
+     
+     /* 编辑页面单选框标签优化 */
+     .flex.items-center.space-x-3.cursor-pointer {
+         display: flex !important;
+         flex-direction: row !important;
+         align-items: center !important;
+         gap: 6px !important;
+         cursor: pointer !important;
+     }
+     
+     /* 编辑页面单选框文字样式 */
+     .flex.items-center.space-x-3.cursor-pointer span {
+         font-size: 14px !important;
+         font-weight: 500 !important;
+         color: #374151 !important;
+         white-space: nowrap !important;
+         order: 2 !important;
+     }
+     
+     /* 编辑页面单选框图标容器 */
+     .flex.items-center.space-x-3.cursor-pointer .relative {
+         order: 1 !important;
+         flex-shrink: 0 !important;
+     }
+     
      /* 确保下拉菜单箭头不影响高度 */
      .transactions-container select {
          background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>') !important;
@@ -493,12 +788,100 @@
     table {
         font-size: 0.75rem !important;
         min-width: 600px !important;
+        table-layout: fixed !important;
     }
     
     table th,
     table td {
         padding: 0.5rem 0.25rem !important;
         white-space: nowrap !important;
+    }
+    
+    /* 移动端表格列宽优化 */
+    .transactions-container table {
+        width: 100% !important;
+    }
+    
+    /* 日期列 */
+    .transactions-container table th:nth-child(1),
+    .transactions-container table td:nth-child(1) {
+        width: 70px !important;
+        max-width: 70px !important;
+        padding: 0.5rem 0.2rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    /* 交易类型列 */
+    .transactions-container table th:nth-child(2),
+    .transactions-container table td:nth-child(2) {
+        width: 50px !important;
+        max-width: 50px !important;
+        padding: 0.5rem 0.15rem 0.5rem 0.3rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    /* 分类列紧凑显示 */
+    .transactions-container table th:nth-child(3),
+    .transactions-container table td:nth-child(3) {
+        width: 55px !important;
+        max-width: 55px !important;
+        padding: 0.5rem 0.15rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    /* 金额列紧凑显示 */
+    .transactions-container table th:nth-child(4),
+    .transactions-container table td:nth-child(4) {
+        width: 65px !important;
+        max-width: 65px !important;
+        padding: 0.5rem 0.15rem !important;
+        font-size: 0.7rem !important;
+        text-align: right !important;
+    }
+    
+    /* 操作列 */
+    .transactions-container table th:nth-child(6),
+    .transactions-container table td:nth-child(6) {
+        width: 40px !important;
+        max-width: 40px !important;
+        padding: 0.15rem 0.15rem !important;
+    }
+    
+    /* 备注列允许换行显示 */
+    .transactions-container table td:nth-child(5) {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        word-break: break-all !important;
+        width: auto !important;
+        min-width: 80px !important;
+        line-height: 1.3 !important;
+        vertical-align: top !important;
+        padding: 0.5rem 0.3rem !important;
+    }
+    
+    /* 备注列标题也允许换行 */
+    .transactions-container table th:nth-child(5) {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        vertical-align: top !important;
+    }
+    
+    /* 操作列保持在一行显示 */
+    .transactions-container table td:last-child {
+        white-space: nowrap !important;
+        vertical-align: top !important;
+    }
+    
+    /* 操作按钮容器优化 */
+    .transactions-container table td:last-child .flex {
+        flex-wrap: nowrap !important;
+        gap: 0.1rem !important;
+        align-items: flex-start !important;
+    }
+    
+    /* 确保其他列也垂直对齐到顶部 */
+    .transactions-container table td {
+        vertical-align: top !important;
     }
     
     /* 分类管理页面移动端优化 */
@@ -718,6 +1101,12 @@
     /* 供应商管理页面移动端优化 */
     .suppliers-container {
         padding: 0.5rem !important;
+        max-width: 100vw !important;
+        width: 100vw !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
     }
     
     /* 搜索筛选栏优化 */
@@ -772,14 +1161,24 @@
     }
     
     /* 页面标题和操作栏优化 */
-    .products-container .flex.items-center.justify-between.mb-6 {
+    .products-container .flex.items-center.justify-between.mb-6,
+    .products-container .flex.items-center.justify-between.mb-8 {
         flex-direction: column !important;
         align-items: stretch !important;
         gap: 1rem !important;
     }
     
-    .products-container .flex.items-center.justify-between.mb-6 > div:first-child {
-        text-align: center !important;
+    .products-container .flex.items-center.justify-between.mb-6 > div:first-child,
+    .products-container .flex.items-center.justify-between.mb-8 > div:first-child {
+        text-align: left !important;
+    }
+    
+    /* 商品管理页面标题区域样式 - 与供应商管理页面保持一致 */
+    .products-container .mb-8 {
+        margin-bottom: 1.5rem !important;
+        padding: 0 0.5rem !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
     }
     
     /* 新增商品按钮 - 悬浮按钮样式 */
@@ -1465,16 +1864,21 @@
      }
      
      /* 应收款页面标题区域优化 */
-     .receivables-container .flex.items-center.justify-between.mb-6 {
-         flex-direction: column !important;
-         align-items: flex-start !important;
-         gap: 0.75rem !important;
-         margin-bottom: 0.75rem !important;
-     }
-     
-     .receivables-container .flex.items-center.justify-between.mb-6 h1 {
-         margin-bottom: 0 !important;
-     }
+    .receivables-container .flex.items-center.justify-between.mb-6 {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .receivables-container .flex.items-center.justify-between.mb-6 h1 {
+        margin-bottom: 0 !important;
+    }
+    
+    .receivables-container .flex.items-center.justify-between.mb-6 > div:first-child,
+    .receivables-container .flex.items-center.justify-between.mb-8 > div:first-child {
+        text-align: left !important;
+    }
      
      /* 新增应收款按钮 - 悬浮按钮样式 */
      .receivables-container #addReceivableBtn {
@@ -1864,7 +2268,7 @@
     /* 供应商页面头部优化 */
     .suppliers-container .mb-8 {
         margin-bottom: 1.5rem !important;
-        padding: 0 1rem !important;
+        padding: 0 0.5rem !important;
         max-width: 100vw !important;
         box-sizing: border-box !important;
     }
@@ -1879,9 +2283,14 @@
         box-sizing: border-box !important;
     }
     
+    .suppliers-container .flex.items-center.justify-between.mb-6 > div:first-child,
+    .suppliers-container .flex.items-center.justify-between.mb-8 > div:first-child {
+        text-align: left !important;
+    }
+    
     .suppliers-container .text-3xl {
-        font-size: 1.75rem !important;
-        line-height: 1.2 !important;
+        font-size: 1.5rem !important;
+        line-height: 1.3 !important;
     }
     
     .suppliers-container .text-gray-600 {
@@ -2054,7 +2463,7 @@
     
     /* 供应商表格移动端优化 - 现代卡片式布局 */
     .suppliers-container {
-        padding: 0 1rem !important;
+        padding: 0.5rem !important;
         max-width: 100vw !important;
         overflow-x: hidden !important;
         box-sizing: border-box !important;

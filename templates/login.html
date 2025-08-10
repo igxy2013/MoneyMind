@@ -2,6 +2,12 @@
 
 {% block extra_head %}
 <style>
+/* 登录页面专用样式 - 防止滚动条 */
+html, body {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
 /* 统一占位符（placeholder）样式：字体大小与颜色一致 */
 #username::placeholder,
 #password::placeholder {
@@ -18,8 +24,27 @@
   color: #9ca3af !important;
   opacity: 1 !important;
 }
-/* 移动端强制对齐与一致尺寸（修正通用样式覆盖）*/
+
+/* 移动端优化 */
 @media (max-width: 768px) {
+  /* 确保移动端也不出现滚动条 */
+  .login-container {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    padding: 1rem !important;
+    padding-top: 2rem !important;
+    align-items: flex-start !important;
+  }
+  
+  /* 移动端登录卡片优化 */
+  .login-card {
+    max-height: calc(100vh - 2rem) !important;
+    overflow-y: auto !important;
+    padding: 1.5rem !important;
+  }
+  
+  /* 移动端强制对齐与一致尺寸（修正通用样式覆盖）*/
   #username,
   #password {
     text-align: left !important;
@@ -32,15 +57,27 @@
   #password {
     padding-right: 3rem !important; /* 等同于 pr-12，为右侧图标预留 */
   }
+  
+  /* 移动端装饰元素调整 */
+  .decoration-element {
+    display: none !important;
+  }
+}
+
+/* 桌面端装饰元素 */
+@media (min-width: 769px) {
+  .decoration-element {
+    display: block !important;
+  }
 }
 </style>
 {% endblock %}
 
 {% block auth_content %}
-<div class="min-h-screen flex items-center justify-center px-4 py-12">
-    <div class="max-w-md w-full">
+<div class="login-container h-screen flex items-start justify-center px-4 overflow-hidden relative pt-16">
+    <div class="max-w-md w-full relative z-10">
         <!-- 登录卡片 -->
-        <div class="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+        <div class="login-card bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
             <!-- Logo和标题 -->
             <div class="text-center mb-8">
                 <div class="mb-6">
@@ -101,11 +138,11 @@
                 </div>
             </div>
         </div>
-        
-        <!-- 装饰性元素 -->
-        <div class="absolute top-10 left-10 w-20 h-20 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full blur-xl"></div>
-        <div class="absolute bottom-10 right-10 w-32 h-32 bg-gradient-to-r from-secondary/20 to-blue-500/20 rounded-full blur-xl"></div>
     </div>
+    
+    <!-- 装饰性元素 -->
+    <div class="decoration-element absolute top-10 left-10 w-20 h-20 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full blur-xl"></div>
+    <div class="decoration-element absolute bottom-10 right-10 w-32 h-32 bg-gradient-to-r from-secondary/20 to-blue-500/20 rounded-full blur-xl"></div>
 </div>
 
 <script>
