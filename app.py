@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,6 +13,32 @@ import os
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import uuid
+import csv
+import io
+try:
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment
+    EXCEL_AVAILABLE = True
+except ImportError:
+    EXCEL_AVAILABLE = False
+
+try:
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+    from reportlab.pdfgen import canvas
+    from reportlab.graphics.shapes import Drawing, Rect, String
+    from reportlab.graphics.charts.linecharts import HorizontalLineChart
+    from reportlab.graphics.charts.barcharts import VerticalBarChart
+    from reportlab.graphics.charts.piecharts import Pie
+    from reportlab.graphics.widgetbase import Widget
+    from reportlab.graphics import renderPDF
+    PDF_AVAILABLE = True
+except ImportError:
+    PDF_AVAILABLE = False
 
 # 加载环境变量
 load_dotenv()
@@ -469,6 +495,143 @@ def transactions():
                          products=products,
                          filter_params=filter_params)
 
+@app.route('/export_transactions')
+@login_required
+def export_transactions():
+    """导出收支记录为CSV文件"""
+    # 获取筛选参数
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    transaction_type = request.args.get('type')
+    category_id = request.args.get('category_id')
+    export_format = request.args.get('format', 'csv')  # 默认CSV格式
+    
+    # 构建查询（与transactions路由相同的逻辑）
+    query = Transaction.query
+    
+    # 日期范围筛选
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(Transaction.date >= start_date_obj)
+        except ValueError:
+            pass
+    
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+            end_date_obj = end_date_obj.replace(hour=23, minute=59, second=59)
+            query = query.filter(Transaction.date <= end_date_obj)
+        except ValueError:
+            pass
+    
+    # 交易类型筛选
+    if transaction_type and transaction_type in ['income', 'expense']:
+        query = query.filter(Transaction.type == transaction_type)
+    
+    # 分类筛选
+    if category_id:
+        try:
+            category_id_int = int(category_id)
+            query = query.filter(Transaction.category_id == category_id_int)
+        except ValueError:
+            pass
+    
+    # 获取所有符合条件的交易记录
+    transactions = query.order_by(Transaction.date.desc()).all()
+    
+    # 检查是否有数据
+    if not transactions:
+        flash('没有符合条件的交易记录可以导出', 'warning')
+        return redirect(url_for('transactions'))
+    
+    if export_format == 'csv':
+        # 创建CSV文件
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # 写入表头
+        writer.writerow(['交易日期', '交易类型', '分类', '金额', '备注信息'])
+        
+        # 写入数据
+        for transaction in transactions:
+            writer.writerow([
+                transaction.date.strftime('%Y-%m-%d'),
+                '收入' if transaction.type == 'income' else '支出',
+                transaction.category.name,
+                transaction.amount,
+                transaction.description or ''
+            ])
+        
+        # 创建响应
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'text/csv; charset=utf-8'
+        
+        # 生成文件名
+        filename = f'transactions_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+        filename_utf8 = f'收支记录_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{filename_utf8.encode("utf-8").decode("latin1")}"'
+        
+        return response
+    
+    elif export_format == 'excel':
+        if not EXCEL_AVAILABLE:
+            flash('Excel导出功能不可用，请安装openpyxl库', 'error')
+            return redirect(url_for('transactions'))
+        
+        # 创建Excel工作簿
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "收支记录"
+        
+        # 设置表头
+        headers = ['交易日期', '交易类型', '分类', '金额', '备注信息']
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+        
+        # 写入数据
+        for row, transaction in enumerate(transactions, 2):
+            ws.cell(row=row, column=1, value=transaction.date.strftime('%Y-%m-%d'))
+            ws.cell(row=row, column=2, value='收入' if transaction.type == 'income' else '支出')
+            ws.cell(row=row, column=3, value=transaction.category.name)
+            ws.cell(row=row, column=4, value=transaction.amount)
+            ws.cell(row=row, column=5, value=transaction.description or '')
+            
+            # 设置交易类型颜色
+            type_cell = ws.cell(row=row, column=2)
+            if transaction.type == 'income':
+                type_cell.font = Font(color="00B050")
+            else:
+                type_cell.font = Font(color="FF0000")
+        
+        # 调整列宽
+        column_widths = [12, 10, 15, 12, 35]
+        for col, width in enumerate(column_widths, 1):
+            ws.column_dimensions[ws.cell(row=1, column=col).column_letter].width = width
+        
+        # 保存到内存
+        output = io.BytesIO()
+        wb.save(output)
+        output.seek(0)
+        
+        # 创建响应
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        
+        # 生成文件名
+        filename = f'transactions_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+        filename_utf8 = f'收支记录_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{filename_utf8.encode("utf-8").decode("latin1")}"'
+        
+        return response
+    
+    else:
+        flash('不支持的导出格式', 'error')
+        return redirect(url_for('transactions'))
+
 @app.route('/add_transaction', methods=['GET', 'POST'])
 @edit_required
 def add_transaction():
@@ -477,7 +640,7 @@ def add_transaction():
         transaction_type = request.form['type']
         description = request.form['description']
         supplier_description = request.form.get('supplier_description', '')
-        category_id = int(request.form['category'])
+        category_id = int(request.form['category_id'])
         date = datetime.strptime(request.form['date'], '%Y-%m-%d')
         
         supplier_id = request.form.get('supplier_id') or None
@@ -1280,39 +1443,61 @@ def delete_user(id):
 @app.route('/statistics')
 @login_required
 def statistics():
-    """财务分析页面 - 重新设计的简洁版本"""
+    """财务分析页面 - 增强版本"""
     try:
+        # 获取筛选参数
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        
         # 获取当前日期
         today = datetime.now().date()
         month_start = today.replace(day=1)
         
-        # 基础财务数据
+        # 设置默认时间范围（最近12个月）
+        if not start_date:
+            default_start = today - timedelta(days=365)
+            start_date = default_start.strftime('%Y-%m-%d')
+        if not end_date:
+            end_date = today.strftime('%Y-%m-%d')
+            
+        # 转换日期
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except ValueError:
+            start_date_obj = today - timedelta(days=365)
+            end_date_obj = today
+        
+        # 基础财务数据（基于选定时间范围）
         total_income = db.session.query(db.func.sum(Transaction.amount)).filter(
-            Transaction.type == 'income'
+            Transaction.type == 'income',
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
         ).scalar() or 0
         
         total_expense = db.session.query(db.func.sum(Transaction.amount)).filter(
-            Transaction.type == 'expense'
+            Transaction.type == 'expense',
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
         ).scalar() or 0
         
         net_assets = total_income - total_expense
         liability_ratio = (total_expense / total_income * 100) if total_income > 0 else 0
         
-        # 财务健康度评分（简化版）
+        # 财务健康度评分
         if net_assets > 0:
             health_score = min(100, max(0, int(100 - liability_ratio)))
         else:
             health_score = 0
         
-        # 获取最近6个月的趋势数据
-        six_months_ago = datetime.now() - timedelta(days=180)
-        
+        # 获取月度统计数据
         monthly_stats = db.session.query(
             db.func.date_format(Transaction.date, '%Y-%m').label('month'),
             Transaction.type,
             db.func.sum(Transaction.amount).label('total')
         ).filter(
-            Transaction.date >= six_months_ago
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
         ).group_by(
             db.func.date_format(Transaction.date, '%Y-%m'),
             Transaction.type
@@ -1329,10 +1514,28 @@ def statistics():
         trend_profit = []
         monthly_data = []
         
-        for month in sorted(month_data.keys()):
+        # 计算环比和同比增长
+        sorted_months = sorted(month_data.keys())
+        for i, month in enumerate(sorted_months):
             income = month_data[month]['income']
             expense = month_data[month]['expense']
             profit = income - expense
+            
+            # 环比增长（与上月比较）
+            mom_growth = 0
+            if i > 0:
+                prev_month = sorted_months[i-1]
+                prev_profit = month_data[prev_month]['income'] - month_data[prev_month]['expense']
+                if prev_profit != 0:
+                    mom_growth = ((profit - prev_profit) / abs(prev_profit)) * 100
+            
+            # 同比增长（与去年同月比较）
+            yoy_growth = 0
+            year_ago_month = f"{int(month[:4])-1}-{month[5:]}"
+            if year_ago_month in month_data:
+                year_ago_profit = month_data[year_ago_month]['income'] - month_data[year_ago_month]['expense']
+                if year_ago_profit != 0:
+                    yoy_growth = ((profit - year_ago_profit) / abs(year_ago_profit)) * 100
             
             trend_months.append(month)
             trend_income.append(income)
@@ -1344,17 +1547,18 @@ def statistics():
                 'income': income,
                 'expense': expense,
                 'profit': profit,
-                'mom_growth': 0,  # 简化版暂不计算增长率
-                'yoy_growth': 0
+                'mom_growth': mom_growth,
+                'yoy_growth': yoy_growth
             })
         
-        # 收支分类数据
+        # 收支分类数据（基于选定时间范围）
         income_categories = db.session.query(
             Category.name,
             db.func.sum(Transaction.amount).label('amount')
         ).join(Transaction).filter(
             Transaction.type == 'income',
-            Transaction.date >= six_months_ago
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
         ).group_by(Category.name).all()
         
         expense_categories = db.session.query(
@@ -1362,7 +1566,8 @@ def statistics():
             db.func.sum(Transaction.amount).label('amount')
         ).join(Transaction).filter(
             Transaction.type == 'expense',
-            Transaction.date >= six_months_ago
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
         ).group_by(Category.name).all()
         
         # 饼图数据
@@ -1456,7 +1661,9 @@ def statistics():
                              assets_growth=assets_growth,
                              liabilities_growth=liabilities_growth,
                              net_assets_growth=net_assets_growth,
-                             liability_ratio_change=liability_ratio_change)
+                             liability_ratio_change=liability_ratio_change,
+                             start_date=start_date,
+                             end_date=end_date)
     
     except Exception as e:
         flash(f'财务分析数据加载失败: {str(e)}', 'error')
@@ -1480,6 +1687,820 @@ def statistics():
                              liabilities_growth=0,
                              net_assets_growth=0,
                              liability_ratio_change=0)
+
+@app.route('/export_statistics')
+@login_required
+def export_statistics():
+    """导出财务分析数据"""
+    try:
+        # 获取筛选参数
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        export_format = request.args.get('format', 'csv')
+        
+        # 获取当前日期
+        today = datetime.now().date()
+        
+        # 设置默认时间范围
+        if not start_date:
+            default_start = today - timedelta(days=365)
+            start_date = default_start.strftime('%Y-%m-%d')
+        if not end_date:
+            end_date = today.strftime('%Y-%m-%d')
+            
+        # 转换日期
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except ValueError:
+            start_date_obj = today - timedelta(days=365)
+            end_date_obj = today
+        
+        # 获取月度统计数据
+        monthly_stats = db.session.query(
+            db.func.date_format(Transaction.date, '%Y-%m').label('month'),
+            Transaction.type,
+            db.func.sum(Transaction.amount).label('total')
+        ).filter(
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
+        ).group_by(
+            db.func.date_format(Transaction.date, '%Y-%m'),
+            Transaction.type
+        ).order_by('month').all()
+        
+        # 处理数据
+        month_data = defaultdict(lambda: {'income': 0, 'expense': 0})
+        for stat in monthly_stats:
+            month_data[stat.month][stat.type] = stat.total
+        
+        # 计算增长率
+        export_data = []
+        sorted_months = sorted(month_data.keys())
+        for i, month in enumerate(sorted_months):
+            income = month_data[month]['income']
+            expense = month_data[month]['expense']
+            profit = income - expense
+            
+            # 环比增长
+            mom_growth = 0
+            if i > 0:
+                prev_month = sorted_months[i-1]
+                prev_profit = month_data[prev_month]['income'] - month_data[prev_month]['expense']
+                if prev_profit != 0:
+                    mom_growth = ((profit - prev_profit) / abs(prev_profit)) * 100
+            
+            # 同比增长
+            yoy_growth = 0
+            year_ago_month = f"{int(month[:4])-1}-{month[5:]}"
+            if year_ago_month in month_data:
+                year_ago_profit = month_data[year_ago_month]['income'] - month_data[year_ago_month]['expense']
+                if year_ago_profit != 0:
+                    yoy_growth = ((profit - year_ago_profit) / abs(year_ago_profit)) * 100
+            
+            export_data.append({
+                'month': month,
+                'income': income,
+                'expense': expense,
+                'profit': profit,
+                'mom_growth': mom_growth,
+                'yoy_growth': yoy_growth
+            })
+        
+        if not export_data:
+            flash('没有符合条件的财务数据可以导出', 'warning')
+            return redirect(url_for('statistics'))
+        
+        if export_format == 'csv':
+            # 创建CSV文件
+            output = io.StringIO()
+            writer = csv.writer(output)
+            
+            # 写入表头
+            writer.writerow(['月份', '收入', '支出', '利润', '环比增长(%)', '同比增长(%)'])
+            
+            # 写入数据
+            for data in export_data:
+                writer.writerow([
+                    data['month'],
+                    f"{data['income']:.2f}",
+                    f"{data['expense']:.2f}",
+                    f"{data['profit']:.2f}",
+                    f"{data['mom_growth']:.2f}",
+                    f"{data['yoy_growth']:.2f}"
+                ])
+            
+            # 创建响应
+            response = make_response(output.getvalue())
+            response.headers['Content-Type'] = 'text/csv; charset=utf-8'
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            # 生成文件名
+            filename = f'financial_analysis_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+            filename_utf8 = f'财务分析_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'\'{filename_utf8.encode("utf-8").decode("latin1")}"'
+            
+            return response
+            
+        elif export_format == 'excel':
+            if not EXCEL_AVAILABLE:
+                flash('Excel导出功能不可用，请安装openpyxl库或选择CSV格式导出', 'error')
+                return redirect(url_for('statistics'))
+                
+            # 创建Excel文件
+            output = io.BytesIO()
+            from openpyxl import Workbook
+            from openpyxl.utils import get_column_letter
+            
+            workbook = Workbook()
+            ws = workbook.active
+            ws.title = "财务分析数据"
+            
+            # 设置表头
+            headers = ['月份', '收入', '支出', '利润', '环比增长(%)', '同比增长(%)']
+            for col, header in enumerate(headers, 1):
+                ws.cell(row=1, column=col, value=header)
+            
+            # 写入数据
+            for row, data in enumerate(export_data, 2):
+                ws.cell(row=row, column=1, value=data['month'])
+                ws.cell(row=row, column=2, value=data['income'])
+                ws.cell(row=row, column=3, value=data['expense'])
+                ws.cell(row=row, column=4, value=data['profit'])
+                ws.cell(row=row, column=5, value=data['mom_growth'])
+                ws.cell(row=row, column=6, value=data['yoy_growth'])
+            
+            # 设置列宽
+            column_widths = [12, 15, 15, 15, 15, 15]
+            for col, width in enumerate(column_widths, 1):
+                ws.column_dimensions[get_column_letter(col)].width = width
+            
+            workbook.save(output)
+            output.seek(0)
+            
+            # 创建响应
+            response = make_response(output.getvalue())
+            response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            
+            # 生成文件名
+            filename = f'financial_analysis_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+            filename_utf8 = f'财务分析_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'\'{filename_utf8.encode("utf-8").decode("latin1")}"'
+            
+            # 添加安全头部减少浏览器警告
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            return response
+            
+    except Exception as e:
+        flash(f'导出失败: {str(e)}', 'error')
+        return redirect(url_for('statistics'))
+
+@app.route('/export_pdf_report')
+@login_required
+def export_pdf_report():
+    """导出PDF财务分析报告"""
+    try:
+        if not PDF_AVAILABLE:
+            flash('PDF生成功能不可用，请安装reportlab库', 'error')
+            return redirect(url_for('statistics'))
+        
+        # 获取筛选参数
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        
+        # 获取当前日期
+        today = datetime.now().date()
+        
+        # 设置默认时间范围
+        if not start_date:
+            default_start = today - timedelta(days=365)
+            start_date = default_start.strftime('%Y-%m-%d')
+        if not end_date:
+            end_date = today.strftime('%Y-%m-%d')
+            
+        # 转换日期
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except ValueError:
+            start_date_obj = today - timedelta(days=365)
+            end_date_obj = today
+        
+        # 获取财务数据
+        monthly_stats = db.session.query(
+            db.func.date_format(Transaction.date, '%Y-%m').label('month'),
+            Transaction.type,
+            db.func.sum(Transaction.amount).label('total')
+        ).filter(
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
+        ).group_by(
+            db.func.date_format(Transaction.date, '%Y-%m'),
+            Transaction.type
+        ).order_by('month').all()
+        
+        # 处理数据
+        month_data = defaultdict(lambda: {'income': 0, 'expense': 0})
+        for stat in monthly_stats:
+            month_data[stat.month][stat.type] = stat.total
+        
+        # 计算关键指标
+        total_income = sum(data['income'] for data in month_data.values())
+        total_expense = sum(data['expense'] for data in month_data.values())
+        net_profit = total_income - total_expense
+        
+        # 获取交易数据用于分析
+        transactions = Transaction.query.filter(
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
+        ).all()
+        
+        # 注册中文字体
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        
+        # 尝试注册系统中文字体
+        chinese_font = 'Helvetica'  # 默认字体
+        try:
+            # Windows系统字体路径
+            font_paths = [
+                'C:/Windows/Fonts/simsun.ttc',  # 宋体
+                'C:/Windows/Fonts/simhei.ttf',  # 黑体
+                'C:/Windows/Fonts/msyh.ttc',    # 微软雅黑
+                'C:/Windows/Fonts/simkai.ttf'   # 楷体
+            ]
+            
+            for font_path in font_paths:
+                if os.path.exists(font_path):
+                    try:
+                        pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
+                        chinese_font = 'ChineseFont'
+                        break
+                    except:
+                        continue
+        except Exception as e:
+            print(f"字体注册失败: {e}")
+        
+        # 创建PDF
+        output = io.BytesIO()
+        doc = SimpleDocTemplate(output, pagesize=A4, topMargin=1*inch, bottomMargin=1*inch)
+        
+        # 获取样式
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontName=chinese_font,
+            fontSize=24,
+            spaceAfter=30,
+            alignment=TA_CENTER,
+            textColor=colors.darkblue
+        )
+        
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontName=chinese_font,
+            fontSize=16,
+            spaceAfter=12,
+            textColor=colors.darkblue
+        )
+        
+        normal_style = ParagraphStyle(
+            'CustomNormal',
+            parent=styles['Normal'],
+            fontName=chinese_font,
+            fontSize=10
+        )
+        
+        # 构建PDF内容
+        story = []
+        
+        # 标题
+        story.append(Paragraph('七彩果坊财务分析报告', title_style))
+        story.append(Paragraph(f'报告期间: {start_date} 至 {end_date}', normal_style))
+        story.append(Paragraph(f'生成时间: {datetime.now().strftime("%Y年%m月%d日 %H:%M")}', normal_style))
+        story.append(Spacer(1, 20))
+        
+        # 执行摘要
+        story.append(Paragraph('执行摘要', heading_style))
+        summary_data = [
+            ['指标', '金额', '说明'],
+            ['总收入', f'¥{total_income:,.2f}', '报告期内总收入'],
+            ['总支出', f'¥{total_expense:,.2f}', '报告期内总支出'],
+            ['净利润', f'¥{net_profit:,.2f}', '收入减去支出的净额'],
+            ['利润率', f'{(net_profit/total_income*100) if total_income > 0 else 0:.2f}%', '净利润占总收入的比例']
+        ]
+        
+        summary_table = Table(summary_data, colWidths=[2*inch, 1.5*inch, 2.5*inch])
+        summary_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), chinese_font),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        story.append(summary_table)
+        story.append(Spacer(1, 20))
+        
+        # 添加图表分析部分
+        story.append(Paragraph('图表分析', heading_style))
+        
+        # 创建收入支出趋势图
+        if month_data:
+            # 准备趋势图数据
+            months = sorted(month_data.keys())
+            income_data = [month_data[month]['income'] for month in months]
+            expense_data = [month_data[month]['expense'] for month in months]
+            
+            # 创建趋势图
+            drawing = Drawing(400, 200)
+            chart = HorizontalLineChart()
+            chart.x = 50
+            chart.y = 50
+            chart.height = 125
+            chart.width = 300
+            chart.data = [income_data, expense_data]
+            chart.categoryAxis.categoryNames = [m.replace('-', '/') for m in months]
+            chart.valueAxis.valueMin = 0
+            chart.valueAxis.valueMax = max(max(income_data) if income_data else [0], max(expense_data) if expense_data else [0]) * 1.1
+            chart.lines[0].strokeColor = colors.green
+            chart.lines[1].strokeColor = colors.red
+            chart.lines[0].strokeWidth = 2
+            chart.lines[1].strokeWidth = 2
+            drawing.add(chart)
+            
+            # 添加图例
+            from reportlab.graphics.shapes import String
+            drawing.add(String(50, 30, '绿线: 收入', fontSize=10, fillColor=colors.green))
+            drawing.add(String(150, 30, '红线: 支出', fontSize=10, fillColor=colors.red))
+            
+            story.append(drawing)
+            story.append(Spacer(1, 10))
+            
+            # 趋势分析文字
+            trend_analysis = []
+            if len(months) >= 2:
+                recent_income = income_data[-1] if income_data else 0
+                previous_income = income_data[-2] if len(income_data) >= 2 else 0
+                recent_expense = expense_data[-1] if expense_data else 0
+                previous_expense = expense_data[-2] if len(expense_data) >= 2 else 0
+                
+                income_change = ((recent_income - previous_income) / previous_income * 100) if previous_income > 0 else 0
+                expense_change = ((recent_expense - previous_expense) / previous_expense * 100) if previous_expense > 0 else 0
+                
+                trend_analysis.append(f'• 最近一个月收入{"增长" if income_change > 0 else "下降"}{abs(income_change):.1f}%')
+                trend_analysis.append(f'• 最近一个月支出{"增长" if expense_change > 0 else "下降"}{abs(expense_change):.1f}%')
+                
+                if income_change > expense_change:
+                    trend_analysis.append('• 收入增长速度超过支出增长，财务状况向好')
+                elif expense_change > income_change:
+                    trend_analysis.append('• 支出增长速度超过收入增长，需要关注成本控制')
+            
+            for analysis in trend_analysis:
+                story.append(Paragraph(analysis, normal_style))
+            
+            story.append(Spacer(1, 20))
+        
+        # 获取分类数据用于饼图
+        category_stats = db.session.query(
+            Category.name,
+            Transaction.type,
+            db.func.sum(Transaction.amount).label('total')
+        ).join(
+            Transaction, Category.id == Transaction.category_id
+        ).filter(
+            Transaction.date >= start_date_obj,
+            Transaction.date <= end_date_obj
+        ).group_by(
+            Category.name, Transaction.type
+        ).all()
+        
+        # 处理分类数据
+        income_categories = {}
+        expense_categories = {}
+        for stat in category_stats:
+            if stat.type == 'income':
+                income_categories[stat.name] = stat.total
+            else:
+                expense_categories[stat.name] = stat.total
+        
+        # 创建支出分类饼图（如果有数据）
+        if expense_categories:
+            story.append(Paragraph('支出分类分析', heading_style))
+            
+            # 创建饼图
+            drawing = Drawing(500, 300)
+            pie = Pie()
+            pie.x = 50
+            pie.y = 50
+            pie.width = 180
+            pie.height = 180
+            
+            # 准备饼图数据
+            categories = list(expense_categories.keys())
+            values = list(expense_categories.values())
+            pie.data = values
+            
+            # 设置颜色
+            colors_list = [colors.red, colors.orange, colors.yellow, colors.green, colors.blue, colors.purple]
+            pie.slices.strokeColor = colors.white
+            for i, color in enumerate(colors_list[:len(values)]):
+                pie.slices[i].fillColor = color
+            
+            # 设置字体
+            pie.slices.fontName = chinese_font
+            pie.slices.fontSize = 10
+            pie.slices.labelRadius = 1.2
+            
+            # 创建图例
+            legend_x = 280
+            legend_y = 200
+            for i, (category, value) in enumerate(zip(categories, values)):
+                # 颜色块
+                rect = Rect(legend_x, legend_y - i * 20, 10, 10)
+                rect.fillColor = colors_list[i % len(colors_list)]
+                rect.strokeColor = colors.black
+                drawing.add(rect)
+                
+                # 标签文字
+                percentage = (value / sum(values)) * 100
+                label_text = f'{category}: {percentage:.1f}%'
+                label = String(legend_x + 15, legend_y - i * 20 + 2, label_text)
+                label.fontName = chinese_font
+                label.fontSize = 9
+                drawing.add(label)
+            
+            # 移除饼图自带的标签以避免重叠
+            pie.labels = None
+            
+            drawing.add(pie)
+            story.append(drawing)
+            story.append(Spacer(1, 10))
+            
+            # 分类分析文字
+            total_expense_cat = sum(expense_categories.values())
+            category_analysis = []
+            sorted_categories = sorted(expense_categories.items(), key=lambda x: x[1], reverse=True)
+            
+            if sorted_categories:
+                top_category = sorted_categories[0]
+                category_analysis.append(f'• 最大支出类别：{top_category[0]}，占总支出的{(top_category[1]/total_expense_cat*100):.1f}%')
+                
+                if len(sorted_categories) >= 3:
+                    top3_total = sum([cat[1] for cat in sorted_categories[:3]])
+                    category_analysis.append(f'• 前三大支出类别占总支出的{(top3_total/total_expense_cat*100):.1f}%')
+                
+                category_analysis.append('• 建议重点关注主要支出类别的成本控制')
+            
+            for analysis in category_analysis:
+                story.append(Paragraph(analysis, normal_style))
+            
+            story.append(Spacer(1, 20))
+        
+        # 月度收支明细
+        story.append(Paragraph('月度收支明细', heading_style))
+        detail_data = [['月份', '收入', '支出', '净利润', '利润率']]
+        
+        for month in sorted(month_data.keys()):
+            data = month_data[month]
+            monthly_profit = data['income'] - data['expense']
+            profit_rate = (monthly_profit / data['income'] * 100) if data['income'] > 0 else 0
+            detail_data.append([
+                month,
+                f'¥{data["income"]:,.2f}',
+                f'¥{data["expense"]:,.2f}',
+                f'¥{monthly_profit:,.2f}',
+                f'{profit_rate:.2f}%'
+            ])
+        
+        detail_table = Table(detail_data, colWidths=[1.2*inch, 1.2*inch, 1.2*inch, 1.2*inch, 1.2*inch])
+        detail_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), chinese_font),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        story.append(detail_table)
+        story.append(Spacer(1, 20))
+        
+        # 收入支出对比分析图表
+        story.append(Paragraph('收入支出对比分析', heading_style))
+        story.append(Spacer(1, 10))
+        
+        # 创建收入支出对比柱状图
+        if month_data:
+            drawing = Drawing(500, 300)
+            chart = VerticalBarChart()
+            chart.x = 50
+            chart.y = 50
+            chart.height = 200
+            chart.width = 400
+            
+            # 准备数据
+            months = sorted(month_data.keys())[-6:]  # 最近6个月
+            income_values = [month_data[m]['income'] for m in months]
+            expense_values = [month_data[m]['expense'] for m in months]
+            
+            chart.data = [income_values, expense_values]
+            chart.categoryAxis.categoryNames = [m.split('-')[1] + '月' for m in months]  # 只显示月份
+            chart.bars[0].fillColor = colors.green
+            chart.bars[1].fillColor = colors.red
+            chart.valueAxis.valueMin = 0
+            chart.valueAxis.valueMax = max(max(income_values, default=0), max(expense_values, default=0)) * 1.1
+            
+            # 添加图例
+            chart.categoryAxis.labels.fontName = chinese_font
+            chart.valueAxis.labels.fontName = chinese_font
+            
+            drawing.add(chart)
+            story.append(drawing)
+            story.append(Spacer(1, 10))
+            
+            # 收入支出对比分析文字
+            comparison_analysis = []
+            avg_income = sum(income_values) / len(income_values) if income_values else 0
+            avg_expense = sum(expense_values) / len(expense_values) if expense_values else 0
+            
+            comparison_analysis.append(f'• 近{len(months)}个月平均收入为 {avg_income:,.2f} 元，平均支出为 {avg_expense:,.2f} 元。')
+            
+            if avg_income > avg_expense:
+                comparison_analysis.append(f'• 收入高于支出 {avg_income - avg_expense:,.2f} 元，经营状况良好。')
+            elif avg_income < avg_expense:
+                comparison_analysis.append(f'• 支出高于收入 {avg_expense - avg_income:,.2f} 元，需要控制成本或增加收入。')
+            else:
+                comparison_analysis.append('• 收支基本平衡。')
+            
+            # 分析收入趋势
+            if len(income_values) >= 3:
+                recent_income_trend = income_values[-1] - income_values[-3]
+                if recent_income_trend > 0:
+                    comparison_analysis.append(f'• 收入呈上升趋势，较前期增长 {recent_income_trend:,.2f} 元。')
+                elif recent_income_trend < 0:
+                    comparison_analysis.append(f'• 收入呈下降趋势，较前期减少 {abs(recent_income_trend):,.2f} 元。')
+                else:
+                    comparison_analysis.append('• 收入保持稳定。')
+            
+            for analysis in comparison_analysis:
+                story.append(Paragraph(analysis, normal_style))
+        
+        story.append(Spacer(1, 20))
+        
+        # 月度净利润趋势分析
+        story.append(Paragraph('月度净利润趋势分析', heading_style))
+        story.append(Spacer(1, 10))
+        
+        if month_data:
+            # 创建净利润趋势线图
+            drawing = Drawing(500, 300)
+            chart = HorizontalLineChart()
+            chart.x = 50
+            chart.y = 50
+            chart.height = 200
+            chart.width = 400
+            
+            # 准备净利润数据
+            profit_values = [month_data[m]['income'] - month_data[m]['expense'] for m in months]
+            chart.data = [profit_values]
+            chart.categoryAxis.categoryNames = [m.split('-')[1] + '月' for m in months]
+            chart.lines[0].strokeColor = colors.blue
+            chart.lines[0].strokeWidth = 2
+            
+            # 设置Y轴范围
+            min_profit = min(profit_values) if profit_values else 0
+            max_profit = max(profit_values) if profit_values else 0
+            chart.valueAxis.valueMin = min_profit * 1.1 if min_profit < 0 else min_profit * 0.9
+            chart.valueAxis.valueMax = max_profit * 1.1 if max_profit > 0 else max_profit * 0.9
+            
+            # 设置字体
+            chart.categoryAxis.labels.fontName = chinese_font
+            chart.valueAxis.labels.fontName = chinese_font
+            
+            drawing.add(chart)
+            story.append(drawing)
+            story.append(Spacer(1, 10))
+            
+            # 净利润趋势分析文字
+            profit_analysis = []
+            avg_profit = sum(profit_values) / len(profit_values) if profit_values else 0
+            profit_analysis.append(f'• 近{len(months)}个月平均净利润为 {avg_profit:,.2f} 元。')
+            
+            # 分析利润波动
+            if len(profit_values) >= 2:
+                profit_volatility = max(profit_values) - min(profit_values)
+                profit_analysis.append(f'• 净利润波动范围为 {profit_volatility:,.2f} 元。')
+                
+                if profit_volatility > abs(avg_profit) * 0.5:
+                    profit_analysis.append('• 利润波动较大，建议加强经营稳定性。')
+                else:
+                    profit_analysis.append('• 利润波动相对稳定。')
+            
+            # 分析最近趋势
+            if len(profit_values) >= 3:
+                recent_trend = profit_values[-1] - profit_values[-3]
+                if recent_trend > 0:
+                    profit_analysis.append(f'• 最近净利润呈上升趋势，增长 {recent_trend:,.2f} 元。')
+                elif recent_trend < 0:
+                    profit_analysis.append(f'• 最近净利润呈下降趋势，减少 {abs(recent_trend):,.2f} 元。')
+                else:
+                    profit_analysis.append('• 最近净利润保持稳定。')
+            
+            for analysis in profit_analysis:
+                story.append(Paragraph(analysis, normal_style))
+        
+        story.append(Spacer(1, 20))
+        
+        # 支出类别分布分析
+        story.append(Paragraph('支出类别分布分析', heading_style))
+        story.append(Spacer(1, 10))
+        
+        # 获取支出类别数据
+        expense_categories = {}
+        for transaction in transactions:
+            if transaction.type == 'expense':
+                category_name = transaction.category.name
+                expense_categories[category_name] = expense_categories.get(category_name, 0) + transaction.amount
+        
+        if expense_categories:
+            # 创建饼图
+            drawing = Drawing(500, 300)
+            pie = Pie()
+            pie.x = 50
+            pie.y = 50
+            pie.width = 180
+            pie.height = 180
+            
+            # 准备饼图数据
+            categories = list(expense_categories.keys())
+            amounts = list(expense_categories.values())
+            
+            pie.data = amounts
+            pie.labels = categories
+            
+            # 设置颜色
+            colors_list = [colors.red, colors.blue, colors.green, colors.orange, colors.purple, colors.brown, colors.pink, colors.gray]
+            for i in range(len(amounts)):
+                pie.slices[i].fillColor = colors_list[i % len(colors_list)]
+            
+            # 设置标签字体和位置
+            pie.slices.fontName = chinese_font
+            pie.slices.fontSize = 10
+            pie.slices.labelRadius = 1.2
+            pie.slices.popout = 0
+            
+            # 创建图例
+            legend_x = 280
+            legend_y = 200
+            for i, (category, amount) in enumerate(zip(categories, amounts)):
+                # 颜色块
+                rect = Rect(legend_x, legend_y - i * 20, 10, 10)
+                rect.fillColor = colors_list[i % len(colors_list)]
+                rect.strokeColor = colors.black
+                drawing.add(rect)
+                
+                # 标签文字
+                percentage = (amount / sum(amounts)) * 100
+                label_text = f'{category}: {percentage:.1f}%'
+                label = String(legend_x + 15, legend_y - i * 20 + 2, label_text)
+                label.fontName = chinese_font
+                label.fontSize = 9
+                drawing.add(label)
+            
+            # 移除饼图自带的标签以避免重叠
+            pie.labels = None
+            
+            drawing.add(pie)
+            story.append(drawing)
+            story.append(Spacer(1, 10))
+            
+            # 支出类别分析文字
+            category_analysis = []
+            total_expense_amount = sum(amounts)
+            
+            # 找出最大支出类别
+            max_category = max(expense_categories, key=expense_categories.get)
+            max_amount = expense_categories[max_category]
+            max_percentage = (max_amount / total_expense_amount) * 100
+            
+            category_analysis.append(f'• 最大支出类别为"{max_category}"，金额为 {max_amount:,.2f} 元，占总支出的 {max_percentage:.1f}%。')
+            
+            # 分析支出集中度
+            if max_percentage > 50:
+                category_analysis.append('• 支出过于集中在单一类别，建议分散支出风险。')
+            elif max_percentage > 30:
+                category_analysis.append('• 支出相对集中，建议关注主要支出类别的成本控制。')
+            else:
+                category_analysis.append('• 支出分布相对均衡。')
+            
+            # 列出前三大支出类别
+            sorted_categories = sorted(expense_categories.items(), key=lambda x: x[1], reverse=True)
+            top_3_categories = sorted_categories[:3]
+            
+            category_analysis.append('• 前三大支出类别分别为：')
+            for i, (cat, amount) in enumerate(top_3_categories, 1):
+                percentage = (amount / total_expense_amount) * 100
+                category_analysis.append(f'  {i}. {cat}：{amount:,.2f} 元 ({percentage:.1f}%)')
+            
+            # 成本控制建议
+            if max_percentage > 40:
+                category_analysis.append(f'• 建议重点关注"{max_category}"类别的成本控制，寻找节约空间。')
+            
+            for analysis in category_analysis:
+                story.append(Paragraph(analysis, normal_style))
+        
+        story.append(Spacer(1, 20))
+        
+        # 财务分析
+        story.append(Paragraph('综合财务分析与建议', heading_style))
+        
+        # 分析内容
+        analysis_points = []
+        if net_profit > 0:
+            analysis_points.append('• 报告期内实现盈利，经营状况良好。')
+        else:
+            analysis_points.append('• 报告期内出现亏损，需要关注成本控制和收入增长。')
+        
+        if total_income > 0:
+            profit_margin = net_profit / total_income * 100
+            if profit_margin > 20:
+                analysis_points.append('• 利润率超过20%，盈利能力优秀。')
+            elif profit_margin > 10:
+                analysis_points.append('• 利润率在10%-20%之间，盈利能力良好。')
+            elif profit_margin > 0:
+                analysis_points.append('• 利润率较低，建议优化成本结构。')
+            else:
+                analysis_points.append('• 出现亏损，建议重新评估业务模式。')
+        
+        # 月度趋势分析
+        if len(month_data) >= 2:
+            months = sorted(month_data.keys())
+            recent_months = months[-3:] if len(months) >= 3 else months
+            recent_profits = [month_data[m]['income'] - month_data[m]['expense'] for m in recent_months]
+            
+            if len(recent_profits) >= 2:
+                if recent_profits[-1] > recent_profits[0]:
+                    analysis_points.append('• 近期利润呈上升趋势，经营改善明显。')
+                elif recent_profits[-1] < recent_profits[0]:
+                    analysis_points.append('• 近期利润呈下降趋势，需要关注经营风险。')
+                else:
+                    analysis_points.append('• 近期利润保持稳定。')
+        
+        for point in analysis_points:
+            story.append(Paragraph(point, normal_style))
+        
+        story.append(Spacer(1, 20))
+        
+        # 建议
+        story.append(Paragraph('经营建议', heading_style))
+        recommendations = [
+            '• 定期监控关键财务指标，及时发现经营问题。',
+            '• 加强成本控制，提高运营效率。',
+            '• 多元化收入来源，降低经营风险。',
+            '• 建立完善的财务预算和控制体系。',
+            '• 关注现金流管理，确保资金链安全。'
+        ]
+        
+        for rec in recommendations:
+            story.append(Paragraph(rec, normal_style))
+        
+        # 生成PDF
+        doc.build(story)
+        output.seek(0)
+        
+        # 创建响应
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        
+        # 生成文件名
+        filename = f'financial_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+        filename_utf8 = f'财务分析报告_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'\'{filename_utf8.encode("utf-8").decode("latin1")}"'
+        
+        return response
+        
+    except Exception as e:
+        flash(f'PDF报告生成失败: {str(e)}', 'error')
+        return redirect(url_for('statistics'))
 
 @app.route('/receivables')
 @login_required

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编辑收支记录 - 七彩果坊</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+</style>
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#6366F1',
+secondary:'#34D399'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+}
+}
+}
+}
+</script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+<div class="flex">
+<nav class="w-64 bg-white/80 backdrop-blur-lg shadow-xl h-screen fixed left-0 top-0 z-10">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-12">
+<div class="w-10 h-10 bg-gradient-to-r from-primary to-purple-500 rounded-xl flex items-center justify-center">
+<span class="font-['Pacifico'] text-white text-lg">L</span>
+</div>
+<span class="font-['Pacifico'] text-xl text-gray-800">logo</span>
+</div>
+<div class="space-y-2">
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/82b8a92d-4b51-4cdf-bcd4-112f15a6305f" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>仪表板</span>
+</a>
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/82b8a92d-4b51-4cdf-bcd4-112f15a6305f" data-readdy="true" class="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-primary/10 to-purple-100 rounded-xl text-primary">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-3-line"></i>
+</div>
+<span class="font-medium">收支记录</span>
+</a>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>财务分析</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-add-circle-line"></i>
+</div>
+<span>添加收支</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-store-2-line"></i>
+</div>
+<span>供应商管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-shopping-bag-line"></i>
+</div>
+<span>商品管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<span>应收款</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-file-list-line"></i>
+</div>
+<span>分类管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-team-line"></i>
+</div>
+<span>用户管理</span>
+</div>
+<div class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>系统设置</span>
+</div>
+</div>
+</div>
+</nav>
+<main class="ml-64 flex-1 p-8">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center space-x-4">
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/82b8a92d-4b51-4cdf-bcd4-112f15a6305f" data-readdy="true" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-primary hover:bg-primary/5 rounded-xl transition-colors">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-left-line"></i>
+</div>
+</a>
+<div>
+<h1 class="text-3xl font-bold text-gray-900 mb-2">编辑收支记录</h1>
+<p class="text-gray-600">修改交易记录的详细信息</p>
+</div>
+</div>
+</div>
+<div class="bg-white/60 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 p-8">
+<form id="editRecordForm" class="space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-3">
+交易日期 <span class="text-red-500">*</span>
+</label>
+<input type="date" id="transactionDate" value="2025-08-08" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-3">
+交易类型 <span class="text-red-500">*</span>
+</label>
+<div class="flex space-x-4">
+<label class="flex items-center space-x-3 cursor-pointer">
+<div class="relative">
+<input type="radio" name="transactionType" value="income" checked class="sr-only">
+<div class="w-5 h-5 border-2 border-primary rounded-full flex items-center justify-center transition-colors">
+<div class="w-2.5 h-2.5 bg-primary rounded-full"></div>
+</div>
+</div>
+<span class="text-sm font-medium text-gray-700">收入</span>
+</label>
+<label class="flex items-center space-x-3 cursor-pointer">
+<div class="relative">
+<input type="radio" name="transactionType" value="expense" class="sr-only">
+<div class="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center transition-colors">
+<div class="w-2.5 h-2.5 bg-transparent rounded-full transition-colors"></div>
+</div>
+</div>
+<span class="text-sm font-medium text-gray-700">支出</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-3">
+分类 <span class="text-red-500">*</span>
+</label>
+<div class="relative">
+<button type="button" id="categorySelect" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm text-left flex items-center justify-between">
+<span>销售收入</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-3">
+金额 <span class="text-red-500">*</span>
+</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="text-gray-500 text-sm">¥</span>
+</div>
+<input type="text" id="amount" value="3,280.00" placeholder="0.00" class="w-full pl-8 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm">
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-3">
+备注信息
+</label>
+<textarea id="notes" rows="4" placeholder="请输入备注信息..." class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm resize-none">高端水果礼盒</textarea>
+</div>
+<div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+<a href="https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/82b8a92d-4b51-4cdf-bcd4-112f15a6305f" data-readdy="true" class="px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-button whitespace-nowrap transition-colors font-medium !rounded-button">
+取消
+</a>
+<button type="submit" class="px-8 py-3 bg-primary text-white rounded-button whitespace-nowrap hover:bg-primary/90 transition-colors font-medium flex items-center space-x-2 !rounded-button">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-save-line"></i>
+</div>
+<span>保存修改</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</main>
+</div>
+<script id="radio-button-script">
+document.addEventListener('DOMContentLoaded', function() {
+const radioButtons = document.querySelectorAll('input[type="radio"]');
+const categorySelect = document.getElementById('categorySelect');
+function updateRadioButton(radio) {
+const container = radio.parentElement.querySelector('div');
+const dot = container.querySelector('div');
+if (radio.checked) {
+container.classList.remove('border-gray-300');
+container.classList.add('border-primary');
+dot.classList.remove('bg-transparent');
+dot.classList.add('bg-primary');
+} else {
+container.classList.remove('border-primary');
+container.classList.add('border-gray-300');
+dot.classList.remove('bg-primary');
+dot.classList.add('bg-transparent');
+}
+}
+radioButtons.forEach(radio => {
+updateRadioButton(radio);
+radio.addEventListener('change', function() {
+radioButtons.forEach(r => updateRadioButton(r));
+updateCategoryOptions();
+});
+});
+function updateCategoryOptions() {
+const selectedType = document.querySelector('input[name="transactionType"]:checked').value;
+const span = categorySelect.querySelector('span');
+if (selectedType === 'income') {
+span.textContent = '销售收入';
+} else {
+span.textContent = '采购成本';
+}
+}
+});
+</script>
+<script id="dropdown-script">
+document.addEventListener('DOMContentLoaded', function() {
+const categorySelect = document.getElementById('categorySelect');
+const incomeCategories = ['销售收入', '服务收入', '投资收益', '其他收入'];
+const expenseCategories = ['采购成本', '工资薪酬', '租金费用', '水电费', '营销推广', '其他支出'];
+function createDropdown(button, options) {
+const dropdown = document.createElement('div');
+dropdown.className = 'absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20 hidden max-h-48 overflow-y-auto';
+options.forEach(option => {
+const item = document.createElement('button');
+item.type = 'button';
+item.className = 'w-full px-4 py-3 text-left text-sm hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0';
+item.textContent = option;
+item.addEventListener('click', () => {
+button.querySelector('span').textContent = option;
+dropdown.classList.add('hidden');
+});
+dropdown.appendChild(item);
+});
+button.parentElement.appendChild(dropdown);
+button.addEventListener('click', (e) => {
+e.preventDefault();
+dropdown.classList.toggle('hidden');
+});
+document.addEventListener('click', (e) => {
+if (!button.parentElement.contains(e.target)) {
+dropdown.classList.add('hidden');
+}
+});
+return dropdown;
+}
+const categoryDropdown = createDropdown(categorySelect, incomeCategories);
+document.querySelector('input[name="transactionType"]').addEventListener('change', function() {
+const selectedType = document.querySelector('input[name="transactionType"]:checked').value;
+const options = selectedType === 'income' ? incomeCategories : expenseCategories;
+categoryDropdown.innerHTML = '';
+options.forEach(option => {
+const item = document.createElement('button');
+item.type = 'button';
+item.className = 'w-full px-4 py-3 text-left text-sm hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0';
+item.textContent = option;
+item.addEventListener('click', () => {
+categorySelect.querySelector('span').textContent = option;
+categoryDropdown.classList.add('hidden');
+});
+categoryDropdown.appendChild(item);
+});
+});
+});
+</script>
+<script id="amount-format-script">
+document.addEventListener('DOMContentLoaded', function() {
+const amountInput = document.getElementById('amount');
+function formatAmount(value) {
+const number = parseFloat(value.replace(/[^\d.]/g, ''));
+if (isNaN(number)) return '';
+return number.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+amountInput.addEventListener('input', function() {
+const cursorPosition = this.selectionStart;
+const oldValue = this.value;
+const newValue = formatAmount(this.value);
+this.value = newValue;
+});
+amountInput.addEventListener('blur', function() {
+if (this.value && !this.value.includes('.')) {
+this.value = formatAmount(this.value + '.00');
+}
+});
+});
+</script>
+<script id="form-submit-script">
+document.addEventListener('DOMContentLoaded', function() {
+const form = document.getElementById('editRecordForm');
+const submitButton = form.querySelector('button[type="submit"]');
+form.addEventListener('submit', function(e) {
+e.preventDefault();
+const requiredFields = [
+document.getElementById('transactionDate'),
+document.querySelector('input[name="transactionType"]:checked'),
+document.getElementById('amount')
+];
+let isValid = true;
+requiredFields.forEach(field => {
+if (!field || !field.value.trim()) {
+isValid = false;
+if (field && field.parentElement) {
+field.parentElement.classList.add('shake');
+setTimeout(() => {
+field.parentElement.classList.remove('shake');
+}, 500);
+}
+}
+});
+if (!isValid) {
+alert('请填写所有必填项！');
+return;
+}
+submitButton.disabled = true;
+submitButton.innerHTML = `
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-loader-4-line animate-spin"></i>
+</div>
+<span>保存中...</span>
+`;
+setTimeout(() => {
+alert('保存成功！');
+window.location.href = 'https://readdy.ai/home/68da4db0-274b-4402-92aa-4741c9138de8/82b8a92d-4b51-4cdf-bcd4-112f15a6305f';
+}, 1500);
+});
+});
+</script>
+<style>
+@keyframes shake {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-5px); }
+75% { transform: translateX(5px); }
+}
+.shake {
+animation: shake 0.5s ease-in-out;
+}
+</style>
+</body>
+</html>

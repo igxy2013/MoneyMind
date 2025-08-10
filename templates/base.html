@@ -215,6 +215,23 @@
         </main>
     </div>
     {% else %}
+        <div class="p-4 md:p-8 max-w-md mx-auto">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-xl {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %} flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>
+                                {{ message }}
+                            </div>
+                            <button type="button" class="text-current" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
         {% block auth_content %}{% endblock %}
     {% endif %}
     
