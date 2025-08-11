@@ -31,37 +31,13 @@
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
     
     <!-- 样式文件 -->
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="{{ url_for('static', filename='css/tailwind-built.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/all.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/mobile.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css" rel="stylesheet">
     
     <!-- Tailwind CSS 配置 -->
-    <script>
-    tailwind.config={
-        theme:{
-            extend:{
-                colors:{
-                    primary:'#6366F1',
-                    secondary:'#34D399'
-                },
-                borderRadius:{
-                    'none':'0px',
-                    'sm':'4px',
-                    DEFAULT:'8px',
-                    'md':'12px',
-                    'lg':'16px',
-                    'xl':'20px',
-                    '2xl':'24px',
-                    '3xl':'32px',
-                    'full':'9999px',
-                    'button':'8px'
-                }
-            }
-        }
-    }
-    </script>
+
 
     
     {% block extra_head %}{% endblock %}

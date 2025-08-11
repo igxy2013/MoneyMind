@@ -1,0 +1,28 @@
+{
+  "name": "moneymind",
+  "version": "1.0.0",
+  "description": "一个专为社区团购企业设计的企业级记账管理系统。",
+  "main": "index.js",
+  "scripts": {
+    "build-css": "tailwindcss -i ./static/css/tailwind.css -o ./static/css/tailwind-built.css --watch",
+    "build-css-prod": "tailwindcss -i ./static/css/tailwind.css -o ./static/css/tailwind-built.css --minify",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/igxy2013/MoneyMind.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/igxy2013/MoneyMind/issues"
+  },
+  "homepage": "https://github.com/igxy2013/MoneyMind#readme",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "tailwindcss": "^3.4.17"
+  }
+}
