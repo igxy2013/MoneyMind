@@ -36,10 +36,7 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
-# Tailwind CSS 构建产物
-static/css/tailwind-built.css
-
-# 构建脚本
+# 构建脚本（开发用）
 build-css.bat
 
 # 文档文件（可选，如果不想上传）
