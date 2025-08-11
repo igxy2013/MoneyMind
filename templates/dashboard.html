@@ -251,13 +251,11 @@
 <table class="w-full">
 <thead>
 <tr class="border-b border-gray-200">
-<th class="text-left py-3 px-4 font-medium text-gray-700">日期</th>
-<th class="text-left py-3 px-4 font-medium text-gray-700">类型</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">交易日期</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">交易类型</th>
 <th class="text-left py-3 px-4 font-medium text-gray-700">分类</th>
-<th class="text-left py-3 px-4 font-medium text-gray-700">交易对象</th>
 <th class="text-right py-3 px-4 font-medium text-gray-700">金额</th>
-<th class="text-left py-3 px-4 font-medium text-gray-700">支付方式</th>
-<th class="text-left py-3 px-4 font-medium text-gray-700">操作</th>
+<th class="text-left py-3 px-4 font-medium text-gray-700">备注信息</th>
 </tr>
 </thead>
 <tbody>
@@ -272,18 +270,10 @@
 {% endif %}
 </td>
 <td class="py-3 px-4 text-gray-700">{{ transaction.category.name if transaction.category else '-' }}</td>
-<td class="py-3 px-4 text-gray-700">{{ transaction.description or '-' }}</td>
 <td class="py-3 px-4 text-right font-medium {% if transaction.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
 {% if transaction.type == 'income' %}+{% else %}-{% endif %}¥{{ "%.2f"|format(transaction.amount) }}
 </td>
-<td class="py-3 px-4 text-gray-700">{{ transaction.payment_method or '-' }}</td>
-<td class="py-3 px-4">
-<button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
-<div class="w-4 h-4 flex items-center justify-center">
-<i class="ri-more-line"></i>
-</div>
-</button>
-</td>
+<td class="py-3 px-4 text-gray-700">{{ transaction.description or '-' }}</td>
 </tr>
 {% endfor %}
 </tbody>
