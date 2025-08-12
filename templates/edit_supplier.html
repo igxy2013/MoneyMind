@@ -2,6 +2,10 @@
 
 {% block title %}编辑供应商 - 七彩果坊经营管理系统{% endblock %}
 
+{% block extra_head %}
+<script src="{{ url_for('static', filename='js/offline-upload.js') }}"></script>
+{% endblock %}
+
 
 {% block content %}
 <div class="row mb-4">
@@ -16,7 +20,7 @@
     <div class="col-md-8 col-lg-6">
         <div class="card">
             <div class="card-body p-4">
-                <form method="POST" enctype="multipart/form-data">
+                <form id="editSupplierForm" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="name" class="form-label">供应商名称 *</label>
                         <input type="text" class="form-control" id="name" name="name" 
@@ -210,6 +214,8 @@
 </style>
 
 <script>
+let selectedFiles = [];
+const supplierId = {{ supplier.id }};
 
 // 删除图片
 async function deleteImage(imageId, supplierId) {
@@ -238,8 +244,9 @@ async function deleteImage(imageId, supplierId) {
 document.getElementById('images').addEventListener('change', function(e) {
     const preview = document.getElementById('image-preview');
     preview.innerHTML = '';
+    selectedFiles = Array.from(e.target.files);
     
-    for (let file of e.target.files) {
+    for (let file of selectedFiles) {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -252,6 +259,78 @@ document.getElementById('images').addEventListener('change', function(e) {
             };
             reader.readAsDataURL(file);
         }
+    }
+});
+
+// 表单提交处理
+document.getElementById('editSupplierForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    formData.append('name', document.getElementById('name').value);
+    formData.append('contact_person', document.getElementById('contact_person').value);
+    formData.append('phone', document.getElementById('phone').value);
+    formData.append('supply_method', document.getElementById('supply_method').value);
+    formData.append('address', document.getElementById('address').value);
+    
+    try {
+        // 先更新供应商基本信息
+        const response = await fetch(`/edit_supplier/${supplierId}`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            // 如果有新图片需要上传
+            if (selectedFiles.length > 0) {
+                if (window.offlineUploader) {
+                    try {
+                        const uploadResults = await window.offlineUploader.uploadImages(
+                            selectedFiles, 
+                            supplierId
+                        );
+                        
+                        const savedToLocal = uploadResults.filter(r => r.saved && !r.uploaded);
+                        if (savedToLocal.length > 0) {
+                            alert(`供应商信息已更新！${savedToLocal.length} 个图片文件已保存到本地，将在网络恢复后自动上传`);
+                        } else {
+                            alert('供应商信息和图片已成功更新！');
+                        }
+                    } catch (error) {
+                        console.error('图片上传处理失败:', error);
+                        alert('供应商信息已更新，但图片上传失败，请稍后重试');
+                    }
+                } else {
+                    // 降级到原有上传方式
+                    const imageFormData = new FormData();
+                    selectedFiles.forEach(file => {
+                        imageFormData.append('images', file);
+                    });
+                    
+                    const imageResponse = await fetch(`/api/supplier/${supplierId}/images`, {
+                        method: 'POST',
+                        body: imageFormData
+                    });
+                    
+                    if (imageResponse.ok) {
+                        alert('供应商信息和图片已成功更新！');
+                    } else {
+                        alert('供应商信息已更新，但图片上传失败，请稍后重试');
+                    }
+                }
+            } else {
+                alert('供应商信息已成功更新！');
+            }
+            
+            // 跳转到供应商列表页面
+            window.location.href = '/suppliers';
+        } else {
+            const errorText = await response.text();
+            alert('更新失败：' + errorText);
+        }
+    } catch (error) {
+        console.error('更新供应商时出错:', error);
+        alert('更新供应商时出错，请重试');
     }
 });
 

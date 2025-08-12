@@ -4,6 +4,7 @@
 
 {% block extra_head %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<script src="{{ url_for('static', filename='js/offline-upload.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -772,22 +773,47 @@ document.addEventListener('DOMContentLoaded', function() {
                  
                  // 如果有新图片需要上传
                  if (newSelectedFiles.length > 0) {
-                     const uploadFormData = new FormData();
-                     newSelectedFiles.forEach(file => {
-                         uploadFormData.append('images', file);
-                     });
+                     const targetSupplierId = supplierId || result.id;
                      
-                     const imageUploadUrl = supplierId ? 
-                         `/api/supplier/${supplierId}/images` : 
-                         `/api/supplier/${result.id}/images`;
-                     
-                     const imageResponse = await fetch(imageUploadUrl, {
-                         method: 'POST',
-                         body: uploadFormData
-                     });
-                     
-                     if (!imageResponse.ok) {
-                          console.warn('图片上传失败，但供应商信息已保存');
+                     // 使用离线上传功能
+                     if (window.offlineUploader) {
+                         try {
+                             const uploadResults = await window.offlineUploader.uploadImages(
+                                 newSelectedFiles, 
+                                 targetSupplierId
+                             );
+                             
+                             // 检查上传结果
+                             const failedUploads = uploadResults.filter(r => !r.success);
+                             if (failedUploads.length > 0) {
+                                 console.warn(`${failedUploads.length} 个文件上传失败或保存到本地`);
+                             }
+                             
+                             const savedToLocal = uploadResults.filter(r => r.saved && !r.uploaded);
+                             if (savedToLocal.length > 0) {
+                                 alert(`${savedToLocal.length} 个文件已保存到本地，将在网络恢复后自动上传`);
+                             }
+                         } catch (error) {
+                             console.error('图片上传处理失败:', error);
+                             alert('图片上传处理失败，但供应商信息已保存');
+                         }
+                     } else {
+                         // 降级到原有上传方式
+                         const uploadFormData = new FormData();
+                         newSelectedFiles.forEach(file => {
+                             uploadFormData.append('images', file);
+                         });
+                         
+                         const imageUploadUrl = `/api/supplier/${targetSupplierId}/images`;
+                         
+                         const imageResponse = await fetch(imageUploadUrl, {
+                             method: 'POST',
+                             body: uploadFormData
+                         });
+                         
+                         if (!imageResponse.ok) {
+                              console.warn('图片上传失败，但供应商信息已保存');
+                          }
                       }
                   }
                   
