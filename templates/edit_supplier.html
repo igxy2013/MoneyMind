@@ -48,43 +48,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="importance_level" class="form-label">重要程度</label>
-                                <select class="form-select" id="importance_level" name="importance_level">
-                                    <option value="">请选择重要程度</option>
-                                    <option value="核心供应商" {% if supplier.importance_level == '核心供应商' %}selected{% endif %}>核心供应商</option>
-                                    <option value="备用供应商" {% if supplier.importance_level == '备用供应商' %}selected{% endif %}>备用供应商</option>
-                                    <option value="临时供应商" {% if supplier.importance_level == '临时供应商' %}selected{% endif %}>临时供应商</option>
-                                </select>
-                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="supply_categories" class="form-label">供货品类</label>
-                        <div id="categories-container">
-                            {% for category in supplier.supply_categories_list %}
-                            <div class="input-group mb-2">
-                                <select class="form-select" name="supply_categories">
-                                    <option value="">请选择商品</option>
-                                    <option value="{{ category.product_name }}" selected>{{ category.product_name }}</option>
-                                </select>
-                                <button type="button" class="btn btn-outline-danger" onclick="removeCategory(this)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                            {% endfor %}
-                            <div class="input-group mb-2">
-                                <select class="form-select" name="supply_categories">
-                                    <option value="">请选择商品</option>
-                                </select>
-                                <button type="button" class="btn btn-outline-success" onclick="addCategory()">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <small class="form-text text-muted">从商品管理中选择该供应商供应的商品</small>
                     </div>
                     
                     <div class="mb-3">
@@ -97,10 +61,17 @@
                                     <div class="position-relative">
                                         <img src="{{ url_for('static', filename=image.image_path) }}" 
                                              alt="供应商图片" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
-                                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" 
+                                        <button type="button" class="btn btn-danger position-absolute top-0 end-0 m-1 delete-image-btn" 
                                                 onclick="deleteImage({{ image.id }}, {{ supplier.id }})">
                                             <i class="fas fa-times"></i>
                                         </button>
+                                        <!-- 移动端专用删除按钮 -->
+                                        <div class="mobile-delete-btn d-md-none">
+                                            <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-2" 
+                                                    onclick="deleteImage({{ image.id }}, {{ supplier.id }})">
+                                                <i class="fas fa-trash-alt me-1"></i>移除图片
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -119,16 +90,7 @@
                                   placeholder="请输入详细地址">{{ supplier.address or '' }}</textarea>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
-                                   {% if supplier.is_active %}checked{% endif %}>
-                            <label class="form-check-label" for="is_active">
-                                启用供应商
-                            </label>
-                        </div>
-                        <small class="form-text text-muted">取消勾选将停用该供应商</small>
-                    </div>
+
                     
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
@@ -144,107 +106,110 @@
     </div>
 </div>
 
-<script>
-// 加载商品列表
-async function loadProducts() {
-    try {
-        const response = await fetch('/api/products', {
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const products = await response.json();
-        
-        const selects = document.querySelectorAll('select[name="supply_categories"]');
-        selects.forEach(select => {
-            // 保留第一个选项和已选中的选项
-            const selectedValue = select.value;
-            select.innerHTML = '<option value="">请选择商品</option>';
-            
-            // 添加商品选项
-            products.forEach(product => {
-                const option = document.createElement('option');
-                option.value = product;
-                option.textContent = product;
-                if (product === selectedValue) {
-                    option.selected = true;
-                }
-                select.appendChild(option);
-            });
-        });
-    } catch (error) {
-        console.error('加载商品列表失败:', error);
-        // 如果是认证错误，重定向到登录页面
-        if (error.message && error.message.includes('401')) {
-            window.location.href = '/login';
-        }
-    }
+<style>
+/* 移动端删除按钮优化 */
+.delete-image-btn {
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    border: 3px solid white;
+    background-color: #dc2626 !important;
+    z-index: 10;
 }
 
-// 添加品类选择框
-function addCategory() {
-    const container = document.getElementById('categories-container');
-    const newGroup = document.createElement('div');
-    newGroup.className = 'input-group mb-2';
-    newGroup.innerHTML = `
-        <select class="form-select" name="supply_categories">
-            <option value="">请选择商品</option>
-        </select>
-        <button type="button" class="btn btn-outline-danger" onclick="removeCategory(this)">
-            <i class="fas fa-minus"></i>
-        </button>
-    `;
-    container.appendChild(newGroup);
+.delete-image-btn i {
+    font-size: 16px;
+    color: white !important;
+}
+
+.delete-image-btn:hover {
+    background-color: #b91c1c !important;
+    transform: scale(1.1);
+}
+
+/* 移动端删除按钮样式 */
+.mobile-delete-btn .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.mobile-delete-btn .btn:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.mobile-delete-btn .btn:active {
+    transform: scale(0.98);
+}
+
+/* 移动端特殊优化 */
+@media (max-width: 768px) {
+    .delete-image-btn {
+        min-width: 56px;
+        min-height: 56px;
+        margin: 4px !important;
+        top: -8px !important;
+        right: -8px !important;
+    }
     
-    // 为新添加的选择框加载商品列表
-    const newSelect = newGroup.querySelector('select');
-    loadProductsForSelect(newSelect);
-}
-
-// 移除品类选择框
-function removeCategory(button) {
-    button.closest('.input-group').remove();
-}
-
-// 为指定选择框加载商品列表
-async function loadProductsForSelect(select) {
-    try {
-        const response = await fetch('/api/products', {
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const products = await response.json();
-        
-        select.innerHTML = '<option value="">请选择商品</option>';
-        products.forEach(product => {
-            const option = document.createElement('option');
-            option.value = product;
-            option.textContent = product;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('加载商品列表失败:', error);
-        // 如果是认证错误，重定向到登录页面
-        if (error.message && error.message.includes('401')) {
-            window.location.href = '/login';
-        }
+    .delete-image-btn i {
+        font-size: 20px;
+    }
+    
+    /* 图片容器在移动端的优化 */
+    .position-relative {
+        margin-bottom: 20px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .position-relative img {
+        border-radius: 12px;
+    }
+    
+    /* 增加图片容器的内边距，为删除按钮留出空间 */
+    .col-md-4 {
+        padding: 8px;
+    }
+    
+    .mobile-delete-btn {
+        margin-top: 8px;
     }
 }
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .delete-image-btn {
+        min-width: 60px;
+        min-height: 60px;
+        top: -10px !important;
+        right: -10px !important;
+    }
+    
+    .delete-image-btn:active {
+        transform: scale(0.9);
+        transition: transform 0.15s ease;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.6);
+    }
+    
+    .delete-image-btn i {
+        font-size: 22px;
+    }
+    
+    .mobile-delete-btn .btn {
+        padding: 12px;
+        font-size: 16px;
+    }
+}
+</style>
+
+<script>
 
 // 删除图片
 async function deleteImage(imageId, supplierId) {
@@ -292,7 +257,7 @@ document.getElementById('images').addEventListener('change', function(e) {
 
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', function() {
-    loadProducts();
+    // 初始化完成
 });
 </script>
-{% endblock %} 
+{% endblock %}

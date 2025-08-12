@@ -2569,24 +2569,10 @@
         border-color: #3b82f6 !important;
     }
     
-    /* 供应商名称和头像 - 现代化布局 */
+    /* 供应商名称 - 简化布局 */
     .suppliers-container .supplier-row td:nth-child(2) {
         margin-bottom: 0.75rem !important;
         padding-right: 2.5rem !important;
-    }
-    
-    .suppliers-container .supplier-row td:nth-child(2) .flex.items-center.space-x-3 {
-        flex-wrap: nowrap !important;
-        gap: 0.75rem !important;
-        align-items: center !important;
-    }
-    
-    .suppliers-container .supplier-row td:nth-child(2) .w-10.h-10 {
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-        flex-shrink: 0 !important;
-        border-radius: 0.625rem !important;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.08) !important;
     }
     
     .suppliers-container .supplier-row td:nth-child(2) .font-semibold {
@@ -2595,12 +2581,6 @@
         line-height: 1.2 !important;
         color: #1f2937 !important;
         margin-bottom: 0.25rem !important;
-    }
-    
-    .suppliers-container .supplier-row td:nth-child(2) .text-sm {
-        font-size: 0.8rem !important;
-        color: #6b7280 !important;
-        font-weight: 500 !important;
     }
     
     /* 信息网格布局 */
@@ -2616,16 +2596,14 @@
         border: 1px solid rgba(226, 232, 240, 0.6) !important;
     }
     
-    .suppliers-container .supplier-row td:nth-child(3):before,
-    .suppliers-container .supplier-row td:nth-child(4):before,
-    .suppliers-container .supplier-row td:nth-child(5):before {
-        content: attr(data-label) !important;
+    .suppliers-container .supplier-row td:nth-child(3):before {
+        content: "联系人" !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
         min-width: 3rem !important;
         height: 1.5rem !important;
-        background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+        background: #c4b5fd !important;
         color: white !important;
         font-size: 0.7rem !important;
         font-weight: 600 !important;
@@ -2634,19 +2612,36 @@
         flex-shrink: 0 !important;
     }
     
-    .suppliers-container .supplier-row td:nth-child(3):before {
-        content: "👤" !important;
-        background: linear-gradient(135deg, #10b981, #059669) !important;
-    }
-    
     .suppliers-container .supplier-row td:nth-child(4):before {
-        content: "📞" !important;
-        background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+        content: "电话" !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 3rem !important;
+        height: 1.5rem !important;
+        background: #c4b5fd !important;
+        color: white !important;
+        font-size: 0.7rem !important;
+        font-weight: 600 !important;
+        border-radius: 0.375rem !important;
+        margin-right: 0.5rem !important;
+        flex-shrink: 0 !important;
     }
     
     .suppliers-container .supplier-row td:nth-child(5):before {
-        content: "📍" !important;
-        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        content: "地址" !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 3rem !important;
+        height: 1.5rem !important;
+        background: #c4b5fd !important;
+        color: white !important;
+        font-size: 0.7rem !important;
+        font-weight: 600 !important;
+        border-radius: 0.375rem !important;
+        margin-right: 0.5rem !important;
+        flex-shrink: 0 !important;
     }
     
     .suppliers-container .supplier-row td:nth-child(3) .text-gray-900,
@@ -2658,45 +2653,114 @@
         flex: 1 !important;
     }
     
+    /* 电话号码拨打按钮 - 仅在移动设备显示 */
+    .phone-call-btn {
+        display: none !important;
+    }
+    
+    @media (max-width: 768px) {
+        .phone-call-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 4rem !important;
+            height: 1.8rem !important;
+            background: #10b981 !important;
+            color: white !important;
+            font-size: 0.65rem !important;
+            font-weight: 600 !important;
+            border-radius: 0.375rem !important;
+            margin-left: 0.5rem !important;
+            text-decoration: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: background-color 0.2s ease !important;
+        }
+        
+        .phone-call-btn[style*="display: none"] {
+            display: inline-flex !important;
+        }
+        
+        .phone-call-btn:hover {
+            background: #059669 !important;
+        }
+        
+        .phone-call-btn:active {
+            background: #047857 !important;
+        }
+    }
+    
     .suppliers-container .supplier-row td:nth-child(5) .max-w-48 {
         max-width: none !important;
         white-space: normal !important;
         word-break: break-word !important;
     }
     
-    /* 状态和欠款信息 - 特殊样式 */
-    .suppliers-container .supplier-row td:nth-child(6),
-    .suppliers-container .supplier-row td:nth-child(7) {
+    /* 供应商类型显示 */
+    .suppliers-container .supplier-row td:nth-child(6) {
         display: flex !important;
         align-items: center !important;
-        justify-content: space-between !important;
         margin-bottom: 0.5rem !important;
         padding: 0.5rem !important;
+        background: rgba(248, 250, 252, 0.5) !important;
         border-radius: 0.5rem !important;
-    }
-    
-    .suppliers-container .supplier-row td:nth-child(6) {
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1)) !important;
-        border: 1px solid rgba(34, 197, 94, 0.2) !important;
-    }
-    
-    .suppliers-container .supplier-row td:nth-child(7) {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1)) !important;
-        border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        border: 1px solid rgba(226, 232, 240, 0.6) !important;
     }
     
     .suppliers-container .supplier-row td:nth-child(6):before {
-        content: "✅ 状态" !important;
-        font-size: 0.8rem !important;
+        content: "类型" !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 3rem !important;
+        height: 1.5rem !important;
+        background: #c4b5fd !important;
+        color: white !important;
+        font-size: 0.7rem !important;
         font-weight: 600 !important;
-        color: #059669 !important;
+        border-radius: 0.375rem !important;
+        margin-right: 0.5rem !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .suppliers-container .supplier-row td:nth-child(6) .inline-flex {
+        font-size: 0.8rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+    
+    /* 产品信息显示 */
+    .suppliers-container .supplier-row td:nth-child(7) {
+        display: flex !important;
+        align-items: center !important;
+        margin-bottom: 0.5rem !important;
+        padding: 0.5rem !important;
+        background: rgba(248, 250, 252, 0.5) !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid rgba(226, 232, 240, 0.6) !important;
     }
     
     .suppliers-container .supplier-row td:nth-child(7):before {
-        content: "💰 欠款" !important;
-        font-size: 0.8rem !important;
+        content: "产品" !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 3rem !important;
+        height: 1.5rem !important;
+        background: #c4b5fd !important;
+        color: white !important;
+        font-size: 0.7rem !important;
         font-weight: 600 !important;
-        color: #dc2626 !important;
+        border-radius: 0.375rem !important;
+        margin-right: 0.5rem !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .suppliers-container .supplier-row td:nth-child(7) .text-gray-900 {
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        color: #374151 !important;
+        line-height: 1.4 !important;
+        word-break: break-word !important;
     }
     
     /* 操作按钮 - 现代化设计 */
@@ -2708,15 +2772,7 @@
     }
     
     .suppliers-container .supplier-row td:last-child:before {
-        content: "⚡ 快捷操作" !important;
-        position: absolute !important;
-        top: -0.5rem !important;
-        left: 1rem !important;
-        background: white !important;
-        padding: 0 0.5rem !important;
-        font-size: 0.75rem !important;
-        font-weight: 600 !important;
-        color: #6b7280 !important;
+        display: none !important;
     }
     
     .suppliers-container .supplier-row td:last-child .flex {

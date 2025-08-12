@@ -106,13 +106,12 @@ class Supplier(db.Model):
     name = db.Column(db.String(100), nullable=False)
     contact_person = db.Column(db.String(50))
     phone = db.Column(db.String(20))
-    email = db.Column(db.String(120))
     address = db.Column(db.String(200))
-    supplier_type = db.Column(db.String(50))  # 保留原字段用于兼容
-    supply_categories = db.Column(db.Text)  # 保留原字段用于兼容
+    supplier_type = db.Column(db.String(50))  # 供应商类型：生鲜供应商、包装材料供应商、设备供应商、服务供应商
+    products = db.Column(db.Text)  # 产品信息
     image_path = db.Column(db.String(255))  # 保留原字段用于兼容
     supply_method = db.Column(db.String(50))  # 供应方式：产地直供/合作社、本地批发市场供应商、一件代发供应商、社区本地农户/小农场
-    importance_level = db.Column(db.String(50))  # 重要程度：核心供应商、备用供应商、临时供应商
+    notes = db.Column(db.Text)  # 备注信息
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
 
@@ -123,12 +122,7 @@ class SupplierImage(db.Model):
     upload_time = db.Column(db.DateTime, default=datetime.utcnow)
     supplier = db.relationship('Supplier', backref='images')
 
-class SupplierSupplyCategory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'), nullable=False)
-    product_name = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    supplier = db.relationship('Supplier', backref='supply_categories_list')
+
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -143,7 +137,7 @@ class Product(db.Model):
     image_path = db.Column(db.String(255))  # 商品图片路径
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
-    supplier = db.relationship('Supplier', backref='products')
+    supplier = db.relationship('Supplier', backref='product_list')
 
 class Receivable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -257,7 +251,7 @@ def dashboard():
     total_categories = Category.query.count()
     
     # 活跃数据统计
-    active_suppliers = Supplier.query.filter_by(is_active=True).count()
+    active_suppliers = Supplier.query.count()
     active_products = Product.query.filter_by(is_active=True).count()
     active_users = User.query.filter_by(is_active=True).count()
     
@@ -477,7 +471,7 @@ def transactions():
         page=page, per_page=20, error_out=False)
     
     categories = Category.query.all()
-    suppliers = Supplier.query.filter_by(is_active=True).all()
+    suppliers = Supplier.query.all()
     products = Product.query.filter_by(is_active=True).all()
     
     # 传递当前筛选参数到模板
@@ -680,7 +674,7 @@ def add_transaction():
     transaction_type = request.args.get('type', 'expense')
     categories = Category.query.all()
     
-    suppliers = Supplier.query.filter_by(is_active=True).all()
+    suppliers = Supplier.query.all()
     products = Product.query.filter_by(is_active=True).all()
     today = datetime.now().strftime('%Y-%m-%d')
     return render_template('add_transaction.html', categories=categories, suppliers=suppliers, products=products, today=today, transaction_type=transaction_type)
@@ -706,7 +700,7 @@ def edit_transaction(id):
         return redirect(url_for('transactions'))
     
     categories = Category.query.all()
-    suppliers = Supplier.query.filter_by(is_active=True).all()
+    suppliers = Supplier.query.all()
     products = Product.query.filter_by(is_active=True).all()
     return render_template('edit_transaction.html', transaction=transaction, categories=categories, suppliers=suppliers, products=products)
 
@@ -799,29 +793,23 @@ def add_supplier():
         contact_person = request.form['contact_person']
         phone = request.form['phone']
         address = request.form['address']
+        supplier_type = request.form.get('supplier_type', '')
+        products = request.form.get('products', '')
         supply_method = request.form.get('supply_method', '')
-        importance_level = request.form.get('importance_level', '')
-        supply_categories = request.form.getlist('supply_categories')  # 获取多个品类
+        notes = request.form.get('notes', '')
         
         supplier = Supplier(
             name=name,
             contact_person=contact_person,
             phone=phone,
             address=address,
+            supplier_type=supplier_type,
+            products=products,
             supply_method=supply_method,
-            importance_level=importance_level
+            notes=notes
         )
         db.session.add(supplier)
         db.session.flush()  # 获取supplier.id
-        
-        # 添加供货品类
-        for category in supply_categories:
-            if category.strip():
-                supply_category = SupplierSupplyCategory(
-                    supplier_id=supplier.id,
-                    product_name=category.strip()
-                )
-                db.session.add(supply_category)
         
         # 处理图片上传
         if 'images' in request.files:
@@ -855,22 +843,10 @@ def edit_supplier(id):
         supplier.contact_person = request.form['contact_person']
         supplier.phone = request.form['phone']
         supplier.address = request.form['address']
+        supplier.supplier_type = request.form.get('supplier_type', '')
+        supplier.products = request.form.get('products', '')
         supplier.supply_method = request.form.get('supply_method', '')
-        supplier.importance_level = request.form.get('importance_level', '')
-        supplier.is_active = 'is_active' in request.form
-        
-        # 更新供货品类
-        new_categories = request.form.getlist('supply_categories')
-        # 删除旧的品类
-        SupplierSupplyCategory.query.filter_by(supplier_id=supplier.id).delete()
-        # 添加新的品类
-        for category in new_categories:
-            if category.strip():
-                supply_category = SupplierSupplyCategory(
-                    supplier_id=supplier.id,
-                    product_name=category.strip()
-                )
-                db.session.add(supply_category)
+        supplier.notes = request.form.get('notes', '')
         
         # 处理图片上传
         if 'images' in request.files:
@@ -900,7 +876,7 @@ def delete_supplier(id):
     supplier = Supplier.query.get_or_404(id)
     
     # 检查是否有关联的交易或商品
-    if supplier.transactions or supplier.products:
+    if supplier.transactions or supplier.product_list:
         flash('无法删除：该供应商下有关联的交易记录或商品', 'error')
     else:
         # 删除供应商图片
@@ -1001,12 +977,11 @@ def api_supplier_detail(id):
         'name': supplier.name,
         'contact_person': supplier.contact_person,
         'phone': supplier.phone,
-        'email': supplier.email,
         'address': supplier.address,
         'supplier_type': supplier.supplier_type,
-        'supply_categories': supplier.supply_categories,
+        'products': supplier.products,
         'supply_method': supplier.supply_method,
-        'importance_level': supplier.importance_level,
+        'notes': supplier.notes,
         'is_active': supplier.is_active,
         'created_at': supplier.created_at.strftime('%Y-%m-%d %H:%M:%S') if supplier.created_at else None
     })
@@ -1022,9 +997,10 @@ def api_update_supplier(id):
         supplier.name = data.get('name', supplier.name)
         supplier.contact_person = data.get('contact_person', supplier.contact_person)
         supplier.phone = data.get('phone', supplier.phone)
-        supplier.email = data.get('email', supplier.email)
         supplier.address = data.get('address', supplier.address)
-        supplier.is_active = data.get('is_active', supplier.is_active)
+        supplier.supplier_type = data.get('supplier_type', supplier.supplier_type)
+        supplier.products = data.get('products', supplier.products)
+        supplier.notes = data.get('notes', supplier.notes)
         
         db.session.commit()
         return jsonify({'message': '供应商更新成功'})
@@ -1045,7 +1021,9 @@ def api_create_supplier():
             phone=data.get('phone'),
             email=data.get('email'),
             address=data.get('address'),
-            is_active=data.get('is_active', True)
+            supplier_type=data.get('supplier_type'),
+            products=data.get('products'),
+            is_active=True
         )
         
         db.session.add(supplier)
@@ -1133,7 +1111,7 @@ def api_delete_supplier_image(supplier_id, image_id):
 @login_required
 def products():
     products = Product.query.all()
-    suppliers = Supplier.query.filter_by(is_active=True).all()
+    suppliers = Supplier.query.all()
     categories = Category.query.all()
     return render_template('products.html', products=products, suppliers=suppliers, categories=categories)
 
@@ -1158,7 +1136,7 @@ def add_product():
             if is_ajax:
                 return jsonify({'success': False, 'message': '商品名称已存在'}), 400
             flash('商品名称已存在', 'error')
-            suppliers = Supplier.query.filter_by(is_active=True).all()
+            suppliers = Supplier.query.all()
             return render_template('add_product.html', suppliers=suppliers)
         
         # 处理图片上传
@@ -1182,7 +1160,7 @@ def add_product():
                     if is_ajax:
                         return jsonify({'success': False, 'message': f'图片上传失败: {str(e)}'}), 500
                     flash(f'图片上传失败: {str(e)}', 'error')
-                    suppliers = Supplier.query.filter_by(is_active=True).all()
+                    suppliers = Supplier.query.all()
                     return render_template('add_product.html', suppliers=suppliers)
         
         product = Product(
@@ -1205,7 +1183,7 @@ def add_product():
         flash('商品添加成功！', 'success')
         return redirect(url_for('products'))
     
-    suppliers = Supplier.query.filter_by(is_active=True).all()
+    suppliers = Supplier.query.all()
     categories = Category.query.all()  # 添加分类数据
     return render_template('add_product.html', suppliers=suppliers, categories=categories)
 
@@ -1284,7 +1262,7 @@ def edit_product(id):
             else:
                 flash(error_message, 'error')
     
-    suppliers = Supplier.query.filter_by(is_active=True).all()
+    suppliers = Supplier.query.all()
     return render_template('edit_product.html', product=product, suppliers=suppliers)
 
 @app.route('/delete_product/<int:id>')

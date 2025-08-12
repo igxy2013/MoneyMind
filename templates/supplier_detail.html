@@ -42,7 +42,15 @@
                             </tr>
                             <tr>
                                 <td><strong>电话：</strong></td>
-                                <td>{{ supplier.phone or '未设置' }}</td>
+                                <td>
+                                    {% if supplier.phone %}
+                                        <a href="tel:{{ supplier.phone }}" class="text-decoration-none">
+                                            {{ supplier.phone }}
+                                        </a>
+                                    {% else %}
+                                        未设置
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
                                 <td><strong>地址：</strong></td>
@@ -54,33 +62,27 @@
                         <h6>供应商信息</h6>
                         <table class="table table-borderless">
                             <tr>
-                                <td><strong>类型：</strong></td>
+                                <td><strong>供应方式：</strong></td>
                                 <td>
-                                    {% if supplier.supplier_type %}
-                                        <span class="badge bg-info">{{ supplier.supplier_type }}</span>
+                                    {% if supplier.supply_method %}
+                                        <span class="badge bg-primary">{{ supplier.supply_method }}</span>
                                     {% else %}
                                         <span class="text-muted">未设置</span>
                                     {% endif %}
                                 </td>
                             </tr>
+
                             <tr>
-                                <td><strong>供货品类：</strong></td>
-                                <td>{{ supplier.supply_categories or '未设置' }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>状态：</strong></td>
+                                <td><strong>产品：</strong></td>
                                 <td>
-                                    {% if supplier.is_active %}
-                                        <span class="badge bg-success">活跃</span>
+                                    {% if supplier.products %}
+                                        <span class="text-info">{{ supplier.products }}</span>
                                     {% else %}
-                                        <span class="badge bg-secondary">停用</span>
+                                        <span class="text-muted">未设置</span>
                                     {% endif %}
                                 </td>
                             </tr>
-                            <tr>
-                                <td><strong>创建时间：</strong></td>
-                                <td>{{ supplier.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                            </tr>
+
                         </table>
                     </div>
                 </div>
@@ -110,7 +112,7 @@
             </div>
             <div class="card-body">
                 <ul class="list-unstyled">
-                    {% for product in supplier.products %}
+                    {% for product in supplier.product_list %}
                     <li class="mb-2">
                         <i class="fas fa-box me-2"></i>
                         {{ product.name }}
@@ -169,7 +171,6 @@ function displaySupplierImages(images) {
                      class="img-fluid rounded shadow cursor-pointer" 
                      style="max-height: 300px; max-width: 100%;" 
                      onclick="showImageModal('${imagePath}')">
-                <p class="text-muted mt-2 small">上传时间: ${image.upload_time || '未知'}</p>
             </div>
         `;
     } else {
@@ -184,9 +185,6 @@ function displaySupplierImages(images) {
                              class="img-fluid rounded shadow cursor-pointer w-100" 
                              style="height: 150px; object-fit: cover;" 
                              onclick="showImageModal('${imagePath}')">
-                        <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-75 text-white p-1 rounded-end small">
-                            ${image.upload_time || '未知时间'}
-                        </div>
                     </div>
                 </div>
             `;
