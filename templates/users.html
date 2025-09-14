@@ -7,32 +7,8 @@
 {% endblock %}
 
 {% block content %}
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
-<script>
-tailwind.config={
-    theme:{
-        extend:{
-            colors:{
-                primary:'#6366F1',
-                secondary:'#34D399'
-            },
-            borderRadius:{
-                'none':'0px',
-                'sm':'4px',
-                DEFAULT:'8px',
-                'md':'12px',
-                'lg':'16px',
-                'xl':'20px',
-                '2xl':'24px',
-                '3xl':'32px',
-                'full':'9999px',
-                'button':'8px'
-            }
-        }
-    }
-}
-</script>
+<!-- Tailwind CSS 已在 base.html 中引用 -->
+<link href="{{ url_for('static', filename='css/remixicon.min.css') }}" rel="stylesheet">
 
 <div class="max-w-7xl mx-auto users-page">
     <!-- 页面标题 -->

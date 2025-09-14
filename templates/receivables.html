@@ -3,7 +3,7 @@
 {% block title %}应收款管理 - 七彩果坊经营管理系统{% endblock %}
 
 {% block extra_head %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/remixicon.min.css') }}" rel="stylesheet">
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 </style>
@@ -977,6 +977,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 页面加载完成后执行
     setTimeout(forceMobileLayout, 500);
+}); // 闭合 DOMContentLoaded 事件监听器
 </script>
 
 {% endblock %}

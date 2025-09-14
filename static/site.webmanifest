@@ -93,22 +93,6 @@
             ]
         }
     ],
-    "screenshots": [
-        {
-            "src": "/static/screenshot-mobile.png",
-            "sizes": "540x720",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "移动端主界面"
-        },
-        {
-            "src": "/static/screenshot-desktop.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "桌面端主界面"
-        }
-    ],
     "related_applications": [],
     "prefer_related_applications": false,
     "edge_side_panel": {
