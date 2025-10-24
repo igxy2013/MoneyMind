@@ -2672,4 +2672,4 @@ if __name__ == '__main__':
     print("\n注意: 当前使用Flask开发服务器")
     print("生产环境请使用: python wsgi.py 或 start_wsgi.bat")
     print("="*50)
-    app.run(host='0.0.0.0', port=5085, debug=True)
+    app.run(host='0.0.0.0', port=5070, debug=True)

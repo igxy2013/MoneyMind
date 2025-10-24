@@ -34,11 +34,11 @@ with app.app_context():
 
 # 4. 启动应用
 echo "启动应用..."
-echo "应用将在 http://your-server-ip:5085 上运行"
+echo "应用将在 http://your-server-ip:5070 上运行"
 echo "默认管理员账户: admin / admin123"
 
 # 使用gunicorn启动（推荐用于生产环境）
-gunicorn --bind 0.0.0.0:5085 --workers 4 --timeout 120 wsgi:app
+gunicorn --bind 0.0.0.0:5070 --workers 4 --timeout 120 wsgi:app
 
 # 或者直接使用Flask启动
 # python wsgi.py 

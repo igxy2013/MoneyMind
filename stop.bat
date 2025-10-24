@@ -19,16 +19,16 @@ for /f "tokens=2" %%a in ('tasklist /fi "imagename eq python.exe" /fo table ^| f
     )
 )
 
-:: 检查端口5085是否还在使用
-netstat -an | findstr ":5085" >nul
+:: 检查端口5070是否还在使用
+netstat -an | findstr ":5070" >nul
 if not errorlevel 1 (
-    echo [信息] 端口5085仍在使用，正在强制关闭...
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5085"') do (
+    echo [信息] 端口5070仍在使用，正在强制关闭...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5070"') do (
         taskkill /f /pid %%a >nul 2>&1
-        echo [信息] 已停止占用端口5085的进程 PID: %%a
+        echo [信息] 已停止占用端口5070的进程 PID: %%a
     )
 ) else (
-    echo [信息] 端口5085已释放
+    echo [信息] 端口5070已释放
 )
 
 echo.

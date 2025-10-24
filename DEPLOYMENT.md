@@ -56,7 +56,7 @@ with app.app_context():
 ### 6. 启动应用
 ```bash
 # 使用gunicorn（推荐）
-gunicorn --bind 0.0.0.0:5085 --workers 4 --timeout 120 wsgi:app
+gunicorn --bind 0.0.0.0:5070 --workers 4 --timeout 120 wsgi:app
 
 # 或使用Flask直接启动
 python wsgi.py
@@ -92,12 +92,12 @@ sudo journalctl -u moneymind -f
 
 ### Ubuntu/Debian
 ```bash
-sudo ufw allow 5085
+sudo ufw allow 5070
 ```
 
 ### CentOS/RHEL
 ```bash
-sudo firewall-cmd --permanent --add-port=5085/tcp
+sudo firewall-cmd --permanent --add-port=5070/tcp
 sudo firewall-cmd --reload
 ```
 
@@ -110,7 +110,7 @@ server {
     server_name your-domain.com;
 
     location / {
-        proxy_pass http://127.0.0.1:5085;
+        proxy_pass http://127.0.0.1:5070;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -133,9 +133,9 @@ server {
 
 ## 访问信息
 
-- **URL**: http://your-server-ip:5085
+- **URL**: http://your-server-ip:5070
 - **默认管理员**: admin / admin123
-- **端口**: 5085
+- **端口**: 5070
 
 ## 故障排除
 
@@ -143,8 +143,8 @@ server {
 
 1. **端口被占用**
    ```bash
-   sudo netstat -tlnp | grep 5085
-   sudo lsof -i :5085
+   sudo netstat -tlnp | grep 5070
+   sudo lsof -i :5070
    ```
 
 2. **权限问题**

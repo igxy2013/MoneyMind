@@ -15,7 +15,7 @@ pip install -r requirements.txt
 REM 启动WSGI服务器
 echo.
 echo 启动Waitress WSGI服务器...
-echo 服务器将在 http://127.0.0.1:5085 启动
+echo 服务器将在 http://127.0.0.1:5070 启动
 echo 按 Ctrl+C 停止服务器
 echo.
 python wsgi.py
